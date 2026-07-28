@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Knowledge Base & Documentation Site</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FDFBF7; color: #111111; }
+    h1, h2, h3, h4, .font-serif { font-family: 'Playfair Display', serif; }
+    .prose h1 { font-size: 1.875rem; font-weight: 800; border-bottom: 2px solid #111; padding-bottom: 0.5rem; margin-top: 1.5rem; margin-bottom: 1rem; }
+    .prose h2 { font-size: 1.5rem; font-weight: 700; color: #D43F33; border-bottom: 1px solid #E5E7EB; padding-bottom: 0.3rem; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+    .prose h3 { font-size: 1.25rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; }
+    .prose p { margin-bottom: 1rem; line-height: 1.7; color: #222222; }
+    .prose ul, .prose ol { margin-left: 1.5rem; margin-bottom: 1rem; }
+    .prose ul { list-style-type: disc; }
+    .prose ol { list-style-type: decimal; }
+    .prose code { background: #F3F4F6; padding: 0.15rem 0.35rem; border-radius: 4px; font-family: monospace; font-size: 0.875em; }
+    .prose pre { background: #111; color: #F3F4F6; padding: 1rem; border-radius: 6px; overflow-x: auto; font-family: monospace; }
+    .prose blockquote { border-left: 4px solid #D43F33; padding-left: 1rem; font-style: italic; color: #4B5563; margin: 1rem 0; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="bg-[#111111] text-white border-b border-gray-800 px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <div class="w-8 h-8 rounded bg-[#D43F33] text-white font-serif font-bold flex items-center justify-center text-lg">K</div>
+      <div>
+        <h1 class="text-lg font-bold font-serif tracking-wide">Knowledge Research Library</h1>
+        <p class="text-[11px] text-gray-400 font-mono">Hosted on GitHub Pages</p>
+      </div>
+    </div>
+    <div class="flex items-center space-x-3 text-xs">
+      <a href="https://github.com/ashokishere/TechCollections" target="_blank" class="px-3 py-1.5 rounded bg-gray-800 hover:bg-gray-700 text-white font-bold flex items-center space-x-1.5 transition-colors">
+        <i class="fab fa-github"></i>
+        <span>View Repository</span>
+      </a>
+    </div>
+  </header>
+
+  <div class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
+    <aside class="md:col-span-1 bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-xs flex flex-col h-fit">
+      <h2 class="font-bold uppercase tracking-wider text-xs text-[#111] mb-3 pb-2 border-b border-gray-200 flex items-center justify-between">
+        <span>Published Documents</span>
+        <span id="doc-count" class="text-[10px] bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-mono">0</span>
+      </h2>
+      <input id="search-input" type="text" placeholder="Search documents..." class="w-full text-xs p-2 mb-3 bg-[#F9F9F7] border border-gray-200 rounded focus:outline-none focus:border-[#111]" oninput="filterDocs()" />
+      <div id="doc-list" class="space-y-1 overflow-y-auto max-h-[60vh]">
+        <div class="text-xs text-gray-400 italic p-2">Loading catalog...</div>
+      </div>
+    </aside>
+
+    <main class="md:col-span-3 bg-white border border-[#E5E7EB] rounded-xl p-6 sm:p-8 shadow-xs">
+      <div id="doc-header" class="mb-6 pb-4 border-b border-gray-200 hidden">
+        <div class="flex items-center space-x-2 text-xs text-[#D43F33] font-bold uppercase tracking-widest mb-1">
+          <i class="fas fa-book-open"></i>
+          <span>24-Section Knowledge Document</span>
+        </div>
+        <h1 id="doc-title" class="text-2xl sm:text-3xl font-extrabold font-serif text-[#111]">Select a document</h1>
+        <p id="doc-meta" class="text-xs text-gray-500 font-mono mt-1"></p>
+      </div>
+
+      <div id="doc-content" class="prose max-w-none">
+        <div class="text-center py-16 text-gray-400">
+          <i class="fas fa-file-alt text-4xl mb-3 text-gray-300"></i>
+          <p class="font-serif italic text-base">Select a Knowledge Document from the sidebar to start reading.</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let documents = [];
+
+    async function loadCatalog() {
+      try {
+        const res = await fetch('./docs/data.json');
+        if (res.ok) {
+          documents = await res.json();
+          renderDocList(documents);
+          if (documents.length > 0) {
+            loadDoc(documents[0].filename);
+          }
+        } else {
+          document.getElementById('doc-list').innerHTML = '<div class="text-xs text-amber-700 bg-amber-50 p-2 rounded">No docs/data.json found. You can add documents to docs/ folder.</div>';
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderDocList(docs) {
+      document.getElementById('doc-count').innerText = docs.length;
+      const container = document.getElementById('doc-list');
+      if (docs.length === 0) {
+        container.innerHTML = '<div class="text-xs text-gray-400 italic p-2">No documents published yet.</div>';
+        return;
+      }
+      container.innerHTML = docs.map(d => `
+        <button onclick="loadDoc('${d.filename}')" class="w-full text-left p-2.5 rounded hover:bg-[#F9F9F7] transition-colors border border-transparent hover:border-gray-200 block cursor-pointer">
+          <p class="font-bold text-xs text-[#111] line-clamp-2">${d.title}</p>
+          <p class="text-[10px] text-gray-400 font-mono mt-0.5">${d.date || ''}</p>
+        </button>
+      `).join('');
+    }
+
+    function filterDocs() {
+      const q = document.getElementById('search-input').value.toLowerCase();
+      const filtered = documents.filter(d => d.title.toLowerCase().includes(q) || d.filename.toLowerCase().includes(q));
+      renderDocList(filtered);
+    }
+
+    async function loadDoc(filename) {
+      try {
+        const doc = documents.find(d => d.filename === filename);
+        document.getElementById('doc-header').classList.remove('hidden');
+        document.getElementById('doc-title').innerText = doc ? doc.title : filename;
+        document.getElementById('doc-meta').innerText = doc ? `File: docs/${filename} • Published ${doc.date || ''}` : filename;
+
+        const res = await fetch(`./docs/${filename}`);
+        if (!res.ok) throw new Error('Document file not found');
+        const mdText = await res.text();
+        document.getElementById('doc-content').innerHTML = marked.parse(mdText);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        document.getElementById('doc-content').innerHTML = `<div class="p-4 rounded bg-rose-50 text-rose-800 text-sm font-semibold">Could not load document: ${err.message}</div>`;
+      }
+    }
+
+    window.onload = loadCatalog;
+  </script>
+</body>
+</html>
