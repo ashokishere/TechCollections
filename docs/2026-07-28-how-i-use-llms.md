@@ -336,7 +336,7 @@ print(calculate_prompt_cost(prompt))
 ```
 
 ### Claude Mermaid Artifact Markup
-```markdown
+ 
 ```mermaid
 graph TD
     A[User Input Request] --> B{Requires Real-time Info?}
@@ -347,7 +347,7 @@ graph TD
     E --> G[Autoregressive Answer Generation]
     F --> G
 ```
-```
+ 
 
 ---
 
