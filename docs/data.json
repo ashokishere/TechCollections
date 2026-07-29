@@ -1,5 +1,10 @@
 [
   {
+    "title": "2: Training Deep NNs (cont.); Introduction to Keras/Tensorflow; Application to Tabular Data",
+    "filename": "2026-07-29-2-training-deep-nns-cont-introduction-to-keras-tensorflow-application-to-tabular-data.md",
+    "date": "2026-07-29"
+  },
+  {
     "title": "Most Common Kubernetes Deployment Strategies (Examples & Code)",
     "filename": "2026-07-29-most-common-kubernetes-deployment-strategies-examples-code.md",
     "date": "2026-07-29"
