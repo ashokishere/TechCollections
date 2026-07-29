@@ -6,6 +6,7 @@ This repository contains published 24-section Knowledge Documents generated from
 
 ## 📚 Published Documents
 
+- [9: Generative AI – Large Language Models (LLMs) and Retrieval Augmented Generation (RAG)](./docs/2026-07-29-9-generative-ai-large-language-models-llms-and-retrieval-augmented-generation-rag.md) *(2026-07-29)*
 - [8: Deep Learning for Natural Language – Transformers, Self-Supervised Learning](./docs/2026-07-29-8-deep-learning-for-natural-language-transformers-self-supervised-learning.md) *(2026-07-29)*
 - [7: Deep Learning for Natural Language – Transformers](./docs/2026-07-29-7-deep-learning-for-natural-language-transformers.md) *(2026-07-29)*
 - [6: Deep Learning for Natural Language – Embeddings](./docs/2026-07-29-6-deep-learning-for-natural-language-embeddings.md) *(2026-07-29)*
