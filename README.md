@@ -6,6 +6,7 @@ This repository contains published 24-section Knowledge Documents generated from
 
 ## 📚 Published Documents
 
+- [6: Deep Learning for Natural Language – Embeddings](./docs/2026-07-29-6-deep-learning-for-natural-language-embeddings.md) *(2026-07-29)*
 - [5: Deep Learning for Natural Language – The Basics](./docs/2026-07-29-5-deep-learning-for-natural-language-the-basics.md) *(2026-07-29)*
 - [4: Deep Learning for Computer Vision – Transfer Learning and Fine-Tuning; Intro to HuggingFace](./docs/2026-07-29-4-deep-learning-for-computer-vision-transfer-learning-and-fine-tuning-intro-to-huggingface.md) *(2026-07-29)*
 - [3: Deep Learning for Computer Vision – Building Convolutional Neural Networks from Scratch](./docs/2026-07-29-3-deep-learning-for-computer-vision-building-convolutional-neural-networks-from-scratch.md) *(2026-07-29)*
