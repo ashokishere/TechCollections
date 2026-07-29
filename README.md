@@ -6,6 +6,7 @@ This repository contains published 24-section Knowledge Documents generated from
 
 ## 📚 Published Documents
 
+- [Most Common Kubernetes Deployment Strategies (Examples & Code)](./docs/2026-07-29-most-common-kubernetes-deployment-strategies-examples-code.md) *(2026-07-29)*
 - [LLM Compression Explained: Build Faster, Efficient AI Models](./docs/2026-07-28-llm-compression-explained-build-faster-efficient-ai-models.md) *(2026-07-28)*
 - [Llama.cpp vs vLLM: Which Local LLM Engine Actually Scales?](./docs/2026-07-28-llama-cpp-vs-vllm-which-local-llm-engine-actually-scales.md) *(2026-07-28)*
 - [1: Introduction to Neural Networks and Deep Learning; Training Deep NNs](./docs/2026-07-28-1-introduction-to-neural-networks-and-deep-learning-training-deep-nns.md) *(2026-07-28)*
