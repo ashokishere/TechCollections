@@ -6,6 +6,7 @@ This repository contains published 24-section Knowledge Documents generated from
 
 ## 📚 Published Documents
 
+- [OpenTelemetry in Kubernetes explained!](./docs/2026-07-30-opentelemetry-in-kubernetes-explained.md) *(2026-07-30)*
 - [Docker AI, what’s new with MCP, Agents, Sandboxes, and more](./docs/2026-07-30-docker-ai-what-s-new-with-mcp-agents-sandboxes-and-more.md) *(2026-07-30)*
 - [11: Generative AI – Text-to-Image Models](./docs/2026-07-30-11-generative-ai-text-to-image-models.md) *(2026-07-30)*
 - [10: Generative AI – Adapting LLMs with Parameter-Efficient Fine-Tuning](./docs/2026-07-30-10-generative-ai-adapting-llms-with-parameter-efficient-fine-tuning.md) *(2026-07-30)*
