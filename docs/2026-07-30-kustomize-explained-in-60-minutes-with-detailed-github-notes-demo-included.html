@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transcript Scholar — Research & Knowledge Library</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FDFBF7; color: #111111; }
+    h1, h2, h3, h4, .font-serif, .editorial-title { font-family: 'Playfair Display', serif; }
+    
+    /* Markdown Prose Styling matching Transcript Scholar */
+    .prose h1 { font-size: 1.75rem; font-weight: 800; border-bottom: 2px solid #111; padding-bottom: 0.5rem; margin-top: 1.5rem; margin-bottom: 1rem; font-family: 'Playfair Display', serif; }
+    .prose h2 { font-size: 1.35rem; font-weight: 700; color: #D43F33; border-bottom: 1px solid #E5E7EB; padding-bottom: 0.3rem; margin-top: 1.5rem; margin-bottom: 0.75rem; font-family: 'Playfair Display', serif; }
+    .prose h3 { font-size: 1.15rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; font-family: 'Playfair Display', serif; }
+    .prose p { margin-bottom: 1rem; line-height: 1.75; color: #222222; font-size: 0.95rem; }
+    .prose ul, .prose ol { margin-left: 1.5rem; margin-bottom: 1.25rem; }
+    .prose ul { list-style-type: disc; }
+    .prose ol { list-style-type: decimal; }
+    .prose li { margin-bottom: 0.35rem; line-height: 1.6; }
+    .prose code { background: #F3F4F6; color: #111; padding: 0.15rem 0.4rem; border-radius: 4px; font-family: monospace; font-size: 0.85em; border: 1px solid #E5E7EB; }
+    .prose pre { background: #111; color: #F3F4F6; padding: 1.25rem; border-radius: 8px; overflow-x: auto; font-family: monospace; font-size: 0.85rem; margin: 1.25rem 0; border: 1px solid #333; }
+    .prose pre code { background: transparent; color: inherit; border: none; padding: 0; }
+    .prose blockquote { border-left: 4px solid #D43F33; padding-left: 1rem; font-style: italic; color: #4B5563; margin: 1.25rem 0; background: #F9F9F7; padding-top: 0.5rem; padding-bottom: 0.5rem; border-radius: 0 6px 6px 0; }
+    .prose table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.875rem; }
+    .prose th, .prose td { border: 1px solid #E5E7EB; padding: 0.6rem 0.8rem; text-align: left; }
+    .prose th { background-color: #F9F9F7; font-weight: 700; color: #111; }
+    .prose strong { color: #111; font-weight: 700; }
+
+    /* Print Stylesheet */
+    @media print {
+      header, aside, .no-print, #view-tabs, #doc-meta-bar { display: none !important; }
+      body { background-color: white !important; color: black !important; font-size: 11pt; }
+      main { width: 100% !important; margin: 0 !important; padding: 0 !important; border: none !important; box-shadow: none !important; }
+      .section-card { page-break-inside: avoid; border: 1px solid #ddd !important; margin-bottom: 1.5rem !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#FDFBF7]">
+
+  <!-- Top Navigation Bar -->
+  <header class="bg-[#111111] text-white border-b border-gray-800 px-4 sm:px-8 py-3.5 flex items-center justify-between sticky top-0 z-40 shadow-md">
+    <div class="flex items-center space-x-3.5">
+      <div class="w-9 h-9 rounded bg-[#D43F33] text-white font-serif font-extrabold flex items-center justify-center text-xl tracking-tighter shadow-xs">TS</div>
+      <div>
+        <div class="flex items-center space-x-2">
+          <h1 class="text-base sm:text-lg font-bold font-serif tracking-wide text-white">TRANSCRIPT SCHOLAR</h1>
+          <span class="hidden sm:inline-block px-2 py-0.5 rounded bg-red-950 text-[#D43F33] border border-red-800 text-[10px] font-mono font-bold uppercase">Research Library</span>
+        </div>
+        <p class="text-[11px] text-gray-400 font-mono">24-Section Knowledge Base • Hosted on GitHub Pages</p>
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-2 sm:space-x-3 text-xs">
+      <button onclick="toggleAudioReader()" class="px-3 py-1.5 rounded bg-[#D43F33] hover:bg-[#be352a] text-white font-bold flex items-center space-x-1.5 transition-colors cursor-pointer" title="Listen to document">
+        <i id="header-audio-icon" class="fas fa-volume-up"></i>
+        <span class="hidden md:inline">Listen Aloud</span>
+      </button>
+
+      <button onclick="window.print()" class="px-3 py-1.5 rounded bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold flex items-center space-x-1.5 transition-colors cursor-pointer" title="Print Academic Document">
+        <i class="fas fa-print"></i>
+        <span class="hidden md:inline">Print Paper</span>
+      </button>
+
+      <button onclick="copyFullMarkdown()" class="px-3 py-1.5 rounded bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold flex items-center space-x-1.5 transition-colors cursor-pointer" title="Copy raw markdown">
+        <i class="fas fa-copy"></i>
+        <span class="hidden md:inline">Copy Markdown</span>
+      </button>
+
+      <a href="https://github.com/ashokishere/TechCollections" target="_blank" class="px-3 py-1.5 rounded bg-gray-800 hover:bg-gray-700 text-white font-bold flex items-center space-x-1.5 transition-colors cursor-pointer">
+        <i class="fab fa-github text-sm"></i>
+        <span class="hidden sm:inline">GitHub Repo</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Audio Reader Floating Status Bar -->
+  <div id="audio-bar" class="hidden bg-[#111111] border-b border-red-900/80 px-4 py-2.5 text-white flex items-center justify-between z-30 sticky top-[57px] shadow-sm">
+    <div class="flex items-center space-x-3">
+      <div class="w-3 h-3 rounded-full bg-[#D43F33] animate-pulse"></div>
+      <span id="audio-status-text" class="text-xs font-mono font-medium text-gray-200">Reading document aloud...</span>
+    </div>
+    <div class="flex items-center space-x-2 text-xs">
+      <button onclick="toggleAudioPause()" class="px-2.5 py-1 rounded bg-gray-800 hover:bg-gray-700 text-white font-bold flex items-center space-x-1">
+        <i id="audio-play-icon" class="fas fa-pause"></i>
+        <span id="audio-pause-label">Pause</span>
+      </button>
+      <button onclick="stopAudioReader()" class="px-2.5 py-1 rounded bg-red-950 hover:bg-red-900 border border-red-800 text-red-200 font-bold flex items-center space-x-1">
+        <i class="fas fa-stop"></i>
+        <span>Stop</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Layout Grid -->
+  <div class="flex-1 max-w-[1400px] w-full mx-auto p-3 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- Left Sidebar: Document Library & 24-Section Index -->
+    <aside class="lg:col-span-3 space-y-5">
+      
+      <!-- Document Catalog Box -->
+      <div class="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-xs">
+        <h2 class="font-bold uppercase tracking-wider text-xs text-[#111111] mb-2.5 pb-2 border-b border-gray-200 flex items-center justify-between">
+          <span class="flex items-center space-x-1.5">
+            <i class="fas fa-books text-[#D43F33]"></i>
+            <span>Published Library</span>
+          </span>
+          <span id="doc-count" class="text-[10px] bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-mono font-bold">0</span>
+        </h2>
+
+        <div class="relative mb-3">
+          <input id="search-docs" type="text" placeholder="Search catalog..." class="w-full text-xs p-2 pl-7 bg-[#F9F9F7] border border-gray-200 rounded focus:outline-none focus:border-[#111111]" oninput="filterDocs()" />
+          <i class="fas fa-search absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
+        </div>
+
+        <div id="doc-list" class="space-y-1.5 overflow-y-auto max-h-[32vh] pr-1">
+          <div class="text-xs text-gray-400 italic p-2">Loading library catalog...</div>
+        </div>
+      </div>
+
+      <!-- 24-Section Quick Index Box -->
+      <div class="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-xs sticky top-20">
+        <div class="flex items-center justify-between mb-2.5 pb-2 border-b border-gray-200">
+          <h2 class="font-bold uppercase tracking-wider text-xs text-[#111111] flex items-center space-x-1.5">
+            <i class="fas fa-list-ol text-[#D43F33]"></i>
+            <span>24-Section Index</span>
+          </h2>
+          <span id="sections-found-badge" class="text-[10px] bg-red-50 text-[#D43F33] font-bold px-2 py-0.5 rounded border border-red-200 font-mono">24 Sections</span>
+        </div>
+
+        <div class="relative mb-2.5">
+          <input id="search-sections" type="text" placeholder="Jump to section..." class="w-full text-xs p-2 pl-7 bg-[#F9F9F7] border border-gray-200 rounded focus:outline-none focus:border-[#111111]" oninput="filterSections()" />
+          <i class="fas fa-filter absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
+        </div>
+
+        <div id="section-nav-list" class="space-y-1 overflow-y-auto max-h-[48vh] pr-1 text-xs">
+          <div class="text-xs text-gray-400 italic p-2">Select a document to view sections...</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area: Transcript Scholar View -->
+    <main class="lg:col-span-9 space-y-6">
+
+      <!-- Document Header Banner -->
+      <div id="doc-header-banner" class="bg-white border border-[#E5E7EB] rounded-xl p-6 sm:p-8 shadow-xs relative overflow-hidden">
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-[#D43F33]"></div>
+
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+          <span class="px-3 py-1 rounded bg-red-50 border border-red-200 text-[#D43F33] font-bold text-[11px] uppercase tracking-widest flex items-center space-x-1.5">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Transcript Scholar • 24-Section Comprehensive Research Document</span>
+          </span>
+          <span id="doc-date-badge" class="text-xs text-gray-500 font-mono"></span>
+        </div>
+
+        <h1 id="doc-title-heading" class="text-2xl sm:text-4xl font-extrabold text-[#111111] tracking-tight mb-3 font-serif leading-snug">
+          Select a Knowledge Document
+        </h1>
+
+        <p id="doc-file-path" class="text-xs text-gray-500 font-mono bg-[#F9F9F7] px-3 py-1.5 rounded border border-[#E5E7EB] inline-block">
+          Select a document from the Published Library on the left sidebar.
+        </p>
+
+        <!-- View Mode Switcher Toolbar -->
+        <div id="view-tabs" class="mt-6 pt-4 border-t border-gray-200 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center space-x-1 bg-[#F9F9F7] p-1 rounded-lg border border-[#E5E7EB]">
+            <button id="tab-doc" onclick="switchViewMode('doc')" class="px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer bg-[#111111] text-white">
+              <i class="fas fa-file-alt"></i>
+              <span>Full Research Document</span>
+            </button>
+            <button id="tab-flashcards" onclick="switchViewMode('flashcards')" class="px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]">
+              <i class="fas fa-clone"></i>
+              <span>Flash Cards</span>
+            </button>
+            <button id="tab-quiz" onclick="switchViewMode('quiz')" class="px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]">
+              <i class="fas fa-tasks"></i>
+              <span>Interactive Quiz</span>
+            </button>
+            <button id="tab-qa" onclick="switchViewMode('qa')" class="px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]">
+              <i class="fas fa-comments text-[#D43F33]"></i>
+              <span>Document Q&A</span>
+            </button>
+          </div>
+
+          <div class="flex items-center space-x-2 text-xs">
+            <span class="text-gray-500 font-bold uppercase tracking-wider text-[10px]">Text Size:</span>
+            <button onclick="changeFontSize('sm')" class="px-2 py-1 rounded bg-[#F9F9F7] hover:bg-gray-200 border border-[#E5E7EB] font-bold">A-</button>
+            <button onclick="changeFontSize('base')" class="px-2 py-1 rounded bg-[#F9F9F7] hover:bg-gray-200 border border-[#E5E7EB] font-bold">A</button>
+            <button onclick="changeFontSize('lg')" class="px-2 py-1 rounded bg-[#F9F9F7] hover:bg-gray-200 border border-[#E5E7EB] font-bold">A+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- View 1: Rendered Document Sections Container -->
+      <div id="view-container-doc" class="space-y-6">
+        <div class="bg-white border border-[#E5E7EB] rounded-xl p-12 text-center text-gray-400 font-serif">
+          <i class="fas fa-spinner fa-spin text-3xl mb-3 text-[#D43F33]"></i>
+          <p>Loading document analysis...</p>
+        </div>
+      </div>
+
+      <!-- View 2: Interactive Flashcards Container -->
+      <div id="view-container-flashcards" class="hidden space-y-6">
+        <div class="bg-white border border-[#E5E7EB] rounded-xl p-8 shadow-xs text-center">
+          <h3 class="font-serif font-bold text-xl text-[#111111] mb-2">Interactive Study Flashcards</h3>
+          <p class="text-xs text-gray-500 mb-6">Click card to reveal answer. Use controls below to navigate.</p>
+
+          <div id="flashcard-box" class="max-w-xl mx-auto min-h-[220px] bg-[#F9F9F7] border-2 border-[#111111] rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer shadow-md transition-all hover:border-[#D43F33]" onclick="flipCard()">
+            <span id="fc-category" class="text-[10px] font-bold uppercase tracking-widest text-[#D43F33] bg-red-50 border border-red-200 px-2.5 py-0.5 rounded-full mb-3">Core Concept</span>
+            <p id="fc-question-text" class="text-lg font-serif font-bold text-[#111111] leading-relaxed">Loading card question...</p>
+            <p id="fc-hint" class="text-[11px] text-gray-400 font-mono mt-4">(Click to flip card)</p>
+          </div>
+
+          <div class="flex items-center justify-center space-x-4 mt-6">
+            <button onclick="prevCard()" class="px-4 py-2 rounded bg-[#111111] hover:bg-[#D43F33] text-white font-bold text-xs uppercase tracking-wider flex items-center space-x-1 transition-colors cursor-pointer">
+              <i class="fas fa-arrow-left"></i>
+              <span>Previous</span>
+            </button>
+            <span id="fc-counter" class="text-xs font-mono font-bold text-gray-600 px-3 py-1 bg-gray-100 rounded">Card 1 / 1</span>
+            <button onclick="nextCard()" class="px-4 py-2 rounded bg-[#111111] hover:bg-[#D43F33] text-white font-bold text-xs uppercase tracking-wider flex items-center space-x-1 transition-colors cursor-pointer">
+              <span>Next</span>
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- View 3: Interactive Quiz Container -->
+      <div id="view-container-quiz" class="hidden space-y-6">
+        <div class="bg-white border border-[#E5E7EB] rounded-xl p-8 shadow-xs">
+          <div class="flex items-center justify-between border-b border-gray-200 pb-4 mb-6">
+            <div>
+              <h3 class="font-serif font-bold text-xl text-[#111111]">Interactive Knowledge Quiz</h3>
+              <p class="text-xs text-gray-500 mt-0.5">Test your comprehension on this research paper.</p>
+            </div>
+            <span id="quiz-score-badge" class="px-3 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 font-mono text-xs font-bold">
+              Score: 0 / 0
+            </span>
+          </div>
+
+          <div id="quiz-questions-list" class="space-y-6">
+            <div class="text-center py-8 text-gray-400 italic">Extracting quiz questions from Section 22...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- View 4: Document Q&A Assistant Container -->
+      <div id="view-container-qa" class="hidden space-y-6">
+        <div class="bg-white border border-[#E5E7EB] rounded-xl p-6 sm:p-8 shadow-xs space-y-6">
+          <div class="border-b border-gray-200 pb-4">
+            <div class="flex items-center space-x-2 text-[#D43F33] text-xs font-bold uppercase tracking-wider mb-1">
+              <i class="fas fa-brain"></i>
+              <span>Instant Semantic Document Search & Synthesis</span>
+            </div>
+            <h3 class="font-serif font-bold text-2xl text-[#111111]">Document Q&A Assistant</h3>
+            <p class="text-xs text-gray-500 mt-1">Ask questions about this research document to get instant answers with section citations.</p>
+          </div>
+
+          <!-- Question Input Form -->
+          <div class="space-y-3">
+            <div class="flex items-center gap-2">
+              <input id="qa-input-field" type="text" placeholder="Ask any question about this document (e.g. 'What are the core conclusions?')..." class="flex-1 text-sm p-3 bg-[#F9F9F7] border border-gray-300 rounded-lg focus:outline-none focus:border-[#111111]" onkeydown="if(event.key==='Enter') submitQaQuestion()" />
+              <button onclick="submitQaQuestion()" class="px-5 py-3 rounded-lg bg-[#111111] hover:bg-[#D43F33] text-white font-bold text-xs uppercase tracking-wider flex items-center space-x-2 transition-colors cursor-pointer">
+                <i class="fas fa-search"></i>
+                <span>Ask</span>
+              </button>
+            </div>
+
+            <!-- Preset Quick Question Chips -->
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+              <span class="text-gray-400 text-[11px] font-mono font-bold">Try asking:</span>
+              <button onclick="setQaQuestion('Summarize the main conclusions of this paper')" class="px-2.5 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium text-[11px] transition-colors">"Summarize main conclusions"</button>
+              <button onclick="setQaQuestion('What key takeaways are highlighted in Section 5?')" class="px-2.5 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium text-[11px] transition-colors">"Key takeaways in Section 5"</button>
+              <button onclick="setQaQuestion('Explain core definitions and methodology')" class="px-2.5 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium text-[11px] transition-colors">"Core methodology"</button>
+            </div>
+          </div>
+
+          <!-- Q&A Results Display -->
+          <div id="qa-results-container" class="mt-6 pt-4 border-t border-gray-200">
+            <div class="text-center py-12 text-gray-400 font-serif">
+              <i class="fas fa-comments text-3xl mb-3 text-gray-300"></i>
+              <p class="font-bold text-gray-600">Enter a question above to analyze document sections.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // GitHub Pages URL normalization (prevents 404 on relative fetches when missing trailing slash)
+    if (!window.location.pathname.endsWith('/') && !window.location.pathname.split('/').pop().includes('.')) {
+      window.location.replace(window.location.pathname + '/' + window.location.search + window.location.hash);
+    }
+
+    window.EMBEDDED_CATALOG = [{"title":"Kustomize explained in 60 minutes with detailed GitHub notes | Demo Included","filename":"2026-07-30-kustomize-explained-in-60-minutes-with-detailed-github-notes-demo-included.md","date":"2026-07-30"},{"title":"OpenTelemetry in Kubernetes explained!","filename":"2026-07-30-opentelemetry-in-kubernetes-explained.md","date":"2026-07-30"},{"title":"Docker AI, what’s new with MCP, Agents, Sandboxes, and more","filename":"2026-07-30-docker-ai-what-s-new-with-mcp-agents-sandboxes-and-more.md","date":"2026-07-30"},{"title":"11: Generative AI – Text-to-Image Models","filename":"2026-07-30-11-generative-ai-text-to-image-models.md","date":"2026-07-30"},{"title":"10: Generative AI – Adapting LLMs with Parameter-Efficient Fine-Tuning","filename":"2026-07-30-10-generative-ai-adapting-llms-with-parameter-efficient-fine-tuning.md","date":"2026-07-30"},{"title":"9: Generative AI – Large Language Models (LLMs) and Retrieval Augmented Generation (RAG)","filename":"2026-07-29-9-generative-ai-large-language-models-llms-and-retrieval-augmented-generation-rag.md","date":"2026-07-29"},{"title":"8: Deep Learning for Natural Language – Transformers, Self-Supervised Learning","filename":"2026-07-29-8-deep-learning-for-natural-language-transformers-self-supervised-learning.md","date":"2026-07-29"},{"title":"7: Deep Learning for Natural Language – Transformers","filename":"2026-07-29-7-deep-learning-for-natural-language-transformers.md","date":"2026-07-29"},{"title":"6: Deep Learning for Natural Language – Embeddings","filename":"2026-07-29-6-deep-learning-for-natural-language-embeddings.md","date":"2026-07-29"},{"title":"5: Deep Learning for Natural Language – The Basics","filename":"2026-07-29-5-deep-learning-for-natural-language-the-basics.md","date":"2026-07-29"},{"title":"4: Deep Learning for Computer Vision – Transfer Learning and Fine-Tuning; Intro to HuggingFace","filename":"2026-07-29-4-deep-learning-for-computer-vision-transfer-learning-and-fine-tuning-intro-to-huggingface.md","date":"2026-07-29"},{"title":"3: Deep Learning for Computer Vision – Building Convolutional Neural Networks from Scratch","filename":"2026-07-29-3-deep-learning-for-computer-vision-building-convolutional-neural-networks-from-scratch.md","date":"2026-07-29"},{"title":"2: Training Deep NNs (cont.); Introduction to Keras/Tensorflow; Application to Tabular Data","filename":"2026-07-29-2-training-deep-nns-cont-introduction-to-keras-tensorflow-application-to-tabular-data.md","date":"2026-07-29"},{"title":"Most Common Kubernetes Deployment Strategies (Examples \u0026 Code)","filename":"2026-07-29-most-common-kubernetes-deployment-strategies-examples-code.md","date":"2026-07-29"},{"title":"LLM Compression Explained: Build Faster, Efficient AI Models","filename":"2026-07-28-llm-compression-explained-build-faster-efficient-ai-models.md","date":"2026-07-28"},{"title":"Llama.cpp vs vLLM: Which Local LLM Engine Actually Scales?","filename":"2026-07-28-llama-cpp-vs-vllm-which-local-llm-engine-actually-scales.md","date":"2026-07-28"},{"title":"1: Introduction to Neural Networks and Deep Learning; Training Deep NNs","filename":"2026-07-28-1-introduction-to-neural-networks-and-deep-learning-training-deep-nns.md","date":"2026-07-28"},{"title":"How I use LLMs","filename":"2026-07-28-how-i-use-llms.md","date":"2026-07-28"},{"title":"Why RAG Solutions Fail with Complex Documents \u0026 Vector Databases","filename":"2026-07-28-why-rag-solutions-fail-with-complex-documents-vector-databases.md","date":"2026-07-28"},{"title":"Is RAG Still Needed? Choosing the Best Approach for LLMs","filename":"2026-07-28-is-rag-still-needed-choosing-the-best-approach-for-llms.md","date":"2026-07-28"}];
+    window.EMBEDDED_CURRENT_DOC = {"title":"Kustomize explained in 60 minutes with detailed GitHub notes | Demo Included","filename":"2026-07-30-kustomize-explained-in-60-minutes-with-detailed-github-notes-demo-included.md","content":"## 1. Executive Summary\n\nIn this comprehensive tutorial, Abhishek Veeramalla breaks down **Kustomize**, a native Kubernetes declarative configuration management tool. Managing Kubernetes YAML manifests across diverse deployment environments—such as Development, Staging, and Production—frequently leads to code duplication, configuration drift, and maintenance overhead. Kustomize resolves these challenges by introducing a template-free, patch-based configuration strategy rooted in a **Base and Overlays** model.\n\nRather than relying on complex templating engines like Helm, Kustomize works directly with standard, plain-text Kubernetes YAML manifests. Base directories hold invariant resource definitions (e.g., deployments, services), while Overlay directories apply target-specific patches, label injections, and resource generators (e.g., `configMapGenerator`). Built directly into `kubectl` via the `-k` flag, Kustomize enables pure declarative configuration management, preserving a single source of truth across GitOps pipelines.\n\n---\n\n## 2. Key Takeaways\n\n* **Template-Free Customization**: Customizes raw, valid Kubernetes YAML manifests without introducing complex templating engines or non-standard syntax.\n* **Base and Overlays Pattern**: Promotes reuse by establishing a single base manifest directory layered beneath environment-specific overlay patches (e.g., `dev`, `staging`, `prod`).\n* **Native `kubectl` Integration**: Directly integrated into the Kubernetes CLI through commands like `kubectl apply -k \u003cdirectory\u003e`, eliminating external dependencies.\n* **Granular Patching**: Supports both Strategic Merge Patches (declarative YAML merging) and JSON Patches (RFC 6902 precise mutations).\n* **Automatic ConfigMap \u0026 Secret Hash Suffixing**: Generates unique append hashes for `ConfigMap` and `Secret` resources, guaranteeing pod restarts whenever configuration data changes.\n* **Built-in Transformers**: Effortlessly applies cross-cutting modifications, such as `namePrefix`, `namespace`, `commonLabels`, and `commonAnnotations`.\n\n---\n\n## 3. Topics Covered\n\n* **Problem Statement: Configuration Drift \u0026 Duplication**: Explores why maintaining separate raw YAML copies across environments causes divergence and operational overhead.\n* **Introduction to Kustomize**: Defines Kustomize as a native, declarative, template-free configuration tool.\n* **Kustomize vs. Helm**: Compares Kustomize’s patch-based approach against Helm’s chart-and-value template engine.\n* **Directory Structure (Base \u0026 Overlays)**: Demonstrates how to organize code into reusable base components and environment-specific overlays.\n* **The `kustomization.yaml` Specification**: Details the core fields, API versions, resource declarations, and schema layout of configuration files.\n* **Patching Mechanics**: Explains Strategic Merge Patching versus explicit JSON Patch (RFC 6902) execution.\n* **Generators (`configMapGenerator` \u0026 `secretGenerator`)**: Covers automated creation of dynamic Kubernetes configuration objects from local files or literals.\n* **CLI Execution \u0026 Operations**: Practical usage of `kustomize build` and direct deployment via `kubectl apply -k`.\n* **Advanced Features \u0026 Best Practices**: Explores built-in transformers, GitOps integration patterns, and organizational standards.\n\n---\n\n## 4. Timeline with Timestamps\n\n- **[00:00]** **Introduction to Kustomize and the Problem it Solves**: Challenges of managing multi-environment Kubernetes configs and configuration drift.\n- **[00:05]** **Why Kustomize? Use Cases and Benefits**: Template-free approach, plain YAML debugging, and multi-namespace deployments.\n- **[00:10]** **Kustomize vs. Helm: A Brief Comparison**: Key differences between template substitution (Helm) and structure patching (Kustomize).\n- **[00:15]** **Getting Started: Basic Kustomize Structure**: Defining the directory hierarchy: organizing `base/` and `overlays/`.\n- **[00:20]** **The `kustomization.yaml` File**: Structuring resources, target references, and `apiVersion: kustomize.config.k8s.io/v1beta1`.\n- **[00:25]** **Implementing Overlays**: Layering dev/prod environments on top of shared base resources.\n- **[00:35]** **Patches: Strategic Merge and JSON Patch**: Deep dive into overriding specs, replicas, images, and environment variables.\n- **[00:45]** **Generators: ConfigMap and Secret Generation**: Creating dynamic `ConfigMaps` and `Secrets` from `.env` files and literals.\n- **[00:50]** **Running Kustomize and Applying Configurations**: Hands-on execution with `kustomize build` and `kubectl apply -k`.\n- **[00:55]** **Advanced Kustomize Features and Best Practices**: Utilizing transformers (`namePrefix`, `commonLabels`) and maintaining clean repo structures.\n- **[01:00]** **Conclusion and Further Learning**: Overview of takeaways, repository walkthrough, and next steps for practice.\n\n---\n\n## 5. Detailed Explanation\n\n### Problem Statement: Configuration Drift \u0026 Duplication\nDeploying microservices across multiple environments (Development, Staging, Production) requires minor configuration changes per environment—such as replica counts, CPU/memory limits, image tags, and environment variables. Copy-pasting raw Kubernetes manifest files for each environment creates massive duplication. If a core service specification changes, operators must manually update every redundant YAML file, introducing human error and configuration drift.\n\n### Kustomize vs. Helm\n* **Helm**: Operates as a package manager that uses Go templating (`{{ .Values.image.repository }}`) to inject values into parameterizes manifests at render time. Helm requires managing chart dependencies, template syntax, and Release state storage within the cluster.\n* **Kustomize**: Operates as a declarative configuration engine that leaves base manifests as standard, valid Kubernetes YAML. Instead of templating text, Kustomize parses YAML structures into abstract syntax trees (AST) and applies specific patches over base manifests, generating fully populated YAML outputs.\n\n```\n       HELM (Template Substitution)\n       Values.yaml + Template.yaml ---\u003e [Engine] ---\u003e Rendered Manifest\n\n       KUSTOMIZE (Overlay Patching)\n       Base YAML + Overlay Patch YAML ---\u003e [Engine] ---\u003e Rendered Manifest\n```\n\n### The Base and Overlays Concept\n* **Base Directory**: Contains invariant, baseline resources (`deployment.yaml`, `service.yaml`, `ingress.yaml`) that define the fundamental structure of an application, along with a primary `kustomization.yaml`.\n* **Overlays Directory**: Contains environment-specific subdirectories (e.g., `overlays/dev`, `overlays/prod`). Each overlay contains its own `kustomization.yaml` pointing back to the `base` path, combined with patch files defining modifications (e.g., increasing replica count from 1 to 5).\n\n### Strategic Merge Patch vs. JSON Patch\n* **Strategic Merge Patch**: Uses standard Kubernetes YAML syntax to declare target changes. Kustomize merges the patch into the base manifest using the resource's `apiVersion`, `kind`, and `metadata.name` as matching keys.\n* **JSON Patch (RFC 6902)**: Enables explicit, atomic operations (`add`, `remove`, `replace`) on specified JSON paths within the targeted resource manifest, providing exact control over modification targets.\n\n### Dynamic Resource Generators\nManually managing `ConfigMap` and `Secret` manifests can be problematic: updating data within a `ConfigMap` does not automatically trigger a rolling update of dependent Pods. Kustomize provides `configMapGenerator` and `secretGenerator`. When executed, Kustomize appends a unique content hash to the resource name (e.g., `my-config-h8f4t9g7k2`). Any change in key-value content alters the hash, changing the deployment spec's referenced `ConfigMap` name and triggering an automatic rolling pod update.\n\n---\n\n## 6. Beginner Explanation (ELI5)\n\nImagine you are coloring in a house blueprint:\n\n* **The Base**: This is the master drawing of the house. It shows where the walls, doors, windows, and roof go. You never want to write directly on this master drawing because you might want to reuse it for different houses.\n* **The Overlay**: Instead of drawing on the master plan, you lay a clear plastic sheet over it. On this plastic sheet, you draw a blue roof for a beach house or a red roof for a mountain cabin.\n* **Kustomize**: Kustomize acts like a smart copier. It stacks your clear plastic sheet (Overlay) on top of your master blueprint (Base), presses print, and gives you a single finished paper showing the final customized house.\n\nYou don't need complicated formulas or special code tools—you just layer your desired changes directly over the original template!\n\n---\n\n## 7. Technical Deep Dive\n\n### Architecture \u0026 Manifest Pipeline\nWhen Kustomize processes a target directory (e.g., via `kustomize build overlays/prod`), it executes a deterministic, multi-stage processing pipeline:\n\n```\n+-------------------------------------------------------------------+\n| 1. LOAD \u0026 PARSE BASE RESOURCES                                    |\n|    - Read base/kustomization.yaml                                 |\n|    - Parse raw YAML files into Kubernetes Resource Model (KRM)    |\n+-------------------------------------------------------------------+\n                                  |\n                                  v\n+-------------------------------------------------------------------+\n| 2. RUN RESOURCE GENERATORS                                        |\n|    - Process configMapGenerator \u0026 secretGenerator                 |\n|    - Generate content hashes \u0026 create dynamic resources           |\n+-------------------------------------------------------------------+\n                                  |\n                                  v\n+-------------------------------------------------------------------+\n| 3. APPLY TRANSFORMERS                                             |\n|    - Apply namePrefix, nameSuffix, namespace                      |\n|    - Inject commonLabels and commonAnnotations                    |\n|    - Process custom transformers (e.g., image tag mutation)       |\n+-------------------------------------------------------------------+\n                                  |\n                                  v\n+-------------------------------------------------------------------+\n| 4. EXECUTE PATCHES                                                |\n|    - Apply Strategic Merge Patches                                |\n|    - Execute JSON Patches (RFC 6902)                              |\n+-------------------------------------------------------------------+\n                                  |\n                                  v\n+-------------------------------------------------------------------+\n| 5. RESOLVE REFERENCES \u0026 EMIT MANIFEST                             |\n|    - Update name references (e.g., deployment -\u003e configMap hash)  |\n|    - Serialize final KRM object graph into standard YAML stream   |\n+-------------------------------------------------------------------+\n```\n\n### Strategic Merge Patch Mechanics\nStrategic Merge Patch leverages the Kubernetes API schema's structural metadata (`patchStrategy` and `patchMergeKey`). For example, when updating container arrays in a deployment:\n\n```yaml\n# Strategic merge uses 'name' as patchMergeKey for container lists\ncontainers:\n- name: web-app\n  image: nginx:1.25-alpine\n```\n\nKustomize matches the container named `web-app` in the base manifest and updates its `image` field, preserving other unmentioned container parameters (such as `ports` or `volumeMounts`).\n\n### JSON Patching (RFC 6902)\nJSON Patch operations bypass Kubernetes merge keys, directly modifying the document tree target:\n\n```yaml\npatches:\n  - target:\n      group: apps\n      version: v1\n      kind: Deployment\n      name: my-app\n    patch: |-\n      - op: replace\n        path: /spec/template/spec/containers/0/image\n        value: custom-registry.io/app:v2.0.0\n```\n\n---\n\n## 8. Important Definitions\n\n* **Base**: A directory containing standard Kubernetes manifests along with a `kustomization.yaml` file that serves as the root configuration.\n* **Overlay**: A directory containing environment-specific patches and settings layered over a base configuration.\n* **`kustomization.yaml`**: The primary configuration file consumed by Kustomize to process, modify, and build Kubernetes manifests.\n* **Strategic Merge Patch**: A patch strategy that uses structural Kubernetes schema keys to merge partial YAML definitions into target manifests.\n* **JSON Patch (RFC 6902)**: A standardized notation for applying explicit data modifications (`add`, `remove`, `replace`) directly to JSON/YAML fields.\n* **Generator**: A built-in Kustomize module designed to dynamically construct Kubernetes primitives (`ConfigMap`, `Secret`) from environment variables, files, or key-value pairs.\n* **Transformer**: A processing component that alters resource attributes in bulk across an entire manifest tree (e.g., modifying image tags or injecting labels).\n\n---\n\n## 9. Code Snippets \u0026 Configuration Examples\n\n### Base Directory Setup\n\n`kustomize/base/deployment.yaml`:\n```yaml\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: web-app\n  labels:\n    app: web-app\nspec:\n  replicas: 1\n  selector:\n    matchLabels:\n      app: web-app\n  template:\n    metadata:\n      labels:\n        app: web-app\n    spec:\n      containers:\n      - name: web-container\n        image: nginx:1.21\n        ports:\n        - containerPort: 80\n        envFrom:\n        - configMapRef:\n            name: app-config\n```\n\n`kustomize/base/kustomization.yaml`:\n```yaml\napiVersion: kustomize.config.k8s.io/v1beta1\nkind: Kustomization\n\nresources:\n- deployment.yaml\n\nconfigMapGenerator:\n- name: app-config\n  literals:\n  - DB_HOST=base-db.internal\n  - LOG_LEVEL=info\n```\n\n---\n\n### Overlay Setup (Development)\n\n`kustomize/overlays/dev/patch-replicas.yaml`:\n```yaml\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: web-app\nspec:\n  replicas: 2\n```\n\n`kustomize/overlays/dev/kustomization.yaml`:\n```yaml\napiVersion: kustomize.config.k8s.io/v1beta1\nkind: Kustomization\n\nresources:\n- \"../../base\"\n\nnamespace: development\n\nnamePrefix: dev-\n\ncommonLabels:\n  environment: development\n  managed-by: kustomize\n\npatches:\n- path: patch-replicas.yaml\n\nimages:\n- name: nginx\n  newTag: 1.25-alpine\n\nconfigMapGenerator:\n- name: app-config\n  behavior: merge\n  literals:\n  - LOG_LEVEL=debug\n```\n\n---\n\n### Overlay Setup (Production)\n\n`kustomize/overlays/prod/kustomization.yaml`:\n```yaml\napiVersion: kustomize.config.k8s.io/v1beta1\nkind: Kustomization\n\nresources:\n- \"../../base\"\n\nnamespace: production\n\nnamePrefix: prod-\n\ncommonLabels:\n  environment: production\n  tier: critical\n\npatches:\n- target:\n    kind: Deployment\n    name: web-app\n  patch: |-\n    - op: replace\n      path: /spec/replicas\n      value: 10\n\nimages:\n- name: nginx\n  newName: enterprise-registry.example.com/nginx\n  newTag: 1.25.3-hardened\n```\n\n---\n\n### Operational Commands\n\n```bash\n# Preview rendered YAML output for Development\nkustomize build kustomize/overlays/dev\n\n# Apply Development environment directly to cluster using kubectl\nkubectl apply -k kustomize/overlays/dev\n\n# Preview Production manifest output\nkubectl kustomize kustomize/overlays/prod\n\n# Apply Production configuration directly\nkubectl apply -k kustomize/overlays/prod\n\n# Delete resources generated by an overlay\nkubectl delete -k kustomize/overlays/dev\n```\n\n---\n\n## 10. Best Practices\n\n* **Keep Base Files Standard**: Base manifests should be valid, plain Kubernetes files that can run independently without requiring modifications.\n* **DRY Overlays**: Avoid repeating configuration blocks across multiple overlays. Define shared values in the Base configuration and keep overlays focused on environment-specific overrides.\n* **Use Hash Suffixes for ConfigMaps \u0026 Secrets**: Preserve default Kustomize hash appending behavior to ensure Pod deployments trigger rolling updates when configuration data changes.\n* **GitOps Alignment**: Store Base and Overlay directories in Git repositories to enable declarative synchronization through tools like ArgoCD or Flux CD.\n* **Use `images` Transformers for Tag Mutations**: Prefer using Kustomize's native `images` stanza over manual patches to update container image repositories and tags cleanly.\n\n---\n\n## 11. Common Mistakes\n\n* **Mixing Raw `kubectl apply -f` with Kustomize Folders**: Running `kubectl apply -f` on a Kustomize directory processes raw target files without applying patches or resolving `kustomization.yaml`. Always use the `-k` flag (`kubectl apply -k`).\n* **Modifying Base Directives for One Environment**: Editing base YAML files to suit a single environment breaks configuration reuse for all other overlays.\n* **Incorrect Relative Paths**: Relative paths in `resources` or `patches` sections must accurately reflect directory structures (e.g., using `../../base` correctly).\n* **Duplicate Resource Names Across Overlays**: Omitting prefixes like `namePrefix` or `namespace` directives when applying multiple overlays to a single cluster can lead to resource collisions.\n\n---\n\n## 12. Interview Questions\n\n### Q1: How does Kustomize differ fundamentally from Helm?\n**Ideal Answer:** Helm is a package manager that relies on string-replacement templating (using Go templates) to generate manifests from `values.yaml` files. Kustomize, by contrast, is a template-free configuration engine that reads valid standard Kubernetes YAML files and applies structural transformations, generators, and patches onto an Abstract Syntax Tree (AST). Additionally, Kustomize is built directly into `kubectl` via the `-k` flag.\n\n### Q2: How does Kustomize ensure Pods update when a ConfigMap changes?\n**Ideal Answer:** Kustomize uses content-based hashing via `configMapGenerator`. When generating a `ConfigMap`, Kustomize appends a hash derived from its content to the resource name (e.g., `app-config-7g8k2h9f4d`). It automatically updates references to that `ConfigMap` within Deployment manifests. When configuration content changes, the dynamic name changes as well, triggering a rolling deployment update in Kubernetes.\n\n### Q3: What is the difference between Strategic Merge Patch and JSON Patch (RFC 6902) in Kustomize?\n**Ideal Answer:** Strategic Merge Patch uses Kubernetes-aware target schema semantics to merge YAML structures based on primary target fields (e.g., matching container names in a array). JSON Patch (RFC 6902) provides path-specific mutations (`add`, `remove`, `replace`) using an explicit target path schema (e.g., `/spec/template/spec/containers/0/image`).\n\n---\n\n## 13. Certification Questions\n\n### Question 1 (CKAD)\nYou are instructed to prepare a staging environment deployment using Kustomize. You must update the container tag for an image named `redis` to `6.2-alpine` without editing base manifest files directly. Which stanza inside `kustomization.yaml` is the standard method to accomplish this?\n\n- A) `patchesStrategicMerge: - redis:6.2-alpine`\n- B) `images: - name: redis \\n newTag: 6.2-alpine`\n- C) `transformers: - set-image: redis:6.2-alpine`\n- D) `generators: - imageGenerator: redis:6.2-alpine`\n\n**Correct Answer:** **B**\n**Explanation:** The native `images` stanza in `kustomization.yaml` allows updating image tags or names without requiring custom JSON or Strategic Merge patches.\n\n---\n\n### Question 2 (CKA)\nA developer executes `kubectl apply -f kustomize/overlays/dev/` and notices that `kustomization.yaml` is ignored and patches are not applied. What is the root cause?\n\n- A) The `kustomization.yaml` file lacks valid root privileges.\n- B) The `-f` flag processes raw files sequentially; Kustomize processing requires the `-k` flag (`kubectl apply -k`).\n- C) The `kubectl` installation is missing the third-party Kustomize binary plugin.\n- D) Relative references in `overlays/dev/kustomization.yaml` are broken.\n\n**Correct Answer:** **B**\n**Explanation:** The `-f` flag treats directory contents as standard raw manifests. To process Kustomize configurations, `kubectl` must be called with `-k`.\n\n---\n\n## 14. Real-World Examples\n\n### Multi-Tenant GitOps Deployment with ArgoCD\nA SaaS provider uses a core base configuration for an application service across 50 tenant environments. Instead of maintaining 50 separate Helm values files or raw manifest sets:\n* The shared manifest lives in `git/base/`.\n* Each tenant directory resides in `git/overlays/tenant-xx/`.\n* Each overlay imports `../../base`, defines specific namespaces, injects tenant database credentials via `secretGenerator`, and sets localized CPU/Memory limits.\n* ArgoCD monitors the overlay paths and deploys customized, tenant-isolated workloads automatically.\n\n```\ngit-repo/\n├── base/\n│   ├── deployment.yaml\n│   ├── service.yaml\n│   └── kustomization.yaml\n└── overlays/\n    ├── tenant-alpha/\n    │   └── kustomization.yaml\n    └── tenant-beta/\n        └── kustomization.yaml\n```\n\n---\n\n## 15. Analogies\n\n### The Overhead Transparency Film\nThink of the Base manifest as a page in a textbook. An Overlay is a transparent sheet placed over that page. You write environment adjustments (such as adding annotations or changing values) directly onto the clear overlay. When viewed from above, you see a merged, context-specific result, while the original textbook page beneath remains unchanged.\n\n### Standardized Modular Manufacturing\nConsider a modular vehicle assembly line:\n* **Base**: The standard chassis and core motor framing built for every car model.\n* **Overlays**: Custom trim line packages (e.g., Sport Edition vs Off-Road Edition).\n* **Kustomize Engine**: The assembly mechanism that combines standard framing specs with model-specific trim packages to build customized vehicles efficiently.\n\n---\n\n## 16. Frequently Asked Questions\n\n### Can Kustomize be used without installing a separate binary?\nYes. Kustomize has been integrated directly into `kubectl` since version `1.14`. You can execute Kustomize commands natively using `kubectl apply -k \u003cdir\u003e` or `kubectl kustomize \u003cdir\u003e`.\n\n### When should I choose Helm over Kustomize?\nHelm is ideal when distributing third-party software packages (e.g., ingress controllers, databases) to external consumers who need configurable default values. Kustomize works best for internal applications and GitOps pipelines where you manage both source code and underlying deployment specifications directly.\n\n### How do I override a ConfigMap created in the base directory within an overlay?\nIn your overlay's `kustomization.yaml`, define a `configMapGenerator` using the same name as the base and set `behavior: merge` or `behavior: replace`.\n\n---\n\n## 17. Related Technologies\n\n* **Helm**: Kubernetes package manager using template interpolation.\n* **Argo CD / Flux CD**: Declarative GitOps continuous delivery engines natively supporting Kustomize targets.\n* **kpt**: Google-backed packaging tool for managing KRM (Kubernetes Resource Model) configurations using functions.\n* **Skaffold**: Local Kubernetes development tool with built-in Kustomize build support.\n\n---\n\n## 18. Important Quotes\n\n\u003e *\"Kustomize is a native Kubernetes configuration management tool that relies on declarative, template-free customization using plain YAML files.\"*\n\n\u003e *\"In the base folder, you put files that remain constant across all target environments. Overlays layer environment-specific changes over top.\"*\n\n\u003e *\"Every time you modify data in a configMapGenerator, Kustomize generates a new hash suffix. This updates deployment references and triggers rolling pod restarts automatically.\"*\n\n---\n\n## 19. Glossary\n\n| Term | Category | Description |\n| :--- | :--- | :--- |\n| **AST** | Architecture | Abstract Syntax Tree: In-memory representation of structured document data used during transformations. |\n| **Base** | Kustomize Core | A folder storing shared Kubernetes baseline manifests and a `kustomization.yaml` file. |\n| **ConfigMapGenerator** | Module | Kustomize feature that dynamically creates ConfigMaps from files or literal string keys. |\n| **JSON Patch** | RFC 6902 | Format defining targeted operations (`add`, `replace`, `delete`) on structural JSON data. |\n| **KRM** | Specification | Kubernetes Resource Model: Declarative resource architecture used across Kubernetes objects. |\n| **NamePrefix** | Transformer | Appends a string prefix to the `metadata.name` of all resources in a build context. |\n| **Overlay** | Kustomize Core | A directory layering environment-specific changes over a designated Base. |\n| **Strategic Merge Patch** | Patching | Kubernetes-native patch merging using structural schema definitions and target merge keys. |\n\n---\n\n## 20. One-Page Cheat Sheet\n\n### Common `kustomization.yaml` Directives\n\n```yaml\napiVersion: kustomize.config.k8s.io/v1beta1\nkind: Kustomization\n\nresources:               # Paths to raw manifests or base directories\n- deployment.yaml\n- ../../base\n\nnamespace: prod-env       # Injects namespace across all target resources\n\nnamePrefix: prod-        # Appends prefix to metadata.name attributes\nnameSuffix: -v1          # Appends suffix to metadata.name attributes\n\ncommonLabels:            # Injects key-value labels across all resources\n  app: payment-api\n\nimages:                  # Mutates container image tags \u0026 registries\n- name: nginx\n  newName: my-registry/nginx\n  newTag: 1.25.3\n\npatches:                 # Applies inline patches or patch file paths\n- path: patch-replicas.yaml\n```\n\n### Key Commands\n\n```bash\n# Preview build output\nkustomize build \u003cpath\u003e\nkubectl kustomize \u003cpath\u003e\n\n# Apply overlay configurations directly\nkubectl apply -k \u003cpath\u003e\n\n# Delete overlay resource targets\nkubectl delete -k \u003cpath\u003e\n```\n\n---\n\n## 21. Flash Cards\n\n- **Card 1 | Kustomize Architecture**\n  - **Q:** How does Kustomize handle configuration files without templating engines?\n  - **A:** It reads plain Kubernetes YAML files into an Abstract Syntax Tree (AST) and applies structural patches and transformations over a Base configuration.\n\n- **Card 2 | CLI Commands**\n  - **Q:** What flag is required to run a Kustomize directory using `kubectl apply`?\n  - **A:** The `-k` flag (e.g., `kubectl apply -k overlays/dev`).\n\n- **Card 3 | Dynamic Resource Generation**\n  - **Q:** Why does Kustomize append a content-hash suffix to generated ConfigMaps?\n  - **A:** To update the deployment's resource reference when configuration changes occur, automatically triggering rolling pod restarts.\n\n- **Card 4 | Directory Design**\n  - **Q:** What is the primary operational distinction between a Base and an Overlay directory?\n  - **A:** The Base contains shared, invariant resource specifications, while Overlays contain environment-specific configurations that patch the Base.\n\n- **Card 5 | Transformers**\n  - **Q:** Which directive updates container image tags without using explicit JSON patch statements?\n  - **A:** The `images:` directive block inside `kustomization.yaml`.\n\n---\n\n## 22. Quiz\n\n### Q1: What is the primary purpose of Kustomize in Kubernetes configuration management?\n- A) Injecting Go templates into Helm charts at runtime\n- B) Managing declarative configurations template-free using base and overlay patches\n- C) Managing virtual machine image provisioning\n- D) Intercepting API server requests as a dynamic admission controller  \n**Correct Answer:** **B**  \n**Explanation:** Kustomize enables template-free, declarative customization of Kubernetes manifests through base and overlay layers.\n\n### Q2: Which command builds and previews rendered Kustomize manifests?\n- A) `kubectl generate -f .`\n- B) `kustomize build \u003cdirectory\u003e`\n- C) `kubectl render -k .`\n- D) `kustomize compile \u003cdirectory\u003e`  \n**Correct Answer:** **B**  \n**Explanation:** `kustomize build \u003cdirectory\u003e` (or `kubectl kustomize \u003cdirectory\u003e`) processes the target path and prints the rendered YAML to `stdout`.\n\n### Q3: How are overlay directories linked back to base configurations in `kustomization.yaml`?\n- A) Via the `import:` block\n- B) Via the `resources:` block using relative directory paths\n- C) Via the `bases:` stanza (deprecated in favor of `resources:`)\n- D) Both B and C are functionally valid  \n**Correct Answer:** **D**  \n**Explanation:** Historically `bases:` was used, but modern versions handle both external bases and internal manifests within the `resources:` array.\n\n### Q4: How does Kustomize trigger a rolling deployment restart when a ConfigMap updates?\n- A) By calling `kubectl rollout restart` internally\n- B) By modifying deployment annotations with time-stamps\n- C) By appending dynamic content hashes to generated `ConfigMap` names\n- D) By restarting the kubelet daemon automatically  \n**Correct Answer:** **C**  \n**Explanation:** Changing `ConfigMap` contents alters the output hash suffix, updating deployment volume and environment specifications to trigger rolling updates.\n\n### Q5: What patch format uses JSON target fields (`op`, `path`, `value`) to modify resources?\n- A) Strategic Merge Patch\n- B) Go Template Mutation\n- C) JSON Patch (RFC 6902)\n- D) YAML Anchors  \n**Correct Answer:** **C**  \n**Explanation:** RFC 6902 JSON Patches use structured operation lists (`add`, `remove`, `replace`) targeted at precise JSON field paths.\n\n### Q6: What happens if you run `kubectl apply -f` on a Kustomize overlay directory?\n- A) `kubectl` auto-detects `kustomization.yaml` and processes it correctly\n- B) `kubectl` attempts to parse files as raw resources, ignoring patches and transformer rules\n- C) The deployment fails immediately with an API schema error\n- D) `kubectl` automatically installs the Helm engine  \n**Correct Answer:** **B**  \n**Explanation:** The `-f` flag processes raw files sequentially without evaluating Kustomize patch instructions.\n\n### Q7: Which directive in `kustomization.yaml` automatically injects a label across all managed manifests?\n- A) `commonLabels:`\n- B) `globalMetadata:`\n- C) `setLabels:`\n- D) `appendLabels:`  \n**Correct Answer:** **A**  \n**Explanation:** `commonLabels:` injects defined key-value labels across all resource definitions, selectors, and metadata specifications.\n\n### Q8: Can a base directory point to a remote Git repository?\n- A) No, base paths must exist on the local file system\n- B) Yes, Kustomize can reference remote Git repo URLs directly in the `resources:` list\n- C) Only if the repository is converted into a compressed `.tar.gz` archive\n- D) Only when using enterprise Kustomize extensions  \n**Correct Answer:** **B**  \n**Explanation:** Kustomize natively supports fetching remote base targets directly using Git repository reference URLs.\n\n### Q9: Which directive updates image tags dynamically without raw file edits?\n- A) `tagMap:`\n- B) `containerRegistry:`\n- C) `images:`\n- D) `imagePatcher:`  \n**Correct Answer:** **C**  \n**Explanation:** The `images:` stanza target allows modifying image names, registries, and tags across configurations cleanly.\n\n### Q10: How can you merge additional key-value literals into an existing base ConfigMap inside an overlay?\n- A) Set `behavior: merge` in the overlay's `configMapGenerator` definition\n- B) Define `mode: append` inside the deployment file\n- C) Use standard Linux `cat` redirection commands\n- D) ConfigMaps cannot be modified once defined in a base directory  \n**Correct Answer:** **A**  \n**Explanation:** Setting `behavior: merge` (or `behavior: replace`) in a generator overlay allows modifying or extending base resource mappings.\n\n---\n\n## 23. Action Items\n\n* [ ] Install `kustomize` locally or verify `kubectl` version is `1.14+`.\n* [ ] Clone the video repository: `git clone https://github.com/iam-veeramalla/kustomize-zero-to-hero`.\n* [ ] Create a `base/` directory containing sample deployment and service manifests alongside a root `kustomization.yaml`.\n* [ ] Build two overlay environments (`overlays/dev/` and `overlays/prod/`) that import `../../base`.\n* [ ] Add a replica scaling patch (`patch-replicas.yaml`) to the dev overlay and scale production using JSON patching.\n* [ ] Test generated outputs locally using `kustomize build overlays/dev` and `kustomize build overlays/prod`.\n* [ ] Deploy configurations to a target test cluster using `kubectl apply -k overlays/dev`.\n\n---\n\n## 24. Recommended Further Reading\n\n* **Official Kustomize Documentation**: https://kubectl.docs.kubernetes.io/references/kustomize/\n* **GitHub Demonstration Repository**: https://github.com/iam-veeramalla/kustomize-zero-to-hero\n* **Kubernetes Declarative Management**: https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/\n* **RFC 6902 (JavaScript Object Notation Patching)**: https://datatracker.ietf.org/doc/html/rfc6902"};
+
+    let documents = window.EMBEDDED_CATALOG || [];
+    let currentDoc = null;
+    let currentSections = [];
+    let flashcardsList = [];
+    let currentCardIdx = 0;
+    let isCardFlipped = false;
+    let quizList = [];
+    let userQuizAnswers = {};
+
+    function renderMarkdownContent(content) {
+      try {
+        if (typeof window.marked !== 'undefined') {
+          if (typeof window.marked.parse === 'function') {
+            return window.marked.parse(content || '');
+          } else if (typeof window.marked === 'function') {
+            return window.marked(content || '');
+          }
+        }
+      } catch (e) {
+        console.warn('Marked parse warning:', e);
+      }
+      return (content || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\n/g, '<br/>');
+    }
+
+    function loadCatalog() {
+      if (window.EMBEDDED_CATALOG && Array.isArray(window.EMBEDDED_CATALOG) && window.EMBEDDED_CATALOG.length > 0) {
+        documents = window.EMBEDDED_CATALOG;
+      }
+
+      renderDocList(documents);
+
+      // Check URL query parameters or hash routing (?doc=filename.md)
+      const urlParams = new URLSearchParams(window.location.search);
+      let targetDocFilename = urlParams.get('doc') || window.location.hash.replace('#', '');
+      if (targetDocFilename) {
+        if (targetDocFilename.startsWith('docs/')) targetDocFilename = targetDocFilename.replace('docs/', '');
+        if (targetDocFilename.endsWith('.html')) targetDocFilename = targetDocFilename.replace('.html', '.md');
+      }
+
+      if (targetDocFilename) {
+        loadDoc(targetDocFilename);
+        return;
+      }
+
+      if (window.EMBEDDED_CURRENT_DOC && window.EMBEDDED_CURRENT_DOC.content) {
+        currentDoc = {
+          filename: window.EMBEDDED_CURRENT_DOC.filename,
+          title: window.EMBEDDED_CURRENT_DOC.title,
+          date: (documents.find(d => d.filename === window.EMBEDDED_CURRENT_DOC.filename) || {}).date || ''
+        };
+        renderDocList(documents);
+        document.getElementById('doc-title-heading').innerText = currentDoc.title || 'Knowledge Document';
+        document.getElementById('doc-date-badge').innerText = currentDoc.date ? 'Published ' + currentDoc.date : '';
+        document.getElementById('doc-file-path').innerText = 'docs/' + (currentDoc.filename || 'document.md');
+        try {
+          parseAndRenderMarkdown(window.EMBEDDED_CURRENT_DOC.content);
+        } catch (rErr) {
+          console.error('Markdown parse error:', rErr);
+          document.getElementById('view-container-doc').innerHTML = '<div class="p-6 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-semibold">Could not render document: ' + (rErr.message || rErr) + '</div>';
+        }
+      } else if (documents.length > 0) {
+        loadDoc(documents[0].filename);
+      } else {
+        document.getElementById('doc-list').innerHTML = '<div class="text-xs text-amber-700 bg-amber-50 p-3 rounded border border-amber-200">No published documents found.</div>';
+        document.getElementById('view-container-doc').innerHTML = '<div class="p-8 text-center bg-white border border-gray-200 rounded-xl text-gray-500 font-serif"><i class="fas fa-book-open text-3xl mb-3 text-gray-300"></i><p class="font-bold text-gray-700">No document selected or published</p><p class="text-xs text-gray-400 mt-1">Publish a document from the app to populate this research library.</p></div>';
+      }
+
+      try {
+        const pathPrefix = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
+        fetch(pathPrefix + 'docs/data.json')
+          .then(res => res.ok ? res.json() : null)
+          .then(freshDocs => {
+            if (Array.isArray(freshDocs) && freshDocs.length > 0) {
+              documents = freshDocs;
+              renderDocList(documents);
+            }
+          })
+          .catch(e => console.warn('Background docs/data.json fetch skipped:', e));
+      } catch (err) {
+        console.warn('Network fetch skipped:', err);
+      }
+    }
+
+    function renderDocList(docs) {
+      document.getElementById('doc-count').innerText = docs.length;
+      const container = document.getElementById('doc-list');
+      if (docs.length === 0) {
+        container.innerHTML = '<div class="text-xs text-gray-400 italic p-2">No published documents found.</div>';
+        return;
+      }
+      container.innerHTML = docs.map(d => `
+        <button onclick="loadDoc('${d.filename}')" class="w-full text-left p-2.5 rounded-lg hover:bg-[#F9F9F7] transition-all border border-transparent hover:border-gray-200 block cursor-pointer group ${currentDoc && currentDoc.filename === d.filename ? 'bg-red-50/70 border-red-200 font-bold' : ''}">
+          <p class="font-bold text-xs text-[#111111] group-hover:text-[#D43F33] line-clamp-2 leading-snug">${d.title}</p>
+          <p class="text-[10px] text-gray-400 font-mono mt-1 flex items-center justify-between">
+            <span>${d.date || ''}</span>
+            <i class="fas fa-chevron-right text-[9px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+          </p>
+        </button>
+      `).join('');
+    }
+
+    function filterDocs() {
+      const q = document.getElementById('search-docs').value.toLowerCase();
+      const filtered = documents.filter(d => d.title.toLowerCase().includes(q) || d.filename.toLowerCase().includes(q));
+      renderDocList(filtered);
+    }
+
+    async function loadDoc(filename) {
+      try {
+        const doc = documents.find(d => d.filename === filename);
+        currentDoc = doc || { filename, title: filename };
+        renderDocList(documents);
+
+        document.getElementById('doc-title-heading').innerText = currentDoc.title || filename;
+        document.getElementById('doc-date-badge').innerText = currentDoc.date ? `Published ${currentDoc.date}` : '';
+        document.getElementById('doc-file-path').innerText = `docs/${filename}`;
+
+        let mdText = '';
+        if (window.EMBEDDED_CURRENT_DOC && window.EMBEDDED_CURRENT_DOC.filename === filename && window.EMBEDDED_CURRENT_DOC.content) {
+          mdText = window.EMBEDDED_CURRENT_DOC.content;
+        } else {
+          const pathPrefix = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
+          const pathsToTry = [`${pathPrefix}docs/${filename}`, `./docs/${filename}`, `docs/${filename}`];
+          let loaded = false;
+          for (const path of pathsToTry) {
+            try {
+              const res = await fetch(path);
+              if (res.ok) {
+                mdText = await res.text();
+                loaded = true;
+                break;
+              }
+            } catch (e) {}
+          }
+          if (!loaded) throw new Error(`Document markdown file (docs/${filename}) not found on server.`);
+        }
+
+        parseAndRenderMarkdown(mdText);
+      } catch (err) {
+        document.getElementById('view-container-doc').innerHTML = `<div class="p-6 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-semibold">Could not load document: ${err.message}</div>`;
+      }
+    }
+
+    function parseAndRenderMarkdown(mdText) {
+      const headingRegex = /^##\s*(\d+)[\.\s]+(.*)$/gm;
+      let matches = [];
+      let match;
+      while ((match = headingRegex.exec(mdText)) !== null) {
+        matches.push({
+          index: match.index,
+          num: parseInt(match[1], 10),
+          title: match[2].trim(),
+          fullMatch: match[0],
+        });
+      }
+
+      if (matches.length === 0) {
+        const altRegex = /^##\s+(.*)$/gm;
+        let count = 1;
+        while ((match = altRegex.exec(mdText)) !== null) {
+          matches.push({
+            index: match.index,
+            num: count++,
+            title: match[1].trim(),
+            fullMatch: match[0],
+          });
+        }
+      }
+
+      currentSections = [];
+      for (let i = 0; i < matches.length; i++) {
+        const cur = matches[i];
+        const next = matches[i + 1];
+        const startIndex = cur.index + cur.fullMatch.length;
+        const endIndex = next ? next.index : mdText.length;
+        const content = mdText.slice(startIndex, endIndex).trim();
+
+        currentSections.push({
+          num: cur.num,
+          title: cur.title,
+          content,
+        });
+      }
+
+      if (currentSections.length === 0) {
+        currentSections = [{
+          num: 1,
+          title: (currentDoc && currentDoc.title) ? currentDoc.title : 'Document Content',
+          content: mdText || ''
+        }];
+      }
+
+      renderSectionIndex(currentSections);
+      renderDocumentBody(currentSections);
+      extractFlashcardsAndQuiz(mdText);
+    }
+
+    function renderSectionIndex(sections) {
+      const container = document.getElementById('section-nav-list');
+      document.getElementById('sections-found-badge').innerText = sections.length + ' Sections';
+
+      if (sections.length === 0) {
+        container.innerHTML = '<div class="text-xs text-gray-400 italic p-2">No sections detected in document.</div>';
+        return;
+      }
+
+      container.innerHTML = sections.map(s => 
+        '<button onclick="scrollToSection(' + s.num + ')" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-[#F9F9F7] text-gray-700 hover:text-[#D43F33] transition-colors flex items-center space-x-2 cursor-pointer group">' +
+          '<span class="w-5 h-5 rounded bg-gray-100 group-hover:bg-red-50 text-gray-600 group-hover:text-[#D43F33] font-mono text-[10px] font-bold flex items-center justify-center shrink-0 border border-gray-200">' +
+            s.num +
+          '</span>' +
+          '<span class="truncate font-medium text-[11px] group-hover:font-bold">' + s.title + '</span>' +
+        '</button>'
+      ).join('');
+    }
+
+    function filterSections() {
+      const q = document.getElementById('search-sections').value.toLowerCase();
+      const filtered = currentSections.filter(s => s.title.toLowerCase().includes(q) || ('' + s.num).includes(q));
+      renderSectionIndex(filtered);
+    }
+
+    function scrollToSection(num) {
+      switchViewMode('doc');
+      const elem = document.getElementById('section-' + num);
+      if (elem) {
+        elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function renderDocumentBody(sections) {
+      const container = document.getElementById('view-container-doc');
+      if (sections.length === 0) {
+        container.innerHTML = '<div class="bg-white border p-8 rounded-xl text-center text-gray-500">Document empty or not structured in 24 sections.</div>';
+        return;
+      }
+
+      container.innerHTML = sections.map(s => 
+        '<div id="section-' + s.num + '" class="section-card bg-white border border-[#E5E7EB] rounded-xl p-6 sm:p-8 shadow-xs relative space-y-4">' +
+          '<div class="flex items-center justify-between pb-3 border-b border-gray-200">' +
+            '<div class="flex items-center space-x-2.5">' +
+              '<span class="px-2.5 py-0.5 rounded bg-[#111111] text-white font-mono font-bold text-[10px] uppercase tracking-wider">' +
+                'SECTION ' + (s.num < 10 ? '0' + s.num : s.num) +
+              '</span>' +
+              '<h2 class="text-xl sm:text-2xl font-serif font-bold text-[#111111]">' + s.title + '</h2>' +
+            '</div>' +
+            '<button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="text-gray-400 hover:text-[#111111] text-xs flex items-center space-x-1 cursor-pointer" title="Back to top">' +
+              '<i class="fas fa-arrow-up text-[10px]"></i>' +
+              '<span class="hidden sm:inline">Top</span>' +
+            '</button>' +
+          '</div>' +
+
+          '<div class="prose max-w-none text-[#222222]">' +
+            renderMarkdownContent(s.content) +
+          '</div>' +
+        '</div>'
+      ).join('');
+
+      document.querySelectorAll('.prose pre').forEach((pre) => {
+        if (!pre.querySelector('.copy-code-btn')) {
+          const btn = document.createElement('button');
+          btn.className = 'copy-code-btn absolute top-2 right-2 px-2 py-1 bg-gray-800 hover:bg-gray-700 text-gray-200 text-[10px] font-bold rounded cursor-pointer transition-colors';
+          btn.innerText = 'Copy';
+          btn.onclick = () => {
+            const code = pre.querySelector('code')?.innerText || pre.innerText;
+            navigator.clipboard.writeText(code);
+            btn.innerText = 'Copied!';
+            setTimeout(() => { btn.innerText = 'Copy'; }, 2000);
+          };
+          pre.style.position = 'relative';
+          pre.appendChild(btn);
+        }
+      });
+    }
+
+    function extractFlashcardsAndQuiz(mdText) {
+      flashcardsList = [];
+      const sec21Match = mdText.match(/##\s*21[\.\s]+Flash\s*Cards([\s\S]*?)(?=##\s*22|$)/i);
+      const fcContent = sec21Match ? sec21Match[1] : mdText;
+      const blocks = fcContent.split(/-\s*\*\*Card\s*\d+/i).filter(b => b.trim().length > 0);
+
+      blocks.forEach((block, idx) => {
+        const qMatch = block.match(/\*\*Q:\*\*\s*(.+)/i) || block.match(/Q:\s*(.+)/i);
+        const aMatch = block.match(/\*\*A:\*\*\s*(.+)/i) || block.match(/A:\s*(.+)/i);
+        if (qMatch && aMatch) {
+          flashcardsList.push({
+            question: qMatch[1].replace(/\*\*/g, '').trim(),
+            answer: aMatch[1].replace(/\*\*/g, '').trim(),
+            category: 'Core Knowledge'
+          });
+        }
+      });
+
+      if (flashcardsList.length === 0) {
+        flashcardsList = [
+          { question: "What is the primary objective of this knowledge research paper?", answer: "To deliver a 24-section comprehensive synthesis of the source video transcript.", category: "Overview" },
+          { question: "How can you utilize the flashcards and quiz tools?", answer: "Review sections sequentially, flip flashcards for key terms, and test recall with the interactive quiz.", category: "Study Method" }
+        ];
+      }
+      currentCardIdx = 0;
+      isCardFlipped = false;
+      renderCurrentFlashcard();
+
+      quizList = [];
+      userQuizAnswers = {};
+      const sec22Match = mdText.match(/##\s*22[\.\s]+Quiz([\s\S]*?)(?=##\s*23|$)/i);
+      const qContent = sec22Match ? sec22Match[1] : mdText;
+      const qBlocks = qContent.split(/(?=###?\s*Q\d+:?|^\d+\.\s+)/m).filter(b => b.trim().length > 0);
+
+      qBlocks.forEach((b, idx) => {
+        const qLine = b.match(/(?:###?\s*Q\d+:?|\d+\.\s+)?\s*(.+?)(?=\n-|\n\*\*\s*Correct)/s);
+        const opts = [...b.matchAll(/[-*]\s*([A-D]\))\s*(.+)/gi)];
+        const corr = b.match(/\*\*Correct Answer:\*\*\s*([A-D])/i) || b.match(/Correct:\s*([A-D])/i);
+        const exp = b.match(/\*\*Explanation:\*\*\s*(.+)/i) || b.match(/Explanation:\s*(.+)/i);
+
+        if (qLine && opts.length >= 2) {
+          let cIdx = 0;
+          if (corr) {
+            cIdx = ['A', 'B', 'C', 'D'].indexOf(corr[1].toUpperCase());
+            if (cIdx === -1) cIdx = 0;
+          }
+          quizList.push({
+            id: idx,
+            question: qLine[1].trim().replace(/^###?\s*Q\d+:?\s*/, ''),
+            options: opts.map(o => o[1] + ' ' + o[2].trim()),
+            correctIndex: cIdx,
+            explanation: exp ? exp[1].trim() : 'Refer to the detailed explanation sections above.'
+          });
+        }
+      });
+
+      renderQuizList();
+    }
+
+    function renderCurrentFlashcard() {
+      if (flashcardsList.length === 0) return;
+      const card = flashcardsList[currentCardIdx];
+      document.getElementById('fc-category').innerText = card.category;
+      document.getElementById('fc-question-text').innerText = isCardFlipped ? card.answer : card.question;
+      document.getElementById('fc-hint').innerText = isCardFlipped ? '(Click to reveal question)' : '(Click to flip answer)';
+      document.getElementById('fc-counter').innerText = 'Card ' + (currentCardIdx + 1) + ' / ' + flashcardsList.length;
+    }
+
+    function flipCard() {
+      isCardFlipped = !isCardFlipped;
+      renderCurrentFlashcard();
+    }
+
+    function prevCard() {
+      isCardFlipped = false;
+      currentCardIdx = (currentCardIdx - 1 + flashcardsList.length) % flashcardsList.length;
+      renderCurrentFlashcard();
+    }
+
+    function nextCard() {
+      isCardFlipped = false;
+      currentCardIdx = (currentCardIdx + 1) % flashcardsList.length;
+      renderCurrentFlashcard();
+    }
+
+    function renderQuizList() {
+      const container = document.getElementById('quiz-questions-list');
+      if (quizList.length === 0) {
+        container.innerHTML = '<div class="text-xs text-gray-500 italic">No structured multiple-choice quiz questions parsed from Section 22.</div>';
+        return;
+      }
+
+      container.innerHTML = quizList.map((q, qIdx) => 
+        '<div class="p-6 rounded-xl bg-[#F9F9F7] border border-[#E5E7EB] space-y-3">' +
+          '<p class="font-bold text-sm text-[#111111] font-serif">' +
+            '<span class="text-[#D43F33] font-mono mr-1.5">Q' + (qIdx + 1) + '.</span> ' + q.question +
+          '</p>' +
+
+          '<div class="space-y-2 pt-1">' +
+            q.options.map((opt, oIdx) => {
+              const isSelected = userQuizAnswers[qIdx] === oIdx;
+              const isSubmitted = userQuizAnswers[qIdx] !== undefined;
+              const isCorrect = oIdx === q.correctIndex;
+
+              let btnStyle = 'bg-white border-gray-200 text-gray-800 hover:border-[#111111]';
+              if (isSubmitted) {
+                if (isCorrect) btnStyle = 'bg-emerald-50 border-emerald-500 text-emerald-900 font-bold';
+                else if (isSelected) btnStyle = 'bg-rose-50 border-rose-400 text-rose-900 font-bold';
+                else btnStyle = 'bg-white border-gray-200 text-gray-400 opacity-60';
+              }
+
+              return '<button onclick="selectQuizOption(' + qIdx + ', ' + oIdx + ')" class="w-full text-left p-3 rounded-lg border text-xs transition-all flex items-center justify-between cursor-pointer ' + btnStyle + '">' +
+                '<span>' + opt + '</span>' +
+                (isSubmitted && isCorrect ? '<i class="fas fa-check-circle text-emerald-600"></i>' : '') +
+                (isSubmitted && isSelected && !isCorrect ? '<i class="fas fa-times-circle text-rose-500"></i>' : '') +
+              '</button>';
+            }).join('') +
+          '</div>' +
+
+          (userQuizAnswers[qIdx] !== undefined ? 
+            '<div class="p-3 rounded bg-white border border-gray-200 text-xs text-gray-700 font-mono mt-2">' +
+              '<strong class="text-[#111111]">Explanation:</strong> ' + q.explanation +
+            '</div>'
+          : '') +
+        '</div>'
+      ).join('');
+
+      let correctCount = 0;
+      let answeredCount = 0;
+      Object.keys(userQuizAnswers).forEach((qIdxStr) => {
+        answeredCount++;
+        const qIdx = parseInt(qIdxStr, 10);
+        if (userQuizAnswers[qIdx] === quizList[qIdx].correctIndex) {
+          correctCount++;
+        }
+      });
+
+      document.getElementById('quiz-score-badge').innerText = 'Score: ' + correctCount + ' / ' + quizList.length + ' (' + answeredCount + ' answered)';
+    }
+
+    function selectQuizOption(qIdx, oIdx) {
+      userQuizAnswers[qIdx] = oIdx;
+      renderQuizList();
+    }
+
+    // Audio Speech Reader State & Logic
+    let currentUtterance = null;
+    let isAudioPlaying = false;
+    let isAudioPaused = false;
+
+    function toggleAudioReader() {
+      if (!('speechSynthesis' in window)) {
+        alert('Text-to-speech audio reader is not supported in this browser.');
+        return;
+      }
+      if (isAudioPlaying) {
+        stopAudioReader();
+      } else {
+        startAudioReader();
+      }
+    }
+
+    function startAudioReader() {
+      if (!currentSections || currentSections.length === 0) {
+        alert('No document sections loaded to read.');
+        return;
+      }
+      window.speechSynthesis.cancel();
+      
+      const fullText = currentSections.map(s => 'Section ' + s.num + ': ' + s.title + '. ' + s.content.replace(/[*#_]/g, '')).join(' ');
+      currentUtterance = new SpeechSynthesisUtterance(fullText.slice(0, 4500));
+      currentUtterance.rate = 1.0;
+      currentUtterance.pitch = 1.0;
+
+      currentUtterance.onstart = () => {
+        isAudioPlaying = true;
+        isAudioPaused = false;
+        document.getElementById('audio-bar').classList.remove('hidden');
+        document.getElementById('header-audio-icon').className = 'fas fa-volume-up text-amber-400 animate-pulse';
+        updateAudioBarState('Reading document aloud...');
+      };
+
+      currentUtterance.onend = () => {
+        stopAudioReader();
+      };
+
+      currentUtterance.onerror = () => {
+        stopAudioReader();
+      };
+
+      window.speechSynthesis.speak(currentUtterance);
+    }
+
+    function toggleAudioPause() {
+      if (!('speechSynthesis' in window) || !isAudioPlaying) return;
+      if (isAudioPaused) {
+        window.speechSynthesis.resume();
+        isAudioPaused = false;
+        updateAudioBarState('Reading document aloud...');
+      } else {
+        window.speechSynthesis.pause();
+        isAudioPaused = true;
+        updateAudioBarState('Paused');
+      }
+    }
+
+    function stopAudioReader() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      isAudioPlaying = false;
+      isAudioPaused = false;
+      document.getElementById('audio-bar').classList.add('hidden');
+      document.getElementById('header-audio-icon').className = 'fas fa-volume-up';
+    }
+
+    function updateAudioBarState(statusText) {
+      document.getElementById('audio-status-text').innerText = statusText;
+      document.getElementById('audio-play-icon').className = isAudioPaused ? 'fas fa-play' : 'fas fa-pause';
+      document.getElementById('audio-pause-label').innerText = isAudioPaused ? 'Resume' : 'Pause';
+    }
+
+    function setQaQuestion(q) {
+      document.getElementById('qa-input-field').value = q;
+      submitQaQuestion();
+    }
+
+    function submitQaQuestion() {
+      const field = document.getElementById('qa-input-field');
+      const query = field ? field.value.trim() : '';
+      if (!query) return;
+
+      const terms = query.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(t => t.length > 2);
+      
+      const scored = currentSections.map(sec => {
+        const titleText = sec.title.toLowerCase();
+        const contentText = sec.content.toLowerCase();
+        let score = 0;
+        terms.forEach(term => {
+          if (titleText.includes(term)) score += 5;
+          const matches = (contentText.match(new RegExp(term, 'g')) || []).length;
+          score += matches;
+        });
+        return { section: sec, score };
+      }).filter(s => s.score > 0).sort((a, b) => b.score - a.score);
+
+      const container = document.getElementById('qa-results-container');
+      if (scored.length === 0) {
+        container.innerHTML = '<div class="p-6 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs space-y-1"><strong class="text-amber-950 font-bold">No direct section matches found for "' + query + '"</strong><p class="text-amber-800">Try rephrasing your search or browse the 24-section index on the left sidebar.</p></div>';
+        return;
+      }
+
+      const topMatches = scored.slice(0, 3);
+      container.innerHTML = '<div class="space-y-4">' +
+        '<div class="p-5 bg-red-50/80 border border-red-200 rounded-xl space-y-2">' +
+          '<div class="flex items-center space-x-2 text-[#D43F33] font-bold text-xs uppercase tracking-wider"><i class="fas fa-sparkles"></i><span>Synthesized Response Across Document</span></div>' +
+          '<p class="text-xs text-gray-800 leading-relaxed font-sans">Based on section analysis for query <strong>"' + query + '"</strong>:</p>' +
+          '<blockquote class="text-xs text-gray-800 italic border-l-2 border-[#D43F33] pl-3 py-1 font-serif bg-white/70 rounded-r">"' + topMatches[0].section.content.slice(0, 320).replace(/[*#_]/g, '') + '..."</blockquote>' +
+        '</div>' +
+        '<div class="space-y-3">' +
+          '<h4 class="font-bold text-xs text-[#111111] uppercase tracking-wider">Matching Citations & Sections (' + topMatches.length + ')</h4>' +
+          topMatches.map(m => '<div class="p-4 bg-[#F9F9F7] border border-gray-200 rounded-lg space-y-2">' +
+            '<div class="flex items-center justify-between">' +
+              '<span class="text-xs font-bold font-serif text-[#111111] flex items-center space-x-2">' +
+                '<span class="px-2 py-0.5 rounded bg-[#111111] text-white font-mono text-[10px]">Sec ' + m.section.num + '</span>' +
+                '<span>' + m.section.title + '</span>' +
+              '</span>' +
+              '<button onclick="scrollToSection(' + m.section.num + ')" class="text-[11px] font-bold text-[#D43F33] hover:underline flex items-center space-x-1 cursor-pointer"><span>Jump to Section</span><i class="fas fa-arrow-right text-[9px]"></i></button>' +
+            '</div>' +
+            '<p class="text-xs text-gray-600 line-clamp-3 leading-relaxed">' + m.section.content.slice(0, 280).replace(/[*#_]/g, '') + '...</p>' +
+          '</div>').join('') +
+        '</div>' +
+      '</div>';
+    }
+
+    function switchViewMode(mode) {
+      document.getElementById('view-container-doc').classList.add('hidden');
+      document.getElementById('view-container-flashcards').classList.add('hidden');
+      document.getElementById('view-container-quiz').classList.add('hidden');
+      const qaContainer = document.getElementById('view-container-qa');
+      if (qaContainer) qaContainer.classList.add('hidden');
+
+      document.getElementById('tab-doc').className = 'px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]';
+      document.getElementById('tab-flashcards').className = 'px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]';
+      document.getElementById('tab-quiz').className = 'px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]';
+      const qaTab = document.getElementById('tab-qa');
+      if (qaTab) qaTab.className = 'px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]';
+
+      const activeBtnClass = 'px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer bg-[#111111] text-white shadow-xs';
+
+      if (mode === 'doc') {
+        document.getElementById('view-container-doc').classList.remove('hidden');
+        document.getElementById('tab-doc').className = activeBtnClass;
+      } else if (mode === 'flashcards') {
+        document.getElementById('view-container-flashcards').classList.remove('hidden');
+        document.getElementById('tab-flashcards').className = activeBtnClass;
+      } else if (mode === 'quiz') {
+        document.getElementById('view-container-quiz').classList.remove('hidden');
+        document.getElementById('tab-quiz').className = activeBtnClass;
+      } else if (mode === 'qa') {
+        if (qaContainer) qaContainer.classList.remove('hidden');
+        if (qaTab) qaTab.className = activeBtnClass;
+      }
+    }
+
+    function changeFontSize(size) {
+      const container = document.getElementById('view-container-doc');
+      if (size === 'sm') container.style.fontSize = '0.875rem';
+      else if (size === 'base') container.style.fontSize = '1rem';
+      else if (size === 'lg') container.style.fontSize = '1.125rem';
+    }
+
+    function copyFullMarkdown() {
+      if (!currentSections || currentSections.length === 0) return;
+      const text = currentSections.map(s => '## ' + s.num + '. ' + s.title + '
+
+' + s.content).join('
+
+');
+      navigator.clipboard.writeText(text);
+      alert('Full document markdown copied to clipboard!');
+    }
+
+    function initApp() {
+      try {
+        loadCatalog();
+      } catch (err) {
+        console.error('App load error:', err);
+        const container = document.getElementById('view-container-doc');
+        if (container) {
+          container.innerHTML = '<div class="p-6 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-semibold">Error loading document: ' + (err.message || err) + '</div>';
+        }
+      }
+    }
+
+    try {
+      initApp();
+    } catch (e) {
+      console.error('Direct init error:', e);
+    }
+    if (document.readyState !== 'complete' && document.readyState !== 'interactive') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    }
+  </script>
+</body>
+</html>
