@@ -1,5 +1,10 @@
 [
   {
+    "title": "Helm vs Kustomize - The Fight Between Templating and Patching in Kubernetes",
+    "filename": "2026-07-30-helm-vs-kustomize-the-fight-between-templating-and-patching-in-kubernetes.md",
+    "date": "2026-07-30"
+  },
+  {
     "title": "Kustomize explained in 60 minutes with detailed GitHub notes | Demo Included",
     "filename": "2026-07-30-kustomize-explained-in-60-minutes-with-detailed-github-notes-demo-included.md",
     "date": "2026-07-30"
