@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transcript Scholar — Research & Knowledge Library</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FDFBF7; color: #111111; }
+    h1, h2, h3, h4, .font-serif, .editorial-title { font-family: 'Playfair Display', serif; }
+    
+    /* Markdown Prose Styling matching Transcript Scholar */
+    .prose h1 { font-size: 1.75rem; font-weight: 800; border-bottom: 2px solid #111; padding-bottom: 0.5rem; margin-top: 1.5rem; margin-bottom: 1rem; font-family: 'Playfair Display', serif; }
+    .prose h2 { font-size: 1.35rem; font-weight: 700; color: #D43F33; border-bottom: 1px solid #E5E7EB; padding-bottom: 0.3rem; margin-top: 1.5rem; margin-bottom: 0.75rem; font-family: 'Playfair Display', serif; }
+    .prose h3 { font-size: 1.15rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; font-family: 'Playfair Display', serif; }
+    .prose p { margin-bottom: 1rem; line-height: 1.75; color: #222222; font-size: 0.95rem; }
+    .prose ul, .prose ol { margin-left: 1.5rem; margin-bottom: 1.25rem; }
+    .prose ul { list-style-type: disc; }
+    .prose ol { list-style-type: decimal; }
+    .prose li { margin-bottom: 0.35rem; line-height: 1.6; }
+    .prose code { background: #F3F4F6; color: #111; padding: 0.15rem 0.4rem; border-radius: 4px; font-family: monospace; font-size: 0.85em; border: 1px solid #E5E7EB; }
+    .prose pre { background: #111; color: #F3F4F6; padding: 1.25rem; border-radius: 8px; overflow-x: auto; font-family: monospace; font-size: 0.85rem; margin: 1.25rem 0; border: 1px solid #333; }
+    .prose pre code { background: transparent; color: inherit; border: none; padding: 0; }
+    .prose blockquote { border-left: 4px solid #D43F33; padding-left: 1rem; font-style: italic; color: #4B5563; margin: 1.25rem 0; background: #F9F9F7; padding-top: 0.5rem; padding-bottom: 0.5rem; border-radius: 0 6px 6px 0; }
+    .prose table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.875rem; }
+    .prose th, .prose td { border: 1px solid #E5E7EB; padding: 0.6rem 0.8rem; text-align: left; }
+    .prose th { background-color: #F9F9F7; font-weight: 700; color: #111; }
+    .prose strong { color: #111; font-weight: 700; }
+
+    /* Print Stylesheet */
+    @media print {
+      header, aside, .no-print, #view-tabs, #doc-meta-bar { display: none !important; }
+      body { background-color: white !important; color: black !important; font-size: 11pt; }
+      main { width: 100% !important; margin: 0 !important; padding: 0 !important; border: none !important; box-shadow: none !important; }
+      .section-card { page-break-inside: avoid; border: 1px solid #ddd !important; margin-bottom: 1.5rem !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#FDFBF7]">
+
+  <!-- Top Navigation Bar -->
+  <header class="bg-[#111111] text-white border-b border-gray-800 px-4 sm:px-8 py-3.5 flex items-center justify-between sticky top-0 z-40 shadow-md">
+    <div class="flex items-center space-x-3.5">
+      <div class="w-9 h-9 rounded bg-[#D43F33] text-white font-serif font-extrabold flex items-center justify-center text-xl tracking-tighter shadow-xs">TS</div>
+      <div>
+        <div class="flex items-center space-x-2">
+          <h1 class="text-base sm:text-lg font-bold font-serif tracking-wide text-white">TRANSCRIPT SCHOLAR</h1>
+          <span class="hidden sm:inline-block px-2 py-0.5 rounded bg-red-950 text-[#D43F33] border border-red-800 text-[10px] font-mono font-bold uppercase">Research Library</span>
+        </div>
+        <p class="text-[11px] text-gray-400 font-mono">24-Section Knowledge Base • Hosted on GitHub Pages</p>
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-2 sm:space-x-3 text-xs">
+      <button onclick="toggleAudioReader()" class="px-3 py-1.5 rounded bg-[#D43F33] hover:bg-[#be352a] text-white font-bold flex items-center space-x-1.5 transition-colors cursor-pointer" title="Listen to document">
+        <i id="header-audio-icon" class="fas fa-volume-up"></i>
+        <span class="hidden md:inline">Listen Aloud</span>
+      </button>
+
+      <button onclick="window.print()" class="px-3 py-1.5 rounded bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold flex items-center space-x-1.5 transition-colors cursor-pointer" title="Print Academic Document">
+        <i class="fas fa-print"></i>
+        <span class="hidden md:inline">Print Paper</span>
+      </button>
+
+      <button onclick="copyFullMarkdown()" class="px-3 py-1.5 rounded bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold flex items-center space-x-1.5 transition-colors cursor-pointer" title="Copy raw markdown">
+        <i class="fas fa-copy"></i>
+        <span class="hidden md:inline">Copy Markdown</span>
+      </button>
+
+      <a href="https://github.com/ashokishere/TechCollections" target="_blank" class="px-3 py-1.5 rounded bg-gray-800 hover:bg-gray-700 text-white font-bold flex items-center space-x-1.5 transition-colors cursor-pointer">
+        <i class="fab fa-github text-sm"></i>
+        <span class="hidden sm:inline">GitHub Repo</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Audio Reader Floating Status Bar -->
+  <div id="audio-bar" class="hidden bg-[#111111] border-b border-red-900/80 px-4 py-2.5 text-white flex items-center justify-between z-30 sticky top-[57px] shadow-sm">
+    <div class="flex items-center space-x-3">
+      <div class="w-3 h-3 rounded-full bg-[#D43F33] animate-pulse"></div>
+      <span id="audio-status-text" class="text-xs font-mono font-medium text-gray-200">Reading document aloud...</span>
+    </div>
+    <div class="flex items-center space-x-2 text-xs">
+      <button onclick="toggleAudioPause()" class="px-2.5 py-1 rounded bg-gray-800 hover:bg-gray-700 text-white font-bold flex items-center space-x-1">
+        <i id="audio-play-icon" class="fas fa-pause"></i>
+        <span id="audio-pause-label">Pause</span>
+      </button>
+      <button onclick="stopAudioReader()" class="px-2.5 py-1 rounded bg-red-950 hover:bg-red-900 border border-red-800 text-red-200 font-bold flex items-center space-x-1">
+        <i class="fas fa-stop"></i>
+        <span>Stop</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Layout Grid -->
+  <div class="flex-1 max-w-[1400px] w-full mx-auto p-3 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- Left Sidebar: Document Library & 24-Section Index -->
+    <aside class="lg:col-span-3 space-y-5">
+      
+      <!-- Document Catalog Box -->
+      <div class="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-xs">
+        <h2 class="font-bold uppercase tracking-wider text-xs text-[#111111] mb-2.5 pb-2 border-b border-gray-200 flex items-center justify-between">
+          <span class="flex items-center space-x-1.5">
+            <i class="fas fa-books text-[#D43F33]"></i>
+            <span>Published Library</span>
+          </span>
+          <span id="doc-count" class="text-[10px] bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-mono font-bold">0</span>
+        </h2>
+
+        <div class="relative mb-3">
+          <input id="search-docs" type="text" placeholder="Search catalog..." class="w-full text-xs p-2 pl-7 bg-[#F9F9F7] border border-gray-200 rounded focus:outline-none focus:border-[#111111]" oninput="filterDocs()" />
+          <i class="fas fa-search absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
+        </div>
+
+        <div id="doc-list" class="space-y-1.5 overflow-y-auto max-h-[32vh] pr-1">
+          <div class="text-xs text-gray-400 italic p-2">Loading library catalog...</div>
+        </div>
+      </div>
+
+      <!-- 24-Section Quick Index Box -->
+      <div class="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-xs sticky top-20">
+        <div class="flex items-center justify-between mb-2.5 pb-2 border-b border-gray-200">
+          <h2 class="font-bold uppercase tracking-wider text-xs text-[#111111] flex items-center space-x-1.5">
+            <i class="fas fa-list-ol text-[#D43F33]"></i>
+            <span>24-Section Index</span>
+          </h2>
+          <span id="sections-found-badge" class="text-[10px] bg-red-50 text-[#D43F33] font-bold px-2 py-0.5 rounded border border-red-200 font-mono">24 Sections</span>
+        </div>
+
+        <div class="relative mb-2.5">
+          <input id="search-sections" type="text" placeholder="Jump to section..." class="w-full text-xs p-2 pl-7 bg-[#F9F9F7] border border-gray-200 rounded focus:outline-none focus:border-[#111111]" oninput="filterSections()" />
+          <i class="fas fa-filter absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
+        </div>
+
+        <div id="section-nav-list" class="space-y-1 overflow-y-auto max-h-[48vh] pr-1 text-xs">
+          <div class="text-xs text-gray-400 italic p-2">Select a document to view sections...</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area: Transcript Scholar View -->
+    <main class="lg:col-span-9 space-y-6">
+
+      <!-- Document Header Banner -->
+      <div id="doc-header-banner" class="bg-white border border-[#E5E7EB] rounded-xl p-6 sm:p-8 shadow-xs relative overflow-hidden">
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-[#D43F33]"></div>
+
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+          <span class="px-3 py-1 rounded bg-red-50 border border-red-200 text-[#D43F33] font-bold text-[11px] uppercase tracking-widest flex items-center space-x-1.5">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Transcript Scholar • 24-Section Comprehensive Research Document</span>
+          </span>
+          <span id="doc-date-badge" class="text-xs text-gray-500 font-mono"></span>
+        </div>
+
+        <h1 id="doc-title-heading" class="text-2xl sm:text-4xl font-extrabold text-[#111111] tracking-tight mb-3 font-serif leading-snug">
+          Select a Knowledge Document
+        </h1>
+
+        <p id="doc-file-path" class="text-xs text-gray-500 font-mono bg-[#F9F9F7] px-3 py-1.5 rounded border border-[#E5E7EB] inline-block">
+          Select a document from the Published Library on the left sidebar.
+        </p>
+
+        <!-- View Mode Switcher Toolbar -->
+        <div id="view-tabs" class="mt-6 pt-4 border-t border-gray-200 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center space-x-1 bg-[#F9F9F7] p-1 rounded-lg border border-[#E5E7EB]">
+            <button id="tab-doc" onclick="switchViewMode('doc')" class="px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer bg-[#111111] text-white">
+              <i class="fas fa-file-alt"></i>
+              <span>Full Research Document</span>
+            </button>
+            <button id="tab-flashcards" onclick="switchViewMode('flashcards')" class="px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]">
+              <i class="fas fa-clone"></i>
+              <span>Flash Cards</span>
+            </button>
+            <button id="tab-quiz" onclick="switchViewMode('quiz')" class="px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]">
+              <i class="fas fa-tasks"></i>
+              <span>Interactive Quiz</span>
+            </button>
+            <button id="tab-qa" onclick="switchViewMode('qa')" class="px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]">
+              <i class="fas fa-comments text-[#D43F33]"></i>
+              <span>Document Q&A</span>
+            </button>
+          </div>
+
+          <div class="flex items-center space-x-2 text-xs">
+            <span class="text-gray-500 font-bold uppercase tracking-wider text-[10px]">Text Size:</span>
+            <button onclick="changeFontSize('sm')" class="px-2 py-1 rounded bg-[#F9F9F7] hover:bg-gray-200 border border-[#E5E7EB] font-bold">A-</button>
+            <button onclick="changeFontSize('base')" class="px-2 py-1 rounded bg-[#F9F9F7] hover:bg-gray-200 border border-[#E5E7EB] font-bold">A</button>
+            <button onclick="changeFontSize('lg')" class="px-2 py-1 rounded bg-[#F9F9F7] hover:bg-gray-200 border border-[#E5E7EB] font-bold">A+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- View 1: Rendered Document Sections Container -->
+      <div id="view-container-doc" class="space-y-6">
+        <div class="bg-white border border-[#E5E7EB] rounded-xl p-12 text-center text-gray-400 font-serif">
+          <i class="fas fa-spinner fa-spin text-3xl mb-3 text-[#D43F33]"></i>
+          <p>Loading document analysis...</p>
+        </div>
+      </div>
+
+      <!-- View 2: Interactive Flashcards Container -->
+      <div id="view-container-flashcards" class="hidden space-y-6">
+        <div class="bg-white border border-[#E5E7EB] rounded-xl p-8 shadow-xs text-center">
+          <h3 class="font-serif font-bold text-xl text-[#111111] mb-2">Interactive Study Flashcards</h3>
+          <p class="text-xs text-gray-500 mb-6">Click card to reveal answer. Use controls below to navigate.</p>
+
+          <div id="flashcard-box" class="max-w-xl mx-auto min-h-[220px] bg-[#F9F9F7] border-2 border-[#111111] rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer shadow-md transition-all hover:border-[#D43F33]" onclick="flipCard()">
+            <span id="fc-category" class="text-[10px] font-bold uppercase tracking-widest text-[#D43F33] bg-red-50 border border-red-200 px-2.5 py-0.5 rounded-full mb-3">Core Concept</span>
+            <p id="fc-question-text" class="text-lg font-serif font-bold text-[#111111] leading-relaxed">Loading card question...</p>
+            <p id="fc-hint" class="text-[11px] text-gray-400 font-mono mt-4">(Click to flip card)</p>
+          </div>
+
+          <div class="flex items-center justify-center space-x-4 mt-6">
+            <button onclick="prevCard()" class="px-4 py-2 rounded bg-[#111111] hover:bg-[#D43F33] text-white font-bold text-xs uppercase tracking-wider flex items-center space-x-1 transition-colors cursor-pointer">
+              <i class="fas fa-arrow-left"></i>
+              <span>Previous</span>
+            </button>
+            <span id="fc-counter" class="text-xs font-mono font-bold text-gray-600 px-3 py-1 bg-gray-100 rounded">Card 1 / 1</span>
+            <button onclick="nextCard()" class="px-4 py-2 rounded bg-[#111111] hover:bg-[#D43F33] text-white font-bold text-xs uppercase tracking-wider flex items-center space-x-1 transition-colors cursor-pointer">
+              <span>Next</span>
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- View 3: Interactive Quiz Container -->
+      <div id="view-container-quiz" class="hidden space-y-6">
+        <div class="bg-white border border-[#E5E7EB] rounded-xl p-8 shadow-xs">
+          <div class="flex items-center justify-between border-b border-gray-200 pb-4 mb-6">
+            <div>
+              <h3 class="font-serif font-bold text-xl text-[#111111]">Interactive Knowledge Quiz</h3>
+              <p class="text-xs text-gray-500 mt-0.5">Test your comprehension on this research paper.</p>
+            </div>
+            <span id="quiz-score-badge" class="px-3 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 font-mono text-xs font-bold">
+              Score: 0 / 0
+            </span>
+          </div>
+
+          <div id="quiz-questions-list" class="space-y-6">
+            <div class="text-center py-8 text-gray-400 italic">Extracting quiz questions from Section 22...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- View 4: Document Q&A Assistant Container -->
+      <div id="view-container-qa" class="hidden space-y-6">
+        <div class="bg-white border border-[#E5E7EB] rounded-xl p-6 sm:p-8 shadow-xs space-y-6">
+          <div class="border-b border-gray-200 pb-4">
+            <div class="flex items-center space-x-2 text-[#D43F33] text-xs font-bold uppercase tracking-wider mb-1">
+              <i class="fas fa-brain"></i>
+              <span>Instant Semantic Document Search & Synthesis</span>
+            </div>
+            <h3 class="font-serif font-bold text-2xl text-[#111111]">Document Q&A Assistant</h3>
+            <p class="text-xs text-gray-500 mt-1">Ask questions about this research document to get instant answers with section citations.</p>
+          </div>
+
+          <!-- Question Input Form -->
+          <div class="space-y-3">
+            <div class="flex items-center gap-2">
+              <input id="qa-input-field" type="text" placeholder="Ask any question about this document (e.g. 'What are the core conclusions?')..." class="flex-1 text-sm p-3 bg-[#F9F9F7] border border-gray-300 rounded-lg focus:outline-none focus:border-[#111111]" onkeydown="if(event.key==='Enter') submitQaQuestion()" />
+              <button onclick="submitQaQuestion()" class="px-5 py-3 rounded-lg bg-[#111111] hover:bg-[#D43F33] text-white font-bold text-xs uppercase tracking-wider flex items-center space-x-2 transition-colors cursor-pointer">
+                <i class="fas fa-search"></i>
+                <span>Ask</span>
+              </button>
+            </div>
+
+            <!-- Preset Quick Question Chips -->
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+              <span class="text-gray-400 text-[11px] font-mono font-bold">Try asking:</span>
+              <button onclick="setQaQuestion('Summarize the main conclusions of this paper')" class="px-2.5 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium text-[11px] transition-colors">"Summarize main conclusions"</button>
+              <button onclick="setQaQuestion('What key takeaways are highlighted in Section 5?')" class="px-2.5 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium text-[11px] transition-colors">"Key takeaways in Section 5"</button>
+              <button onclick="setQaQuestion('Explain core definitions and methodology')" class="px-2.5 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium text-[11px] transition-colors">"Core methodology"</button>
+            </div>
+          </div>
+
+          <!-- Q&A Results Display -->
+          <div id="qa-results-container" class="mt-6 pt-4 border-t border-gray-200">
+            <div class="text-center py-12 text-gray-400 font-serif">
+              <i class="fas fa-comments text-3xl mb-3 text-gray-300"></i>
+              <p class="font-bold text-gray-600">Enter a question above to analyze document sections.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // GitHub Pages URL normalization (prevents 404 on relative fetches when missing trailing slash)
+    if (!window.location.pathname.endsWith('/') && !window.location.pathname.split('/').pop().includes('.')) {
+      window.location.replace(window.location.pathname + '/' + window.location.search + window.location.hash);
+    }
+
+    window.EMBEDDED_CATALOG = [{"title":"Docker AI, what’s new with MCP, Agents, Sandboxes, and more","filename":"2026-07-30-docker-ai-what-s-new-with-mcp-agents-sandboxes-and-more.md","date":"2026-07-30"},{"title":"11: Generative AI – Text-to-Image Models","filename":"2026-07-30-11-generative-ai-text-to-image-models.md","date":"2026-07-30"},{"title":"10: Generative AI – Adapting LLMs with Parameter-Efficient Fine-Tuning","filename":"2026-07-30-10-generative-ai-adapting-llms-with-parameter-efficient-fine-tuning.md","date":"2026-07-30"},{"title":"9: Generative AI – Large Language Models (LLMs) and Retrieval Augmented Generation (RAG)","filename":"2026-07-29-9-generative-ai-large-language-models-llms-and-retrieval-augmented-generation-rag.md","date":"2026-07-29"},{"title":"8: Deep Learning for Natural Language – Transformers, Self-Supervised Learning","filename":"2026-07-29-8-deep-learning-for-natural-language-transformers-self-supervised-learning.md","date":"2026-07-29"},{"title":"7: Deep Learning for Natural Language – Transformers","filename":"2026-07-29-7-deep-learning-for-natural-language-transformers.md","date":"2026-07-29"},{"title":"6: Deep Learning for Natural Language – Embeddings","filename":"2026-07-29-6-deep-learning-for-natural-language-embeddings.md","date":"2026-07-29"},{"title":"5: Deep Learning for Natural Language – The Basics","filename":"2026-07-29-5-deep-learning-for-natural-language-the-basics.md","date":"2026-07-29"},{"title":"4: Deep Learning for Computer Vision – Transfer Learning and Fine-Tuning; Intro to HuggingFace","filename":"2026-07-29-4-deep-learning-for-computer-vision-transfer-learning-and-fine-tuning-intro-to-huggingface.md","date":"2026-07-29"},{"title":"3: Deep Learning for Computer Vision – Building Convolutional Neural Networks from Scratch","filename":"2026-07-29-3-deep-learning-for-computer-vision-building-convolutional-neural-networks-from-scratch.md","date":"2026-07-29"},{"title":"2: Training Deep NNs (cont.); Introduction to Keras/Tensorflow; Application to Tabular Data","filename":"2026-07-29-2-training-deep-nns-cont-introduction-to-keras-tensorflow-application-to-tabular-data.md","date":"2026-07-29"},{"title":"Most Common Kubernetes Deployment Strategies (Examples \u0026 Code)","filename":"2026-07-29-most-common-kubernetes-deployment-strategies-examples-code.md","date":"2026-07-29"},{"title":"LLM Compression Explained: Build Faster, Efficient AI Models","filename":"2026-07-28-llm-compression-explained-build-faster-efficient-ai-models.md","date":"2026-07-28"},{"title":"Llama.cpp vs vLLM: Which Local LLM Engine Actually Scales?","filename":"2026-07-28-llama-cpp-vs-vllm-which-local-llm-engine-actually-scales.md","date":"2026-07-28"},{"title":"1: Introduction to Neural Networks and Deep Learning; Training Deep NNs","filename":"2026-07-28-1-introduction-to-neural-networks-and-deep-learning-training-deep-nns.md","date":"2026-07-28"},{"title":"How I use LLMs","filename":"2026-07-28-how-i-use-llms.md","date":"2026-07-28"},{"title":"Why RAG Solutions Fail with Complex Documents \u0026 Vector Databases","filename":"2026-07-28-why-rag-solutions-fail-with-complex-documents-vector-databases.md","date":"2026-07-28"},{"title":"Is RAG Still Needed? Choosing the Best Approach for LLMs","filename":"2026-07-28-is-rag-still-needed-choosing-the-best-approach-for-llms.md","date":"2026-07-28"}];
+    window.EMBEDDED_CURRENT_DOC = {"title":"Docker AI, what’s new with MCP, Agents, Sandboxes, and more","filename":"2026-07-30-docker-ai-what-s-new-with-mcp-agents-sandboxes-and-more.md","content":"# Docker AI, What’s New with MCP, Agents, Sandboxes, and More\n\n---\n\n## 1. Executive Summary\n\nIn this technical deep dive, Docker’s Michael Irwin and host Bret Fisher explore Docker’s rapidly evolving AI ecosystem. As generative AI shifts from interactive chat to autonomous agents operating in \"YOLO mode\" (where agents independently write code, run commands, and execute shell scripts), fundamental container security models require re-architecting. Docker addresses this by introducing microVM-based **Docker Sandboxes**, which provide hard hardware-virtualized boundary isolation, dedicated Linux kernels, isolated Docker daemons, and outbound proxy network firewalls. Concurrently, Docker introduces **Cagent** (formerly Docker Agent) for CI/CD automation, native **Model Context Protocol (MCP)** integration, macOS **MLX framework support** within Docker Model Runner, and **Docker Hardened Images**. Together, these technologies establish a secure runtime ecosystem for untrusted, agentic AI workloads across development environments and automated DevOps pipelines.\n\n---\n\n## 2. Key Takeaways\n\n* **MicroVM Hardening for AI Agents**: Docker Sandboxes transition agent execution from shared-kernel container isolation (namespaces/cgroups) to full hardware virtualization microVMs, isolating the Linux kernel, filesystem, and Docker daemon.\n* **Cagent (Docker Agent) CI/CD Automation**: Cagent integrates into GitHub Actions to automate code execution, pull request reviews, documentation audits, and build validations inside secure sandbox boundaries.\n* **Model Context Protocol (MCP) Integration**: Docker embraces Anthropic’s MCP standard via an integrated catalog and toolkit, enabling AI models to dynamically discover, connect to, and interact with external context providers and local toolchains.\n* **Apple Silicon MLX Acceleration**: Docker Model Runner natively incorporates Apple's MLX machine learning framework, delivering optimized local inference speeds on macOS hardware.\n* **Outbound Network Proxying \u0026 Guardrails**: Sandboxes employ fine-grained network firewalls and proxy layers to restrict egress traffic generated by non-deterministic agentic tools.\n* **Docker Hardened Images \u0026 Packages**: Security-hardened base images and system packages are now broadly accessible across the developer ecosystem to mitigate supply chain risks.\n\n---\n\n## 3. Topics Covered\n\n* **Docker Hardened Images and System Packages**: Secure base images and system-level packaging designed to eliminate common vulnerabilities and streamline enterprise compliance.\n* **Gordon AI Updates**: Enhancements to Docker's built-in conversational assistant, refining its context awareness and command generation accuracy within Docker Desktop.\n* **Docker Sandboxes Architecture**: The design principles of microVM-backed sandboxing designed to safely execute non-deterministic AI coding agents.\n* **Sandbox Network Security \u0026 Isolation**: Granular controls, proxy-level firewalling, and mount points enabling safe host-to-sandbox folder sharing without compromising host integrity.\n* **Model Runner, OpenWebUI, and MLX Support**: Local LLM execution updates inside Docker Desktop, featuring Apple Silicon MLX hardware acceleration and OpenWebUI integrations.\n* **MCP Catalog and Developer Toolkit**: A managed directory and debugging suite for Model Context Protocol servers to facilitate seamless tool access for agents.\n* **Cagent \u0026 The Future of AI in DevOps**: Automated PR reviews, open-source agent tooling, and the long-term convergence of autonomous software agents with cloud-native DevOps pipelines.\n\n---\n\n## 4. Timeline with Timestamps\n\n* **[00:00] Introduction**: Overview of Docker's major releases across Docker Desktop, Engine, Compose, MCP, Model Runner, Sandboxes, and Cagent.\n* **[11:15] Docker Hardened Images**: Deep dive into Hardened Base Images, system package security, and supply chain vulnerability reduction.\n* **[25:19] Gordon AI Updates**: Architectural and behavioral improvements to Docker's conversational assistant within Docker Desktop.\n* **[35:40] Docker Sandboxes: An Introduction**: Rationale for moving beyond classical container namespaces to microVM isolation for autonomous AI tools.\n* **[39:55] Sandbox Demo \u0026 Network Security**: Live demonstration showcasing microVM boundaries, isolated Docker daemons, proxy egress firewalls, and workspace mounts.\n* **[57:27] Model Runner, OpenWebUI \u0026 MCP Tools**: MLX framework support on macOS, local LLM execution, OpenWebUI integration, and the MCP server catalog.\n* **[01:08:48] Cagent, Open Source \u0026 The Future of AI in DevOps**: Renaming Docker Agent to Cagent, GitHub Actions workflows for automated code review, and future trends in autonomous DevOps engineering.\n\n---\n\n## 5. Detailed Explanation\n\n### Docker Hardened Images and System Packages\nTraditional base images often contain unnecessary system utilities, shell binaries, and outdated libraries that expand the attack surface. Docker Hardened Images provide minimal, secure base configurations containing audited system packages. These images undergo continuous vulnerability scanning, employ non-root execution profiles, and remove shell utilities where unnecessary, ensuring enterprise compliance and supply chain security out of the box.\n\n### Gordon AI Updates\nGordon AI serves as Docker's contextual assistant. The latest updates improve its ability to parse multi-container Docker Compose architectures, diagnose failing build layers, and suggest optimized Dockerfile configurations based on live engine state.\n\n### Docker Sandboxes Architecture\nWhen an AI agent runs shell commands, creates files, or installs dependencies autonomously, standard OS-level container isolation (Linux namespaces, cgroups, and seccomp profiles) presents risks. If an agent escalates privileges or exploits a kernel vulnerability, it could jeopardize the host OS. \n\n```\n+-------------------------------------------------------------------+\n|                            HOST SYSTEM                            |\n|                                                                   |\n|   +-----------------------------------------------------------+   |\n|   |                  DOCKER SANDBOX (MicroVM)                 |   |\n|   |                                                           |   |\n|   |   +-------------------+       +-----------------------+   |   |\n|   |   | Dedicated Kernel  |       | Isolated Docker Daemon|   |   |   |\n|   |   +---------+---------+       +-----------+-----------+   |   |\n|   |             |                             |               |   |\n|   |             v                             v               |   |\n|   |   +---------------------------------------------------+   |   |\n|   |   |         AI Agent Execution Environment            |   |   |\n|   |   +-------------------------+-------------------------+   |   |\n|   |                             |                             |   |\n|   +-----------------------------|-----------------------------+   |\n|                                 | Egress Control                  |\n|                                 v                                 |\n|                     [ Network Proxy / Firewall ]                  |\n|                                 |                                 |\n+---------------------------------|---------------------------------+\n                                  v\n                             [ Internet ]\n```\n\nDocker Sandboxes isolate untrusted execution inside lightweight virtual machines (microVMs). Each sandbox runs:\n1. An independent Linux kernel.\n2. A separate Docker daemon (`dockerd`), ensuring root access within the sandbox cannot affect the host Docker socket.\n3. Isolated root filesystems and loopback networking interfaces.\n\n### Sandbox Network Security \u0026 Egress Guardrails\nNetwork security in sandboxes is managed via explicit proxy egress controls. Autonomous agents executing commands in \"YOLO mode\" can trigger unsafe external API calls or download untrusted binaries. The Docker Sandbox architecture intercepts all outbound network requests using a host-managed proxy firewall. Developers can define explicit domain allowlists (e.g., allowing access to `github.com` or `registry.npmjs.org` while blocking arbitrary IP ranges).\n\n### Model Runner, OpenWebUI, and MCP Tools\nDocker Model Runner allows developers to pull and run Open Source LLMs locally. On macOS, Model Runner leverages Apple’s MLX framework to execute models directly on unified memory (Metal GPU acceleration). Docker Desktop provides seamless integration with OpenWebUI, allowing developers to interact with locally running models via a graphical chat interface. Furthermore, the Model Context Protocol (MCP) Catalog standardizes how agents discover tools, database drivers, and local APIs.\n\n### Cagent and the Future of AI in DevOps\nCagent (formerly Docker Agent) translates high-level task instructions into execution steps inside sandboxed environments. Integrated directly into GitHub Actions, Cagent can pull code modifications, spin up a secure microVM sandbox, execute test suits, analyze diffs, generate pull request reviews, and run static documentation audits automatically.\n\n---\n\n## 6. Beginner Explanation (ELI5)\n\nImagine you hire an assistant (an AI agent) to redecorate your living room. \n\n* **The Old Way (Standard Containers)**: You give the assistant a key to your main house. They work in the living room, but they can easily walk into your bedroom, open your safe, or accidentally knock down a support beam because they share the exact same foundation and hallways as you.\n* **The New Way (Docker Sandboxes)**: You build a separate, temporary guesthouse in the backyard with its own doors, locks, electricity, and water supply. The assistant works entirely inside this guesthouse. Even if they break a window or make a mess inside the guesthouse, your main house remains safe and unaffected.\n\nWhen the assistant needs tools (like a hammer or paint), they use a standardized hatch in the wall called **MCP (Model Context Protocol)**. If they need to order supplies over the phone, a guard standing outside (**Network Proxy**) checks the phone number to make sure they aren't calling unauthorized services. Once the assistant finishes decorating, you can check their work, accept the changes, and reset the guesthouse for the next task.\n\n---\n\n## 7. Technical Deep Dive\n\n### MicroVM Isolation vs. Container Namespaces\n\nStandard Linux containers achieve isolation via kernel primitives:\n* **Namespaces** (`pid`, `net`, `mnt`, `ipc`, `uts`, `user`) virtualize system resources.\n* **Cgroups** (Control Groups) meter resource consumption (CPU, Memory, I/O).\n* **Seccomp / AppArmor** restrict system call access to the host kernel interface.\n\nIn this model, all containers share the single underlying host Linux kernel. If an AI agent executes arbitrary code containing an unknown Linux kernel zero-day privilege escalation (e.g., a dirty COW variant), it can break out of container boundaries to compromise the host.\n\n```\n+-----------------------------------------------------------------+\n| Container Model: Shared Host Kernel                             |\n|                                                                 |\n|   +-------------------+    +-------------------+                |\n|   | Container A       |    | Container B (Agent|                |\n|   | (App Workload)    |    | \"YOLO\" Mode)      |                |\n|   +---------+---------+    +---------+---------+                |\n|             |                        |                          |\n|             +------------+-----------+                          |\n|                          v                                      |\n|          [ Shared Host Linux Kernel ]  \u003c-- Vulnerability Surface |\n+-----------------------------------------------------------------+\n\n+-----------------------------------------------------------------+\n| MicroVM Sandbox Model: Isolated Kernel                          |\n|                                                                 |\n|   +-------------------+    +----------------------------------+ |\n|   | Container A       |    | MicroVM Sandbox                  | |\n|   | (App Workload)    |    |  +-----------------------------+ | |\n|   |                   |    |  | Isolated Kernel             | | |\n|   |                   |    |  | Isolated Docker Daemon      | | |\n|   |                   |    |  | Agent Workload              | | |\n|   |                   |    |  +-----------------------------+ | |\n|   +---------+---------+    +----------------+-----------------+ |\n|             |                               |                   |\n|             v                               v                   |\n|   [ Host Linux Kernel ]             [ Hypervisor Barrier ]      |\n+-----------------------------------------------------------------+\n```\n\nDocker Sandboxes utilize hypervisor virtualization (such as Firecracker or Cloud-Hypervisor) to spin up microVMs in milliseconds. \n\n#### Hardware Boundary Features:\n1. **Isolated Virtual CPU/Memory Boundary**: Memory management is handled by hardware-assisted virtualization (Intel VT-x / AMD-V / Apple Virtualization Framework).\n2. **Dedicated Kernel Instance**: The sandbox runs an isolated, highly stripped Linux kernel. System calls executed by an agent terminate at the guest kernel.\n3. **Dedicated Virtual Storage Device**: Disk I/O operations are handled via virtual block devices (`virtio-blk`), preventing unauthorized raw access to host block storage.\n4. **Isolated Docker Daemon (`dockerd`)**: The guest runs its own nested container runtime. Container management calls inside the sandbox communicate exclusively with the guest daemon socket (`unix:///var/run/docker.sock` inside the VM), leaving host sockets completely unexposed.\n\n---\n\n## 8. Important Definitions\n\n* **MicroVM**: A minimal virtual machine designed to boot in milliseconds with low memory overhead while providing hardware-level virtualization isolation.\n* **Model Context Protocol (MCP)**: An open standard created by Anthropic that defines how language models discover and interact with external context providers, databases, and local system tools.\n* **Cagent (Docker Agent)**: Docker's native multi-agent runtime optimized for software engineering and CI/CD task automation.\n* **Docker Sandboxes**: A hypervisor-enforced isolated runtime environment provided by Docker Desktop to execute untrusted code and agent actions safely.\n* **Apple MLX Framework**: A high-performance array framework designed for machine learning on Apple Silicon, optimized for Metal GPU unified memory architectures.\n* **Docker Hardened Images**: Enterprise-grade base container images built with minimal attack surfaces, strict vulnerability SLAs, and secure defaults.\n* **YOLO Mode**: A colloquial term describing an AI agent running with full autonomous execution capabilities (reading, modifying, running shell commands) without requiring manual human confirmation for every step.\n\n---\n\n## 9. Code Snippets \u0026 Configuration Examples\n\n### Example 1: GitHub Actions Workflow for Cagent\n\n```yaml\nname: Continuous Integration \u0026 Agent Audit\n\non:\n  pull_request:\n    branches: [ \"main\" ]\n\njobs:\n  agent-review:\n    runs-on: ubuntu-latest\n    steps:\n      - name: Checkout Source Code\n        uses: actions/checkout@v4\n\n      - name: Setup Docker Buildx\n        uses: docker/setup-buildx-action@v3\n\n      - name: Run Cagent Automated Audit\n        uses: docker/cagent-action@v1\n        with:\n          agent-task: \"Analyze PR diffs, execute unit tests, and post security summary.\"\n          sandbox-enabled: \"true\"\n          allowed-hosts: \"api.github.com,registry.npmjs.org\"\n        env:\n          GITHUB_TOKEN: \u0024{{ secrets.GITHUB_TOKEN }}\n          OPENAI_API_KEY: \u0024{{ secrets.OPENAI_API_KEY }}\n```\n\n### Example 2: MCP Server Configuration (`mcp.json`)\n\n```json\n{\n  \"mcpServers\": {\n    \"docker-engine-toolkit\": {\n      \"command\": \"docker\",\n      \"args\": [\n        \"run\",\n        \"-i\",\n        \"--rm\",\n        \"--net=none\",\n        \"docker/mcp-server-docker:latest\"\n      ],\n      \"env\": {\n        \"LOG_LEVEL\": \"info\"\n      }\n    },\n    \"postgres-context\": {\n      \"command\": \"npx\",\n      \"args\": [\n        \"-y\",\n        \"@modelcontextprotocol/server-postgres\",\n        \"postgresql://read_only_user:securepass@localhost:5432/app_db\"\n      ]\n    }\n  }\n}\n```\n\n### Example 3: Running Docker Model Runner with MLX Acceleration (CLI)\n\n```bash\n# Verify Model Runner service state in Docker Desktop\ndocker model status\n\n# Pull an optimized GGUF/MLX quantized model for Apple Silicon local inference\ndocker model pull meta-llama/Llama-3.2-3B-Instruct-MLX\n\n# Run an interactive local model server exposed on a local loopback port\ndocker model run \\\n  --name local-llama \\\n  --gpu-backend mlx \\\n  --port 8080:8080 \\\n  meta-llama/Llama-3.2-3B-Instruct-MLX\n```\n\n---\n\n## 10. Best Practices\n\n1. **Enforce MicroVM Boundaries for Untrusted Code**: Always wrap autonomous AI agents (e.g., OpenHands, AutoGPT, Cagent) in microVM-backed Docker Sandboxes when executing arbitrary shell scripts.\n2. **Apply Default-Deny Egress Firewall Policies**: Configure outbound proxies to block all destination IP addresses by default, explicitly allowlisting only mandatory APIs (such as specific GitHub or package manager endpoints).\n3. **Mount Repositories via Read-Only Flags where Applicable**: When mounting host source directories into an AI sandbox, use read-only flags (`:ro`) unless the task specifically requires write access.\n4. **Standardize Tool Access via MCP**: Avoid custom shell wrappers for agent tools; use Model Context Protocol (MCP) servers to enable structured tool execution.\n5. **Standardize Base Layers on Hardened Images**: Migrate enterprise Dockerfiles from default OS distributions (e.g., standard Ubuntu/Debian) to Docker Hardened Images to eliminate unused packages and unpatched vulnerabilities.\n\n---\n\n## 11. Common Mistakes\n\n* **Exposing the Host Docker Socket (`/var/run/docker.sock`) directly to Autonomous Agents**: Granting an AI agent direct access to the host Docker socket gives it root privileges over the host machine. Always use an isolated Docker daemon inside a microVM Sandbox.\n* **Assuming Standard Containers Provide Sufficient Isolation for Execution**: Using default `docker run` commands without hypervisor boundaries leaves the host kernel exposed to kernel-level escapes.\n* **Unrestricted Egress Access in CI/CD Agents**: Leaving network access wide open inside agent environments enables malicious or hallucinated code to leak credentials or contact rogue endpoints.\n* **Over-reliance on Prompt Engineering for Security**: Attempting to prevent an agent from executing harmful bash commands strictly via system prompts (e.g., \"Please do not delete system files\") is vulnerable to prompt injection attacks. Hardware enforcement is required.\n\n---\n\n## 12. Interview Questions\n\n### Q1: What is the primary architectural difference between running an agent inside a standard Docker container versus a Docker Sandbox?\n**Answer**: A standard Docker container shares the host system's Linux kernel, isolating workloads using kernel primitives (namespaces, cgroups, seccomp). If an agent exploits a kernel vulnerability or has root privileges inside the container, host integrity can be compromised. A Docker Sandbox uses microVM hypervisor isolation, assigning a dedicated Linux kernel, isolated virtual memory, and an independent internal Docker daemon (`dockerd`) to the workspace. Kernel operations remain isolated within the microVM boundary.\n\n### Q2: How does the Model Context Protocol (MCP) standard enhance AI agent security and interoperability?\n**Answer**: MCP standardizes communication between large language models and external client tools or contextual data sources. Instead of writing custom API integration code for each system, MCP provides a uniform schema for tool discovery, arguments, and responses. Security is enhanced because MCP servers can run inside isolated boundaries, restricting LLM tool execution to pre-defined function signatures and validation rules rather than raw host execution.\n\n### Q3: Why is a dedicated Docker daemon necessary inside an AI execution sandbox?\n**Answer**: If an autonomous agent needs to build images or launch sidecar containers (e.g., database instances for running tests), giving it access to the host `dockerd` socket allows it to spawn privileged containers, mount host root filesystems, and bypass host security policies. Running a dedicated, nested Docker daemon inside the sandbox microVM ensures all container operations remain completely isolated from the host engine.\n\n---\n\n## 13. Certification Questions\n\n### Question 1 (DevOps / Container Security)\nWhich technical mechanism provides hardware-enforced isolation when executing untrusted AI coding scripts inside a Docker Sandbox?\n- A) Seccomp system call profiles\n- B) Linux Namespaces (`mnt`, `pid`, `net`)\n- C) MicroVM Hypervisor Boundaries\n- D) Docker Engine Daemon ACLs\n\n**Correct Answer**: C  \n**Explanation**: Docker Sandboxes utilize lightweight hypervisors (microVMs) to provide hardware-assisted virtualization. Options A and B rely on OS-level isolation (shared host kernel), while Option D controls API access rather than runtime virtualization.\n\n---\n\n### Question 2 (CI/CD Pipelines)\nWhen deploying Cagent into a GitHub Actions pipeline to review pull requests and execute code safely, what is the most secure method for handling outbound network traffic generated by the agent?\n- A) Disabling all host firewalls on the CI runner\n- B) Routing agent egress traffic through an outbound proxy with explicit domain allowlists\n- C) Granting full root privilege to the container network driver\n- D) Binding the container network directly to host interface in `--net=host` mode\n\n**Correct Answer**: B  \n**Explanation**: Network proxy egress filtering ensures that an autonomous agent operating in \"YOLO mode\" can only communicate with approved domains (e.g., specific package registries or API endpoints), preventing data exfiltration or calls to untrusted external systems.\n\n---\n\n## 14. Real-World Examples\n\n### 1. Safe Execution of Autonomous Coding Agents (Devin / OpenHands)\nA developer wants to evaluate an open-source autonomous coding agent that reads source code, plans refactoring, installs npm dependencies, and runs local test suits. By running the agent inside a Docker Sandbox, the developer mounts their local workspace directory into the microVM. The agent can freely install packages, run arbitrary `bash` commands, and spin up nested local database containers without risk of corrupting the developer's macOS/Linux host environment.\n\n### 2. Automated PR Security Audits via Cagent in Enterprise CI\nAn enterprise software organization integrates Cagent into their GitHub repository. Whenever a developer opens a PR modifying critical authentication logic, Cagent executes inside an isolated sandbox, pulls down the branch, compiles the code, executes dynamic fuzz testing, calls external vulnerability databases via MCP, and posts a comprehensive audit report directly back to the GitHub PR thread.\n\n---\n\n## 15. Analogies\n\n### 1. Shared Apartment vs. Standalone Safehouse\n* **Standard Container**: Living in a private room inside a shared apartment. You have your own room (namespaces), but you share the foundation, front door, and plumbing (host kernel). If someone bursts a pipe in their room, the whole apartment floods.\n* **MicroVM Sandbox**: Living in a completely separate, self-contained, gated safehouse on its own property. Anything happening inside that safehouse cannot affect the main building.\n\n### 2. The Universal Adapter (MCP)\n* **Model Context Protocol (MCP)**: Think of MCP as a universal USB-C standard for AI software. Instead of every tool requiring a custom, proprietary plug to connect to an LLM, MCP provides a standard port where any database, API, or local utility can instantly plug in and communicate seamlessly.\n\n---\n\n## 16. Frequently Asked Questions\n\n### Is Docker Sandbox performance significantly slower than running standard Docker containers?\nNo. MicroVM technology (such as Firecracker or Apple Virtualization Framework) enables sandboxes to boot in milliseconds with minimal CPU and RAM overhead, offering near-native execution performance alongside hypervisor security.\n\n### Can an agent inside a Docker Sandbox launch its own containerized stack using Docker Compose?\nYes. Because each Docker Sandbox runs its own isolated Docker daemon (`dockerd`) within the microVM, agents can execute standard `docker run` or `docker compose up` commands independently of the host engine.\n\n### How does Docker Model Runner utilize Apple's MLX Framework?\nDocker Model Runner includes specialized runtime drivers that bind to Apple Silicon's unified memory architecture via Metal. When enabled, MLX-formatted models run directly on the Mac's GPU, bypassing standard CPU translation layers for significantly faster local LLM inference.\n\n### What happens if an AI agent runs a destructive command like `rm -rf /` inside a Sandbox?\nThe command destroys the virtual filesystem within that specific guest microVM. The host machine and host filesystem remain entirely unaffected. Once the task finishes or fails, the sandbox can be discarded and restored instantly.\n\n---\n\n## 17. Related Technologies\n\n* **Firecracker / Cloud-Hypervisor**: Minimalist hypervisor implementations designed specifically for spawning secure microVMs in cloud-native workloads.\n* **Anthropic Model Context Protocol (MCP)**: Open specification defining client-server interactions between LLMs and tools.\n* **OpenWebUI**: An extensible, feature-rich web user interface for executing and managing local LLM workloads.\n* **Apple MLX**: An array-oriented machine learning framework optimized for Apple Silicon hardware.\n* **GitHub Actions**: Continuous integration and continuous delivery (CI/CD) platform where Cagent automates engineering workflows.\n\n---\n\n## 18. Important Quotes\n\n\u003e *\"Docker Sandboxes leverage microVMs, offering a significant security upgrade over traditional container-only setups by providing a separate Docker daemon, filesystem, and network layer for each sandbox.\"*\n\n\u003e *\"When running AI agents in 'YOLO mode', relying purely on prompt instructions to restrict system access is insufficient. Security must be enforced at the hardware and network virtualization boundaries.\"*\n\n\u003e *\"By bringing MLX support to Docker Model Runner on macOS, local LLM execution becomes significantly faster, enabling developers to run high-throughput local models directly on Apple Silicon.\"*\n\n---\n\n## 19. Glossary\n\n* **Agent**: An AI system capable of multi-step reasoning, planning, and tool execution to accomplish open-ended tasks autonomously.\n* **Cagent**: Docker’s specialized multi-agent CLI/CI runtime (formerly Docker Agent).\n* **Cgroups (Control Groups)**: A Linux kernel feature that limits, accounts for, and isolates resource usage (CPU, memory, disk I/O) for process groups.\n* **Docker Hardened Images**: Base images structured with minimal dependencies, stripped shell utilities, non-root user profiles, and active vulnerability tracking.\n* **Hypervisor**: Software, firmware, or hardware that creates and runs virtual machines by virtualizing host hardware.\n* **Model Context Protocol (MCP)**: An open specification for connecting AI models to context sources and executable tools.\n* **MicroVM**: A lightweight virtual machine running a minimal kernel for fast startup and hardware isolation.\n* **MLX**: An open-source machine learning framework developed by Apple for efficient inference and training on Apple Silicon.\n\n---\n\n## 20. One-Page Cheat Sheet\n\n### Key Architecture Comparison\n\n| Feature | Standard Docker Container | Docker Sandbox (MicroVM) |\n| :--- | :--- | :--- |\n| **Isolation Boundary** | OS Namespaces / Cgroups | Hardware Hypervisor |\n| **Linux Kernel** | Shared Host Kernel | Dedicated Guest Kernel |\n| **Docker Daemon Access** | Host Daemon (`docker.sock`) | Isolated Nested Daemon |\n| **Egress Filtering** | Standard Bridge / iptables | Managed Host Proxy Firewall |\n| **Boot Speed** | Instant (~100ms) | Rapid (~500ms) |\n| **Use Case** | Trusted Web Services / Apps | Untrusted AI Agents / Code Exec |\n\n### Key Commands Summary\n\n```bash\n# Verify Docker Model Runner status\ndocker model status\n\n# Pull and run an MLX model on Apple Silicon\ndocker model pull meta-llama/Llama-3.2-3B-Instruct-MLX\ndocker model run --gpu-backend mlx meta-llama/Llama-3.2-3B-Instruct-MLX\n\n# Execute Cagent locally in a sandbox environment\ncagent run --sandbox --task \"Run tests and refactor src/index.ts\"\n\n# Check active sandboxes in Docker Desktop CLI\ndocker sandbox ls\n```\n\n---\n\n## 21. Flash Cards\n\n- **Card 1 | MicroVM Isolation**\n  - **Q:** Why do AI agents executing autonomous bash commands require MicroVM Sandboxes rather than default containers?\n  - **A:** Standard containers share the host Linux kernel, leaving the host vulnerable to kernel escape exploits. MicroVM Sandboxes run dedicated guest kernels to enforce hardware boundaries.\n\n- **Card 2 | Dedicated Docker Daemon**\n  - **Q:** What security advantage does a dedicated nested Docker daemon inside a sandbox provide?\n  - **A:** It prevents the agent from communicating with the host Docker socket (`/var/run/docker.sock`), blocking privileged container escalation on the host system.\n\n- **Card 3 | Model Context Protocol (MCP)**\n  - **Q:** What is the core purpose of Anthropic's Model Context Protocol (MCP)?\n  - **A:** MCP provides a standardized client-server protocol enabling LLMs to discover and execute tools, access databases, and retrieve system context dynamically.\n\n- **Card 4 | Apple Silicon Acceleration**\n  - **Q:** What framework does Docker Model Runner utilize on macOS for GPU acceleration?\n  - **A:** Apple’s MLX machine learning framework, which leverages unified memory architectures via Metal.\n\n- **Card 5 | Egress Security Controls**\n  - **Q:** How do Docker Sandboxes manage unverified outbound network requests from autonomous agents?\n  - **A:** All outbound traffic passes through a managed proxy firewall that enforces explicit domain allowlisting.\n\n- **Card 6 | Cagent**\n  - **Q:** What was Docker Agent renamed to, and what is its primary CI/CD integration point?\n  - **A:** Renamed to Cagent; it integrates directly into GitHub Actions to automate development, PR audits, and code execution.\n\n---\n\n## 22. Quiz\n\n### Q1: What component is shared between a standard Linux container and the host OS?\n- A) Root Filesystem\n- B) Docker Daemon\n- C) Linux Kernel\n- D) Process ID Space  \n**Correct Answer: C**  \n**Explanation:** Standard containers share the host's Linux kernel, relying on namespaces and cgroups to segregate process environments.\n\n### Q2: How does Docker Sandbox prevent kernel privilege escalation exploits from affecting the host?\n- A) By filtering user passwords\n- B) By running inside an isolated hardware microVM with its own kernel\n- C) By blocking all inbound ports\n- D) By encrypting the container image layer  \n**Correct Answer: B**  \n**Explanation:** Sandboxes run inside microVMs, meaning kernel-level operations execute against a guest kernel rather than the host kernel.\n\n### Q3: What happens to host files when an agent executes `rm -rf /` inside a microVM Docker Sandbox?\n- A) The host machine immediately crashes\n- B) The host files are moved to the Trash\n- C) Only the guest sandbox virtual filesystem is destroyed; the host remains unaffected\n- D) The host kernel locks the filesystem in read-only mode  \n**Correct Answer: C**  \n**Explanation:** Hypervisor virtual block devices ensure the guest environment cannot reach the host filesystem unless explicit write mounts are provided.\n\n### Q4: Which standard protocol does Docker integrate to allow LLMs to interact with database drivers and external tools?\n- A) gRPC\n- B) Model Context Protocol (MCP)\n- C) OpenTelemetry (OTel)\n- D) OpenAPI / REST  \n**Correct Answer: B**  \n**Explanation:** Docker natively integrates the Model Context Protocol (MCP) to standardize tool interactions for AI models.\n\n### Q5: What framework is used by Docker Model Runner to optimize local LLMs on macOS?\n- A) CUDA\n- B) Direct3D\n- C) Apple MLX\n- D) OpenCL  \n**Correct Answer: C**  \n**Explanation:** Docker Model Runner uses Apple’s MLX framework to provide hardware-accelerated local inference on Apple Silicon.\n\n### Q6: What is the main security risk of mounting `/var/run/docker.sock` into an untrusted agent container?\n- A) It consumes excessive disk space\n- B) It allows the container to read host environment variables\n- C) It grants full root-level control over the host Docker daemon and underlying machine\n- D) It slows down network throughput  \n**Correct Answer: C**  \n**Explanation:** Access to the Docker socket allows a process to create privileged containers, access host drives, and essentially take full control of the host.\n\n### Q7: What is Cagent?\n- A) A Kubernetes database controller\n- B) Docker's multi-agent runtime designed for automated CI/CD software tasks\n- C) A load balancer for web traffic\n- D) A logging system for Docker Engine  \n**Correct Answer: B**  \n**Explanation:** Cagent (formerly Docker Agent) is designed to execute multi-step software engineering tasks in isolated environments.\n\n### Q8: How is network egress controlled inside a Docker Sandbox?\n- A) Network access is completely impossible\n- B) Through a host-managed proxy firewall enforcing domain allowlists\n- C) By limiting network bandwidth to 10 kbps\n- D) By disabling DNS resolution  \n**Correct Answer: B**  \n**Explanation:** Sandboxes route outbound traffic through a managed proxy firewall to restrict agent calls to explicitly approved destinations.\n\n### Q9: Which feature is central to Docker Hardened Images?\n- A) They contain every debugging tool available in Linux\n- B) They operate as privileged root containers by default\n- C) They minimize attack surfaces by removing unnecessary utilities and continuous patch scanning\n- D) They only work on ARM processors  \n**Correct Answer: C**  \n**Explanation:** Hardened images eliminate unnecessary dependencies and shells, reducing vulnerability surface areas.\n\n### Q10: Why are prompt-based instructions insufficient for securing AI agents executing arbitrary shell commands?\n- A) Prompts increase GPU overhead\n- B) Non-deterministic agents can suffer prompt injections or hallucinations, bypassing soft rules\n- C) Prompts do not work with English language models\n- D) Prompts are overwritten every time a container restarts  \n**Correct Answer: B**  \n**Explanation:** Prompt-level constraints are soft instructions that can be bypassed via prompt injections. System security requires hard runtime boundaries.\n\n---\n\n## 23. Action Items\n\n1. **Update Docker Desktop**: Upgrade to the latest version of Docker Desktop to unlock Docker Sandboxes, Model Runner updates, and the MCP Catalog.\n2. **Isolate AI Workflows**: Audit local workflows running autonomous coding tools (e.g., Devin, OpenHands, AutoGPT) and migrate them into Docker Sandboxes.\n3. **Configure MCP Tools**: Set up `mcp.json` to expose local databases and tools safely to your agent applications via standardized servers.\n4. **Test Local LLMs via Model Runner**: On macOS, test local LLM inference speeds using `docker model run --gpu-backend mlx`.\n5. **Implement Egress Allowlists**: Define proxy firewall allowlists for CI/CD agent workflows to enforce strict outbound network guardrails.\n6. **Adopt Hardened Base Images**: Transition internal Dockerfiles from standard OS distributions to Docker Hardened Images across build pipelines.\n\n---\n\n## 24. Recommended Further Reading\n\n* [Docker Official Documentation: Docker Sandboxes](https://docs.docker.com/)\n* [Anthropic Model Context Protocol (MCP) Specification](https://modelcontextprotocol.io/)\n* [Apple MLX Framework GitHub Repository](https://github.com/ml-explore/mlx)\n* [Firecracker MicroVM Architecture Deep Dive](https://firecracker-microvm.github.io/)\n* [Docker Security Practices \u0026 Hardened Base Images Guide](https://docs.docker.com/security/)"};
+
+    let documents = window.EMBEDDED_CATALOG || [];
+    let currentDoc = null;
+    let currentSections = [];
+    let flashcardsList = [];
+    let currentCardIdx = 0;
+    let isCardFlipped = false;
+    let quizList = [];
+    let userQuizAnswers = {};
+
+    function renderMarkdownContent(content) {
+      try {
+        if (typeof window.marked !== 'undefined') {
+          if (typeof window.marked.parse === 'function') {
+            return window.marked.parse(content || '');
+          } else if (typeof window.marked === 'function') {
+            return window.marked(content || '');
+          }
+        }
+      } catch (e) {
+        console.warn('Marked parse warning:', e);
+      }
+      return (content || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/
+/g, '<br/>');
+     function loadCatalog() {
+      if (window.EMBEDDED_CATALOG && Array.isArray(window.EMBEDDED_CATALOG) && window.EMBEDDED_CATALOG.length > 0) {
+        documents = window.EMBEDDED_CATALOG;
+      }
+
+      renderDocList(documents);
+
+      // Check URL query parameters or hash routing (?doc=filename.md)
+      const urlParams = new URLSearchParams(window.location.search);
+      let targetDocFilename = urlParams.get('doc') || window.location.hash.replace('#', '');
+      if (targetDocFilename) {
+        if (targetDocFilename.startsWith('docs/')) targetDocFilename = targetDocFilename.replace('docs/', '');
+        if (targetDocFilename.endsWith('.html')) targetDocFilename = targetDocFilename.replace('.html', '.md');
+      }
+
+      if (targetDocFilename) {
+        loadDoc(targetDocFilename);
+        return;
+      }
+
+      if (window.EMBEDDED_CURRENT_DOC && window.EMBEDDED_CURRENT_DOC.content) {
+        currentDoc = {
+          filename: window.EMBEDDED_CURRENT_DOC.filename,
+          title: window.EMBEDDED_CURRENT_DOC.title,
+          date: (documents.find(d => d.filename === window.EMBEDDED_CURRENT_DOC.filename) || {}).date || ''
+        };
+        renderDocList(documents);
+        document.getElementById('doc-title-heading').innerText = currentDoc.title || 'Knowledge Document';
+        document.getElementById('doc-date-badge').innerText = currentDoc.date ? 'Published ' + currentDoc.date : '';
+        document.getElementById('doc-file-path').innerText = 'docs/' + (currentDoc.filename || 'document.md');
+        try {
+          parseAndRenderMarkdown(window.EMBEDDED_CURRENT_DOC.content);
+        } catch (rErr) {
+          console.error('Markdown parse error:', rErr);
+          document.getElementById('view-container-doc').innerHTML = '<div class="p-6 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-semibold">Could not render document: ' + (rErr.message || rErr) + '</div>';
+        }
+      } else if (documents.length > 0) {
+        loadDoc(documents[0].filename);
+      } else {
+        document.getElementById('doc-list').innerHTML = '<div class="text-xs text-amber-700 bg-amber-50 p-3 rounded border border-amber-200">No published documents found.</div>';
+        document.getElementById('view-container-doc').innerHTML = '<div class="p-8 text-center bg-white border border-gray-200 rounded-xl text-gray-500 font-serif"><i class="fas fa-book-open text-3xl mb-3 text-gray-300"></i><p class="font-bold text-gray-700">No document selected or published</p><p class="text-xs text-gray-400 mt-1">Publish a document from the app to populate this research library.</p></div>';
+      }
+
+      try {
+        const pathPrefix = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
+        fetch(pathPrefix + 'docs/data.json')
+          .then(res => res.ok ? res.json() : null)
+          .then(freshDocs => {
+            if (Array.isArray(freshDocs) && freshDocs.length > 0) {
+              documents = freshDocs;
+              renderDocList(documents);
+            }
+          })
+          .catch(e => console.warn('Background docs/data.json fetch skipped:', e));
+      } catch (err) {
+        console.warn('Network fetch skipped:', err);
+      }
+    }
+
+    function renderDocList(docs) {
+      document.getElementById('doc-count').innerText = docs.length;
+      const container = document.getElementById('doc-list');
+      if (docs.length === 0) {
+        container.innerHTML = '<div class="text-xs text-gray-400 italic p-2">No published documents found.</div>';
+        return;
+      }
+      container.innerHTML = docs.map(d => `
+        <button onclick="loadDoc('${d.filename}')" class="w-full text-left p-2.5 rounded-lg hover:bg-[#F9F9F7] transition-all border border-transparent hover:border-gray-200 block cursor-pointer group ${currentDoc && currentDoc.filename === d.filename ? 'bg-red-50/70 border-red-200 font-bold' : ''}">
+          <p class="font-bold text-xs text-[#111111] group-hover:text-[#D43F33] line-clamp-2 leading-snug">${d.title}</p>
+          <p class="text-[10px] text-gray-400 font-mono mt-1 flex items-center justify-between">
+            <span>${d.date || ''}</span>
+            <i class="fas fa-chevron-right text-[9px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+          </p>
+        </button>
+      `).join('');
+    }
+
+    function filterDocs() {
+      const q = document.getElementById('search-docs').value.toLowerCase();
+      const filtered = documents.filter(d => d.title.toLowerCase().includes(q) || d.filename.toLowerCase().includes(q));
+      renderDocList(filtered);
+    }
+
+    async function loadDoc(filename) {
+      try {
+        const doc = documents.find(d => d.filename === filename);
+        currentDoc = doc || { filename, title: filename };
+        renderDocList(documents);
+
+        document.getElementById('doc-title-heading').innerText = currentDoc.title || filename;
+        document.getElementById('doc-date-badge').innerText = currentDoc.date ? `Published ${currentDoc.date}` : '';
+        document.getElementById('doc-file-path').innerText = `docs/${filename}`;
+
+        let mdText = '';
+        if (window.EMBEDDED_CURRENT_DOC && window.EMBEDDED_CURRENT_DOC.filename === filename && window.EMBEDDED_CURRENT_DOC.content) {
+          mdText = window.EMBEDDED_CURRENT_DOC.content;
+        } else {
+          const pathPrefix = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
+          const pathsToTry = [`${pathPrefix}docs/${filename}`, `./docs/${filename}`, `docs/${filename}`];
+          let loaded = false;
+          for (const path of pathsToTry) {
+            try {
+              const res = await fetch(path);
+              if (res.ok) {
+                mdText = await res.text();
+                loaded = true;
+                break;
+              }
+            } catch (e) {}
+          }
+          if (!loaded) throw new Error(`Document markdown file (docs/${filename}) not found on server.`);
+        }
+
+        parseAndRenderMarkdown(mdText);
+      } catch (err) {
+        document.getElementById('view-container-doc').innerHTML = `<div class="p-6 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-semibold">Could not load document: ${err.message}</div>`;
+      }
+    }
+
+    function parseAndRenderMarkdown(mdText) {
+      const headingRegex = /^##\s*(\d+)[\.\s]+(.*)$/gm;
+      let matches = [];
+      let match;
+      while ((match = headingRegex.exec(mdText)) !== null) {
+        matches.push({
+          index: match.index,
+          num: parseInt(match[1], 10),
+          title: match[2].trim(),
+          fullMatch: match[0],
+        });
+      }
+
+      if (matches.length === 0) {
+        const altRegex = /^##\s+(.*)$/gm;
+        let count = 1;
+        while ((match = altRegex.exec(mdText)) !== null) {
+          matches.push({
+            index: match.index,
+            num: count++,
+            title: match[1].trim(),
+            fullMatch: match[0],
+          });
+        }
+      }
+
+      currentSections = [];
+      for (let i = 0; i < matches.length; i++) {
+        const cur = matches[i];
+        const next = matches[i + 1];
+        const startIndex = cur.index + cur.fullMatch.length;
+        const endIndex = next ? next.index : mdText.length;
+        const content = mdText.slice(startIndex, endIndex).trim();
+
+        currentSections.push({
+          num: cur.num,
+          title: cur.title,
+          content,
+        });
+      }
+
+      if (currentSections.length === 0) {
+        currentSections = [{
+          num: 1,
+          title: (currentDoc && currentDoc.title) ? currentDoc.title : 'Document Content',
+          content: mdText || ''
+        }];
+      }
+
+      renderSectionIndex(currentSections);
+      renderDocumentBody(currentSections);
+      extractFlashcardsAndQuiz(mdText);
+    }
+
+    function renderSectionIndex(sections) {
+      const container = document.getElementById('section-nav-list');
+      document.getElementById('sections-found-badge').innerText = sections.length + ' Sections';
+
+      if (sections.length === 0) {
+        container.innerHTML = '<div class="text-xs text-gray-400 italic p-2">No sections detected in document.</div>';
+        return;
+      }
+
+      container.innerHTML = sections.map(s => 
+        '<button onclick="scrollToSection(' + s.num + ')" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-[#F9F9F7] text-gray-700 hover:text-[#D43F33] transition-colors flex items-center space-x-2 cursor-pointer group">' +
+          '<span class="w-5 h-5 rounded bg-gray-100 group-hover:bg-red-50 text-gray-600 group-hover:text-[#D43F33] font-mono text-[10px] font-bold flex items-center justify-center shrink-0 border border-gray-200">' +
+            s.num +
+          '</span>' +
+          '<span class="truncate font-medium text-[11px] group-hover:font-bold">' + s.title + '</span>' +
+        '</button>'
+      ).join('');
+    }
+
+    function filterSections() {
+      const q = document.getElementById('search-sections').value.toLowerCase();
+      const filtered = currentSections.filter(s => s.title.toLowerCase().includes(q) || ('' + s.num).includes(q));
+      renderSectionIndex(filtered);
+    }
+
+    function scrollToSection(num) {
+      switchViewMode('doc');
+      const elem = document.getElementById('section-' + num);
+      if (elem) {
+        elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function renderDocumentBody(sections) {
+      const container = document.getElementById('view-container-doc');
+      if (sections.length === 0) {
+        container.innerHTML = '<div class="bg-white border p-8 rounded-xl text-center text-gray-500">Document empty or not structured in 24 sections.</div>';
+        return;
+      }
+
+      container.innerHTML = sections.map(s => 
+        '<div id="section-' + s.num + '" class="section-card bg-white border border-[#E5E7EB] rounded-xl p-6 sm:p-8 shadow-xs relative space-y-4">' +
+          '<div class="flex items-center justify-between pb-3 border-b border-gray-200">' +
+            '<div class="flex items-center space-x-2.5">' +
+              '<span class="px-2.5 py-0.5 rounded bg-[#111111] text-white font-mono font-bold text-[10px] uppercase tracking-wider">' +
+                'SECTION ' + (s.num < 10 ? '0' + s.num : s.num) +
+              '</span>' +
+              '<h2 class="text-xl sm:text-2xl font-serif font-bold text-[#111111]">' + s.title + '</h2>' +
+            '</div>' +
+            '<button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="text-gray-400 hover:text-[#111111] text-xs flex items-center space-x-1 cursor-pointer" title="Back to top">' +
+              '<i class="fas fa-arrow-up text-[10px]"></i>' +
+              '<span class="hidden sm:inline">Top</span>' +
+            '</button>' +
+          '</div>' +
+
+          '<div class="prose max-w-none text-[#222222]">' +
+            renderMarkdownContent(s.content) +
+          '</div>' +
+        '</div>'
+      ).join('');
+
+      document.querySelectorAll('.prose pre').forEach((pre) => {
+        if (!pre.querySelector('.copy-code-btn')) {
+          const btn = document.createElement('button');
+          btn.className = 'copy-code-btn absolute top-2 right-2 px-2 py-1 bg-gray-800 hover:bg-gray-700 text-gray-200 text-[10px] font-bold rounded cursor-pointer transition-colors';
+          btn.innerText = 'Copy';
+          btn.onclick = () => {
+            const code = pre.querySelector('code')?.innerText || pre.innerText;
+            navigator.clipboard.writeText(code);
+            btn.innerText = 'Copied!';
+            setTimeout(() => { btn.innerText = 'Copy'; }, 2000);
+          };
+          pre.style.position = 'relative';
+          pre.appendChild(btn);
+        }
+      });
+    }
+
+    function extractFlashcardsAndQuiz(mdText) {
+      flashcardsList = [];
+      const sec21Match = mdText.match(/##\s*21[\.\s]+Flash\s*Cards([\s\S]*?)(?=##\s*22|$)/i);
+      const fcContent = sec21Match ? sec21Match[1] : mdText;
+      const blocks = fcContent.split(/-\s*\*\*Card\s*\d+/i).filter(b => b.trim().length > 0);
+
+      blocks.forEach((block, idx) => {
+        const qMatch = block.match(/\*\*Q:\*\*\s*(.+)/i) || block.match(/Q:\s*(.+)/i);
+        const aMatch = block.match(/\*\*A:\*\*\s*(.+)/i) || block.match(/A:\s*(.+)/i);
+        if (qMatch && aMatch) {
+          flashcardsList.push({
+            question: qMatch[1].replace(/\*\*/g, '').trim(),
+            answer: aMatch[1].replace(/\*\*/g, '').trim(),
+            category: 'Core Knowledge'
+          });
+        }
+      });
+
+      if (flashcardsList.length === 0) {
+        flashcardsList = [
+          { question: "What is the primary objective of this knowledge research paper?", answer: "To deliver a 24-section comprehensive synthesis of the source video transcript.", category: "Overview" },
+          { question: "How can you utilize the flashcards and quiz tools?", answer: "Review sections sequentially, flip flashcards for key terms, and test recall with the interactive quiz.", category: "Study Method" }
+        ];
+      }
+      currentCardIdx = 0;
+      isCardFlipped = false;
+      renderCurrentFlashcard();
+
+      quizList = [];
+      userQuizAnswers = {};
+      const sec22Match = mdText.match(/##\s*22[\.\s]+Quiz([\s\S]*?)(?=##\s*23|$)/i);
+      const qContent = sec22Match ? sec22Match[1] : mdText;
+      const qBlocks = qContent.split(/(?=###?\s*Q\d+:?|^\d+\.\s+)/m).filter(b => b.trim().length > 0);
+
+      qBlocks.forEach((b, idx) => {
+        const qLine = b.match(/(?:###?\s*Q\d+:?|\d+\.\s+)?\s*(.+?)(?=\n-|
+\*\*\s*Correct)/s);
+        const opts = [...b.matchAll(/[-*]\s*([A-D]\))\s*(.+)/gi)];
+        const corr = b.match(/\*\*Correct Answer:\*\*\s*([A-D])/i) || b.match(/Correct:\s*([A-D])/i);
+        const exp = b.match(/\*\*Explanation:\*\*\s*(.+)/i) || b.match(/Explanation:\s*(.+)/i);
+
+        if (qLine && opts.length >= 2) {
+          let cIdx = 0;
+          if (corr) {
+            cIdx = ['A', 'B', 'C', 'D'].indexOf(corr[1].toUpperCase());
+            if (cIdx === -1) cIdx = 0;
+                quizList.push({
+            id: idx,
+            question: qLine[1].trim().replace(/^###?s*Qd+:?s*/, ''),
+            options: opts.map(o => o[1] + ' ' + o[2].trim()),
+            correctIndex: cIdx,
+            explanation: exp ? exp[1].trim() : 'Refer to the detailed explanation sections above.'
+          });
+        }
+      });
+
+      renderQuizList();
+    }
+
+    function renderCurrentFlashcard() {
+      if (flashcardsList.length === 0) return;
+      const card = flashcardsList[currentCardIdx];
+      document.getElementById('fc-category').innerText = card.category;
+      document.getElementById('fc-question-text').innerText = isCardFlipped ? card.answer : card.question;
+      document.getElementById('fc-hint').innerText = isCardFlipped ? '(Click to reveal question)' : '(Click to flip answer)';
+      document.getElementById('fc-counter').innerText = 'Card ' + (currentCardIdx + 1) + ' / ' + flashcardsList.length;
+    }
+
+    function flipCard() {
+      isCardFlipped = !isCardFlipped;
+      renderCurrentFlashcard();
+    }
+
+    function prevCard() {
+      isCardFlipped = false;
+      currentCardIdx = (currentCardIdx - 1 + flashcardsList.length) % flashcardsList.length;
+      renderCurrentFlashcard();
+    }
+
+    function nextCard() {
+      isCardFlipped = false;
+      currentCardIdx = (currentCardIdx + 1) % flashcardsList.length;
+      renderCurrentFlashcard();
+    }
+
+    function renderQuizList() {
+      const container = document.getElementById('quiz-questions-list');
+      if (quizList.length === 0) {
+        container.innerHTML = '<div class="text-xs text-gray-500 italic">No structured multiple-choice quiz questions parsed from Section 22.</div>';
+        return;
+      }
+
+      container.innerHTML = quizList.map((q, qIdx) => 
+        '<div class="p-6 rounded-xl bg-[#F9F9F7] border border-[#E5E7EB] space-y-3">' +
+          '<p class="font-bold text-sm text-[#111111] font-serif">' +
+            '<span class="text-[#D43F33] font-mono mr-1.5">Q' + (qIdx + 1) + '.</span> ' + q.question +
+          '</p>' +
+
+          '<div class="space-y-2 pt-1">' +
+            q.options.map((opt, oIdx) => {
+              const isSelected = userQuizAnswers[qIdx] === oIdx;
+              const isSubmitted = userQuizAnswers[qIdx] !== undefined;
+              const isCorrect = oIdx === q.correctIndex;
+
+              let btnStyle = 'bg-white border-gray-200 text-gray-800 hover:border-[#111111]';
+              if (isSubmitted) {
+                if (isCorrect) btnStyle = 'bg-emerald-50 border-emerald-500 text-emerald-900 font-bold';
+                else if (isSelected) btnStyle = 'bg-rose-50 border-rose-400 text-rose-900 font-bold';
+                else btnStyle = 'bg-white border-gray-200 text-gray-400 opacity-60';
+              }
+
+              return '<button onclick="selectQuizOption(' + qIdx + ', ' + oIdx + ')" class="w-full text-left p-3 rounded-lg border text-xs transition-all flex items-center justify-between cursor-pointer ' + btnStyle + '">' +
+                '<span>' + opt + '</span>' +
+                (isSubmitted && isCorrect ? '<i class="fas fa-check-circle text-emerald-600"></i>' : '') +
+                (isSubmitted && isSelected && !isCorrect ? '<i class="fas fa-times-circle text-rose-500"></i>' : '') +
+              '</button>';
+            }).join('') +
+          '</div>' +
+
+          (userQuizAnswers[qIdx] !== undefined ? 
+            '<div class="p-3 rounded bg-white border border-gray-200 text-xs text-gray-700 font-mono mt-2">' +
+              '<strong class="text-[#111111]">Explanation:</strong> ' + q.explanation +
+            '</div>'
+          : '') +
+        '</div>'
+      ).join('');
+
+      let correctCount = 0;
+      let answeredCount = 0;
+      Object.keys(userQuizAnswers).forEach((qIdxStr) => {
+        answeredCount++;
+        const qIdx = parseInt(qIdxStr, 10);
+        if (userQuizAnswers[qIdx] === quizList[qIdx].correctIndex) {
+          correctCount++;
+        }
+      });
+
+      document.getElementById('quiz-score-badge').innerText = 'Score: ' + correctCount + ' / ' + quizList.length + ' (' + answeredCount + ' answered)';
+    }
+
+    function selectQuizOption(qIdx, oIdx) {
+      userQuizAnswers[qIdx] = oIdx;
+      renderQuizList();
+    }
+
+    // Audio Speech Reader State & Logic
+    let currentUtterance = null;
+    let isAudioPlaying = false;
+    let isAudioPaused = false;
+
+    function toggleAudioReader() {
+      if (!('speechSynthesis' in window)) {
+        alert('Text-to-speech audio reader is not supported in this browser.');
+        return;
+      }
+      if (isAudioPlaying) {
+        stopAudioReader();
+      } else {
+        startAudioReader();
+      }
+    }
+
+    function startAudioReader() {
+      if (!currentSections || currentSections.length === 0) {
+        alert('No document sections loaded to read.');
+        return;
+      }
+      window.speechSynthesis.cancel();
+      
+      const fullText = currentSections.map(s => 'Section ' + s.num + ': ' + s.title + '. ' + s.content.replace(/[*#_]/g, '')).join(' ');
+      currentUtterance = new SpeechSynthesisUtterance(fullText.slice(0, 4500));
+      currentUtterance.rate = 1.0;
+      currentUtterance.pitch = 1.0;
+
+      currentUtterance.onstart = () => {
+        isAudioPlaying = true;
+        isAudioPaused = false;
+        document.getElementById('audio-bar').classList.remove('hidden');
+        document.getElementById('header-audio-icon').className = 'fas fa-volume-up text-amber-400 animate-pulse';
+        updateAudioBarState('Reading document aloud...');
+      };
+
+      currentUtterance.onend = () => {
+        stopAudioReader();
+      };
+
+      currentUtterance.onerror = () => {
+        stopAudioReader();
+      };
+
+      window.speechSynthesis.speak(currentUtterance);
+    }
+
+    function toggleAudioPause() {
+      if (!('speechSynthesis' in window) || !isAudioPlaying) return;
+      if (isAudioPaused) {
+        window.speechSynthesis.resume();
+        isAudioPaused = false;
+        updateAudioBarState('Reading document aloud...');
+      } else {
+        window.speechSynthesis.pause();
+        isAudioPaused = true;
+        updateAudioBarState('Paused');
+      }
+    }
+
+    function stopAudioReader() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      isAudioPlaying = false;
+      isAudioPaused = false;
+      document.getElementById('audio-bar').classList.add('hidden');
+      document.getElementById('header-audio-icon').className = 'fas fa-volume-up';
+    }
+
+    function updateAudioBarState(statusText) {
+      document.getElementById('audio-status-text').innerText = statusText;
+      document.getElementById('audio-play-icon').className = isAudioPaused ? 'fas fa-play' : 'fas fa-pause';
+      document.getElementById('audio-pause-label').innerText = isAudioPaused ? 'Resume' : 'Pause';
+    }
+
+    function setQaQuestion(q) {
+      document.getElementById('qa-input-field').value = q;
+      submitQaQuestion();
+    }
+
+    function submitQaQuestion() {
+      const field = document.getElementById('qa-input-field');
+      const query = field ? field.value.trim() : '';
+      if (!query) return;
+
+      const terms = query.toLowerCase().replace(/[^a-z0-9s]/g, '').split(/s+/).filter(t => t.length > 2);
+      
+      const scored = currentSections.map(sec => {
+        const titleText = sec.title.toLowerCase();
+        const contentText = sec.content.toLowerCase();
+        let score = 0;
+        terms.forEach(term => {
+          if (titleText.includes(term)) score += 5;
+          const matches = (contentText.match(new RegExp(term, 'g')) || []).length;
+          score += matches;
+        });
+        return { section: sec, score };
+      }).filter(s => s.score > 0).sort((a, b) => b.score - a.score);
+
+      const container = document.getElementById('qa-results-container');
+      if (scored.length === 0) {
+        container.innerHTML = '<div class="p-6 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs space-y-1"><strong class="text-amber-950 font-bold">No direct section matches found for "' + query + '"</strong><p class="text-amber-800">Try rephrasing your search or browse the 24-section index on the left sidebar.</p></div>';
+        return;
+      }
+
+      const topMatches = scored.slice(0, 3);
+      container.innerHTML = '<div class="space-y-4">' +
+        '<div class="p-5 bg-red-50/80 border border-red-200 rounded-xl space-y-2">' +
+          '<div class="flex items-center space-x-2 text-[#D43F33] font-bold text-xs uppercase tracking-wider"><i class="fas fa-sparkles"></i><span>Synthesized Response Across Document</span></div>' +
+          '<p class="text-xs text-gray-800 leading-relaxed font-sans">Based on section analysis for query <strong>"' + query + '"</strong>:</p>' +
+          '<blockquote class="text-xs text-gray-800 italic border-l-2 border-[#D43F33] pl-3 py-1 font-serif bg-white/70 rounded-r">"' + topMatches[0].section.content.slice(0, 320).replace(/[*#_]/g, '') + '..."</blockquote>' +
+        '</div>' +
+        '<div class="space-y-3">' +
+          '<h4 class="font-bold text-xs text-[#111111] uppercase tracking-wider">Matching Citations & Sections (' + topMatches.length + ')</h4>' +
+          topMatches.map(m => '<div class="p-4 bg-[#F9F9F7] border border-gray-200 rounded-lg space-y-2">' +
+            '<div class="flex items-center justify-between">' +
+              '<span class="text-xs font-bold font-serif text-[#111111] flex items-center space-x-2">' +
+                '<span class="px-2 py-0.5 rounded bg-[#111111] text-white font-mono text-[10px]">Sec ' + m.section.num + '</span>' +
+                '<span>' + m.section.title + '</span>' +
+              '</span>' +
+              '<button onclick="scrollToSection(' + m.section.num + ')" class="text-[11px] font-bold text-[#D43F33] hover:underline flex items-center space-x-1 cursor-pointer"><span>Jump to Section</span><i class="fas fa-arrow-right text-[9px]"></i></button>' +
+            '</div>' +
+            '<p class="text-xs text-gray-600 line-clamp-3 leading-relaxed">' + m.section.content.slice(0, 280).replace(/[*#_]/g, '') + '...</p>' +
+          '</div>').join('') +
+        '</div>' +
+      '</div>';
+    }
+
+    function switchViewMode(mode) {
+      document.getElementById('view-container-doc').classList.add('hidden');
+      document.getElementById('view-container-flashcards').classList.add('hidden');
+      document.getElementById('view-container-quiz').classList.add('hidden');
+      const qaContainer = document.getElementById('view-container-qa');
+      if (qaContainer) qaContainer.classList.add('hidden');
+
+      document.getElementById('tab-doc').className = 'px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]';
+      document.getElementById('tab-flashcards').className = 'px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]';
+      document.getElementById('tab-quiz').className = 'px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]';
+      const qaTab = document.getElementById('tab-qa');
+      if (qaTab) qaTab.className = 'px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]';
+
+      const activeBtnClass = 'px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer bg-[#111111] text-white shadow-xs';
+
+      if (mode === 'doc') {
+        document.getElementById('view-container-doc').classList.remove('hidden');
+        document.getElementById('tab-doc').className = activeBtnClass;
+      } else if (mode === 'flashcards') {
+        document.getElementById('view-container-flashcards').classList.remove('hidden');
+        document.getElementById('tab-flashcards').className = activeBtnClass;
+      } else if (mode === 'quiz') {
+        document.getElementById('view-container-quiz').classList.remove('hidden');
+        document.getElementById('tab-quiz').className = activeBtnClass;
+      } else if (mode === 'qa') {
+        if (qaContainer) qaContainer.classList.remove('hidden');
+        if (qaTab) qaTab.className = activeBtnClass;
+      }
+    }
+
+    function changeFontSize(size) {
+      const container = document.getElementById('view-container-doc');
+      if (size === 'sm') container.style.fontSize = '0.875rem';
+      else if (size === 'base') container.style.fontSize = '1rem';
+      else if (size === 'lg') container.style.fontSize = '1.125rem';
+    }
+
+    function copyFullMarkdown() {
+      if (!currentSections || currentSections.length === 0) return;
+      const text = currentSections.map(s => '## ' + s.num + '. ' + s.title + '
+
+' + s.content).join('
+
+');
+      navigator.clipboard.writeText(text);
+      alert('Full document markdown copied to clipboard!');
+    }
+
+    function initApp() {
+      try {
+        loadCatalog();
+      } catch (err) {
+        console.error('App load error:', err);
+        const container = document.getElementById('view-container-doc');
+        if (container) {
+          container.innerHTML = '<div class="p-6 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-semibold">Error loading document: ' + (err.message || err) + '</div>';
+        }
+      }
+    }
+
+    try {
+      initApp();
+    } catch (e) {
+      console.error('Direct init error:', e);
+    }
+    if (document.readyState !== 'complete' && document.readyState !== 'interactive') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    }
+  </script>
+</body>
+</html>
