@@ -6,6 +6,7 @@ This repository contains published 24-section Knowledge Documents generated from
 
 ## 📚 Published Documents
 
+- [11: Generative AI – Text-to-Image Models](./docs/2026-07-30-11-generative-ai-text-to-image-models.md) *(2026-07-30)*
 - [10: Generative AI – Adapting LLMs with Parameter-Efficient Fine-Tuning](./docs/2026-07-30-10-generative-ai-adapting-llms-with-parameter-efficient-fine-tuning.md) *(2026-07-30)*
 - [9: Generative AI – Large Language Models (LLMs) and Retrieval Augmented Generation (RAG)](./docs/2026-07-29-9-generative-ai-large-language-models-llms-and-retrieval-augmented-generation-rag.md) *(2026-07-29)*
 - [8: Deep Learning for Natural Language – Transformers, Self-Supervised Learning](./docs/2026-07-29-8-deep-learning-for-natural-language-transformers-self-supervised-learning.md) *(2026-07-29)*
