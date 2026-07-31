@@ -6,6 +6,7 @@ This repository contains published 24-section Knowledge Documents generated from
 
 ## 📚 Published Documents
 
+- [Docker AI, what’s new with MCP, Agents, Sandboxes, and more](./docs/2026-07-31-docker-ai-what-s-new-with-mcp-agents-sandboxes-and-more.md) *(2026-07-31)*
 - [Networking Concepts Every DevOps Engineer Must Know](./docs/2026-07-31-networking-concepts-every-devops-engineer-must-know.md) *(2026-07-31)*
 - [Helm vs Kustomize - The Fight Between Templating and Patching in Kubernetes](./docs/2026-07-30-helm-vs-kustomize-the-fight-between-templating-and-patching-in-kubernetes.md) *(2026-07-30)*
 - [Kustomize explained in 60 minutes with detailed GitHub notes | Demo Included](./docs/2026-07-30-kustomize-explained-in-60-minutes-with-detailed-github-notes-demo-included.md) *(2026-07-30)*
