@@ -1,5 +1,10 @@
 [
   {
+    "title": "Networking Concepts Every DevOps Engineer Must Know",
+    "filename": "2026-07-31-networking-concepts-every-devops-engineer-must-know.md",
+    "date": "2026-07-31"
+  },
+  {
     "title": "Helm vs Kustomize - The Fight Between Templating and Patching in Kubernetes",
     "filename": "2026-07-30-helm-vs-kustomize-the-fight-between-templating-and-patching-in-kubernetes.md",
     "date": "2026-07-30"
