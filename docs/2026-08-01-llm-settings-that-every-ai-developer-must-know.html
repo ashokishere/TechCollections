@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transcript Scholar — Research & Knowledge Library</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FDFBF7; color: #111111; }
+    h1, h2, h3, h4, .font-serif, .editorial-title { font-family: 'Playfair Display', serif; }
+    
+    /* Markdown Prose Styling matching Transcript Scholar */
+    .prose h1 { font-size: 1.75rem; font-weight: 800; border-bottom: 2px solid #111; padding-bottom: 0.5rem; margin-top: 1.5rem; margin-bottom: 1rem; font-family: 'Playfair Display', serif; }
+    .prose h2 { font-size: 1.35rem; font-weight: 700; color: #D43F33; border-bottom: 1px solid #E5E7EB; padding-bottom: 0.3rem; margin-top: 1.5rem; margin-bottom: 0.75rem; font-family: 'Playfair Display', serif; }
+    .prose h3 { font-size: 1.15rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; font-family: 'Playfair Display', serif; }
+    .prose p { margin-bottom: 1rem; line-height: 1.75; color: #222222; font-size: 0.95rem; }
+    .prose ul, .prose ol { margin-left: 1.5rem; margin-bottom: 1.25rem; }
+    .prose ul { list-style-type: disc; }
+    .prose ol { list-style-type: decimal; }
+    .prose li { margin-bottom: 0.35rem; line-height: 1.6; }
+    .prose code { background: #F3F4F6; color: #111; padding: 0.15rem 0.4rem; border-radius: 4px; font-family: monospace; font-size: 0.85em; border: 1px solid #E5E7EB; }
+    .prose pre { background: #111; color: #F3F4F6; padding: 1.25rem; border-radius: 8px; overflow-x: auto; font-family: monospace; font-size: 0.85rem; margin: 1.25rem 0; border: 1px solid #333; }
+    .prose pre code { background: transparent; color: inherit; border: none; padding: 0; }
+    .prose blockquote { border-left: 4px solid #D43F33; padding-left: 1rem; font-style: italic; color: #4B5563; margin: 1.25rem 0; background: #F9F9F7; padding-top: 0.5rem; padding-bottom: 0.5rem; border-radius: 0 6px 6px 0; }
+    .prose table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.875rem; }
+    .prose th, .prose td { border: 1px solid #E5E7EB; padding: 0.6rem 0.8rem; text-align: left; }
+    .prose th { background-color: #F9F9F7; font-weight: 700; color: #111; }
+    .prose strong { color: #111; font-weight: 700; }
+
+    /* Print Stylesheet */
+    @media print {
+      header, aside, .no-print, #view-tabs, #doc-meta-bar { display: none !important; }
+      body { background-color: white !important; color: black !important; font-size: 11pt; }
+      main { width: 100% !important; margin: 0 !important; padding: 0 !important; border: none !important; box-shadow: none !important; }
+      .section-card { page-break-inside: avoid; border: 1px solid #ddd !important; margin-bottom: 1.5rem !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#FDFBF7]">
+
+  <!-- Top Navigation Bar -->
+  <header class="bg-[#111111] text-white border-b border-gray-800 px-4 sm:px-8 py-3.5 flex items-center justify-between sticky top-0 z-40 shadow-md">
+    <div class="flex items-center space-x-3.5">
+      <div class="w-9 h-9 rounded bg-[#D43F33] text-white font-serif font-extrabold flex items-center justify-center text-xl tracking-tighter shadow-xs">TS</div>
+      <div>
+        <div class="flex items-center space-x-2">
+          <h1 class="text-base sm:text-lg font-bold font-serif tracking-wide text-white">TRANSCRIPT SCHOLAR</h1>
+          <span class="hidden sm:inline-block px-2 py-0.5 rounded bg-red-950 text-[#D43F33] border border-red-800 text-[10px] font-mono font-bold uppercase">Research Library</span>
+        </div>
+        <p class="text-[11px] text-gray-400 font-mono">24-Section Knowledge Base • Hosted on GitHub Pages</p>
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-2 sm:space-x-3 text-xs">
+      <button onclick="toggleAudioReader()" class="px-3 py-1.5 rounded bg-[#D43F33] hover:bg-[#be352a] text-white font-bold flex items-center space-x-1.5 transition-colors cursor-pointer" title="Listen to document">
+        <i id="header-audio-icon" class="fas fa-volume-up"></i>
+        <span class="hidden md:inline">Listen Aloud</span>
+      </button>
+
+      <button onclick="window.print()" class="px-3 py-1.5 rounded bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold flex items-center space-x-1.5 transition-colors cursor-pointer" title="Print Academic Document">
+        <i class="fas fa-print"></i>
+        <span class="hidden md:inline">Print Paper</span>
+      </button>
+
+      <button onclick="copyFullMarkdown()" class="px-3 py-1.5 rounded bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold flex items-center space-x-1.5 transition-colors cursor-pointer" title="Copy raw markdown">
+        <i class="fas fa-copy"></i>
+        <span class="hidden md:inline">Copy Markdown</span>
+      </button>
+
+      <a href="https://github.com/ashokishere/TechCollections" target="_blank" class="px-3 py-1.5 rounded bg-gray-800 hover:bg-gray-700 text-white font-bold flex items-center space-x-1.5 transition-colors cursor-pointer">
+        <i class="fab fa-github text-sm"></i>
+        <span class="hidden sm:inline">GitHub Repo</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Audio Reader Floating Status Bar -->
+  <div id="audio-bar" class="hidden bg-[#111111] border-b border-red-900/80 px-4 py-2.5 text-white flex items-center justify-between z-30 sticky top-[57px] shadow-sm">
+    <div class="flex items-center space-x-3">
+      <div class="w-3 h-3 rounded-full bg-[#D43F33] animate-pulse"></div>
+      <span id="audio-status-text" class="text-xs font-mono font-medium text-gray-200">Reading document aloud...</span>
+    </div>
+    <div class="flex items-center space-x-2 text-xs">
+      <button onclick="toggleAudioPause()" class="px-2.5 py-1 rounded bg-gray-800 hover:bg-gray-700 text-white font-bold flex items-center space-x-1">
+        <i id="audio-play-icon" class="fas fa-pause"></i>
+        <span id="audio-pause-label">Pause</span>
+      </button>
+      <button onclick="stopAudioReader()" class="px-2.5 py-1 rounded bg-red-950 hover:bg-red-900 border border-red-800 text-red-200 font-bold flex items-center space-x-1">
+        <i class="fas fa-stop"></i>
+        <span>Stop</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Layout Grid -->
+  <div class="flex-1 max-w-[1400px] w-full mx-auto p-3 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- Left Sidebar: Document Library & 24-Section Index -->
+    <aside class="lg:col-span-3 space-y-5">
+      
+      <!-- Document Catalog Box -->
+      <div class="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-xs">
+        <h2 class="font-bold uppercase tracking-wider text-xs text-[#111111] mb-2.5 pb-2 border-b border-gray-200 flex items-center justify-between">
+          <span class="flex items-center space-x-1.5">
+            <i class="fas fa-books text-[#D43F33]"></i>
+            <span>Published Library</span>
+          </span>
+          <span id="doc-count" class="text-[10px] bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-mono font-bold">0</span>
+        </h2>
+
+        <div class="relative mb-3">
+          <input id="search-docs" type="text" placeholder="Search catalog..." class="w-full text-xs p-2 pl-7 bg-[#F9F9F7] border border-gray-200 rounded focus:outline-none focus:border-[#111111]" oninput="filterDocs()" />
+          <i class="fas fa-search absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
+        </div>
+
+        <div id="doc-list" class="space-y-1.5 overflow-y-auto max-h-[32vh] pr-1">
+          <div class="text-xs text-gray-400 italic p-2">Loading library catalog...</div>
+        </div>
+      </div>
+
+      <!-- 24-Section Quick Index Box -->
+      <div class="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-xs sticky top-20">
+        <div class="flex items-center justify-between mb-2.5 pb-2 border-b border-gray-200">
+          <h2 class="font-bold uppercase tracking-wider text-xs text-[#111111] flex items-center space-x-1.5">
+            <i class="fas fa-list-ol text-[#D43F33]"></i>
+            <span>24-Section Index</span>
+          </h2>
+          <span id="sections-found-badge" class="text-[10px] bg-red-50 text-[#D43F33] font-bold px-2 py-0.5 rounded border border-red-200 font-mono">24 Sections</span>
+        </div>
+
+        <div class="relative mb-2.5">
+          <input id="search-sections" type="text" placeholder="Jump to section..." class="w-full text-xs p-2 pl-7 bg-[#F9F9F7] border border-gray-200 rounded focus:outline-none focus:border-[#111111]" oninput="filterSections()" />
+          <i class="fas fa-filter absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
+        </div>
+
+        <div id="section-nav-list" class="space-y-1 overflow-y-auto max-h-[48vh] pr-1 text-xs">
+          <div class="text-xs text-gray-400 italic p-2">Select a document to view sections...</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area: Transcript Scholar View -->
+    <main class="lg:col-span-9 space-y-6">
+
+      <!-- Document Header Banner -->
+      <div id="doc-header-banner" class="bg-white border border-[#E5E7EB] rounded-xl p-6 sm:p-8 shadow-xs relative overflow-hidden">
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-[#D43F33]"></div>
+
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+          <span class="px-3 py-1 rounded bg-red-50 border border-red-200 text-[#D43F33] font-bold text-[11px] uppercase tracking-widest flex items-center space-x-1.5">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Transcript Scholar • 24-Section Comprehensive Research Document</span>
+          </span>
+          <span id="doc-date-badge" class="text-xs text-gray-500 font-mono"></span>
+        </div>
+
+        <h1 id="doc-title-heading" class="text-2xl sm:text-4xl font-extrabold text-[#111111] tracking-tight mb-3 font-serif leading-snug">
+          Select a Knowledge Document
+        </h1>
+
+        <p id="doc-file-path" class="text-xs text-gray-500 font-mono bg-[#F9F9F7] px-3 py-1.5 rounded border border-[#E5E7EB] inline-block">
+          Select a document from the Published Library on the left sidebar.
+        </p>
+
+        <!-- View Mode Switcher Toolbar -->
+        <div id="view-tabs" class="mt-6 pt-4 border-t border-gray-200 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center space-x-1 bg-[#F9F9F7] p-1 rounded-lg border border-[#E5E7EB]">
+            <button id="tab-doc" onclick="switchViewMode('doc')" class="px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer bg-[#111111] text-white">
+              <i class="fas fa-file-alt"></i>
+              <span>Full Research Document</span>
+            </button>
+            <button id="tab-flashcards" onclick="switchViewMode('flashcards')" class="px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]">
+              <i class="fas fa-clone"></i>
+              <span>Flash Cards</span>
+            </button>
+            <button id="tab-quiz" onclick="switchViewMode('quiz')" class="px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]">
+              <i class="fas fa-tasks"></i>
+              <span>Interactive Quiz</span>
+            </button>
+            <button id="tab-qa" onclick="switchViewMode('qa')" class="px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]">
+              <i class="fas fa-comments text-[#D43F33]"></i>
+              <span>Document Q&A</span>
+            </button>
+          </div>
+
+          <div class="flex items-center space-x-2 text-xs">
+            <span class="text-gray-500 font-bold uppercase tracking-wider text-[10px]">Text Size:</span>
+            <button onclick="changeFontSize('sm')" class="px-2 py-1 rounded bg-[#F9F9F7] hover:bg-gray-200 border border-[#E5E7EB] font-bold">A-</button>
+            <button onclick="changeFontSize('base')" class="px-2 py-1 rounded bg-[#F9F9F7] hover:bg-gray-200 border border-[#E5E7EB] font-bold">A</button>
+            <button onclick="changeFontSize('lg')" class="px-2 py-1 rounded bg-[#F9F9F7] hover:bg-gray-200 border border-[#E5E7EB] font-bold">A+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- View 1: Rendered Document Sections Container -->
+      <div id="view-container-doc" class="space-y-6">
+        <div class="bg-white border border-[#E5E7EB] rounded-xl p-12 text-center text-gray-400 font-serif">
+          <i class="fas fa-spinner fa-spin text-3xl mb-3 text-[#D43F33]"></i>
+          <p>Loading document analysis...</p>
+        </div>
+      </div>
+
+      <!-- View 2: Interactive Flashcards Container -->
+      <div id="view-container-flashcards" class="hidden space-y-6">
+        <div class="bg-white border border-[#E5E7EB] rounded-xl p-8 shadow-xs text-center">
+          <h3 class="font-serif font-bold text-xl text-[#111111] mb-2">Interactive Study Flashcards</h3>
+          <p class="text-xs text-gray-500 mb-6">Click card to reveal answer. Use controls below to navigate.</p>
+
+          <div id="flashcard-box" class="max-w-xl mx-auto min-h-[220px] bg-[#F9F9F7] border-2 border-[#111111] rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer shadow-md transition-all hover:border-[#D43F33]" onclick="flipCard()">
+            <span id="fc-category" class="text-[10px] font-bold uppercase tracking-widest text-[#D43F33] bg-red-50 border border-red-200 px-2.5 py-0.5 rounded-full mb-3">Core Concept</span>
+            <p id="fc-question-text" class="text-lg font-serif font-bold text-[#111111] leading-relaxed">Loading card question...</p>
+            <p id="fc-hint" class="text-[11px] text-gray-400 font-mono mt-4">(Click to flip card)</p>
+          </div>
+
+          <div class="flex items-center justify-center space-x-4 mt-6">
+            <button onclick="prevCard()" class="px-4 py-2 rounded bg-[#111111] hover:bg-[#D43F33] text-white font-bold text-xs uppercase tracking-wider flex items-center space-x-1 transition-colors cursor-pointer">
+              <i class="fas fa-arrow-left"></i>
+              <span>Previous</span>
+            </button>
+            <span id="fc-counter" class="text-xs font-mono font-bold text-gray-600 px-3 py-1 bg-gray-100 rounded">Card 1 / 1</span>
+            <button onclick="nextCard()" class="px-4 py-2 rounded bg-[#111111] hover:bg-[#D43F33] text-white font-bold text-xs uppercase tracking-wider flex items-center space-x-1 transition-colors cursor-pointer">
+              <span>Next</span>
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- View 3: Interactive Quiz Container -->
+      <div id="view-container-quiz" class="hidden space-y-6">
+        <div class="bg-white border border-[#E5E7EB] rounded-xl p-8 shadow-xs">
+          <div class="flex items-center justify-between border-b border-gray-200 pb-4 mb-6">
+            <div>
+              <h3 class="font-serif font-bold text-xl text-[#111111]">Interactive Knowledge Quiz</h3>
+              <p class="text-xs text-gray-500 mt-0.5">Test your comprehension on this research paper.</p>
+            </div>
+            <span id="quiz-score-badge" class="px-3 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 font-mono text-xs font-bold">
+              Score: 0 / 0
+            </span>
+          </div>
+
+          <div id="quiz-questions-list" class="space-y-6">
+            <div class="text-center py-8 text-gray-400 italic">Extracting quiz questions from Section 22...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- View 4: Document Q&A Assistant Container -->
+      <div id="view-container-qa" class="hidden space-y-6">
+        <div class="bg-white border border-[#E5E7EB] rounded-xl p-6 sm:p-8 shadow-xs space-y-6">
+          <div class="border-b border-gray-200 pb-4">
+            <div class="flex items-center space-x-2 text-[#D43F33] text-xs font-bold uppercase tracking-wider mb-1">
+              <i class="fas fa-brain"></i>
+              <span>Instant Semantic Document Search & Synthesis</span>
+            </div>
+            <h3 class="font-serif font-bold text-2xl text-[#111111]">Document Q&A Assistant</h3>
+            <p class="text-xs text-gray-500 mt-1">Ask questions about this research document to get instant answers with section citations.</p>
+          </div>
+
+          <!-- Question Input Form -->
+          <div class="space-y-3">
+            <div class="flex items-center gap-2">
+              <input id="qa-input-field" type="text" placeholder="Ask any question about this document (e.g. 'What are the core conclusions?')..." class="flex-1 text-sm p-3 bg-[#F9F9F7] border border-gray-300 rounded-lg focus:outline-none focus:border-[#111111]" onkeydown="if(event.key==='Enter') submitQaQuestion()" />
+              <button onclick="submitQaQuestion()" class="px-5 py-3 rounded-lg bg-[#111111] hover:bg-[#D43F33] text-white font-bold text-xs uppercase tracking-wider flex items-center space-x-2 transition-colors cursor-pointer">
+                <i class="fas fa-search"></i>
+                <span>Ask</span>
+              </button>
+            </div>
+
+            <!-- Preset Quick Question Chips -->
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+              <span class="text-gray-400 text-[11px] font-mono font-bold">Try asking:</span>
+              <button onclick="setQaQuestion('Summarize the main conclusions of this paper')" class="px-2.5 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium text-[11px] transition-colors">"Summarize main conclusions"</button>
+              <button onclick="setQaQuestion('What key takeaways are highlighted in Section 5?')" class="px-2.5 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium text-[11px] transition-colors">"Key takeaways in Section 5"</button>
+              <button onclick="setQaQuestion('Explain core definitions and methodology')" class="px-2.5 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium text-[11px] transition-colors">"Core methodology"</button>
+            </div>
+          </div>
+
+          <!-- Q&A Results Display -->
+          <div id="qa-results-container" class="mt-6 pt-4 border-t border-gray-200">
+            <div class="text-center py-12 text-gray-400 font-serif">
+              <i class="fas fa-comments text-3xl mb-3 text-gray-300"></i>
+              <p class="font-bold text-gray-600">Enter a question above to analyze document sections.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // GitHub Pages URL normalization (prevents 404 on relative fetches when missing trailing slash)
+    if (!window.location.pathname.endsWith('/') && !window.location.pathname.split('/').pop().includes('.')) {
+      window.location.replace(window.location.pathname + '/' + window.location.search + window.location.hash);
+    }
+
+    window.EMBEDDED_CATALOG = [{"title":"LLM Settings That Every AI Developer Must Know","filename":"2026-08-01-llm-settings-that-every-ai-developer-must-know.md","date":"2026-08-01"},{"title":"Docker AI, what’s new with MCP, Agents, Sandboxes, and more","filename":"2026-07-31-docker-ai-what-s-new-with-mcp-agents-sandboxes-and-more.md","date":"2026-07-31"},{"title":"Networking Concepts Every DevOps Engineer Must Know","filename":"2026-07-31-networking-concepts-every-devops-engineer-must-know.md","date":"2026-07-31"},{"title":"Helm vs Kustomize - The Fight Between Templating and Patching in Kubernetes","filename":"2026-07-30-helm-vs-kustomize-the-fight-between-templating-and-patching-in-kubernetes.md","date":"2026-07-30"},{"title":"Kustomize explained in 60 minutes with detailed GitHub notes | Demo Included","filename":"2026-07-30-kustomize-explained-in-60-minutes-with-detailed-github-notes-demo-included.md","date":"2026-07-30"},{"title":"OpenTelemetry in Kubernetes explained!","filename":"2026-07-30-opentelemetry-in-kubernetes-explained.md","date":"2026-07-30"},{"title":"Docker AI, what’s new with MCP, Agents, Sandboxes, and more","filename":"2026-07-30-docker-ai-what-s-new-with-mcp-agents-sandboxes-and-more.md","date":"2026-07-30"},{"title":"11: Generative AI – Text-to-Image Models","filename":"2026-07-30-11-generative-ai-text-to-image-models.md","date":"2026-07-30"},{"title":"10: Generative AI – Adapting LLMs with Parameter-Efficient Fine-Tuning","filename":"2026-07-30-10-generative-ai-adapting-llms-with-parameter-efficient-fine-tuning.md","date":"2026-07-30"},{"title":"9: Generative AI – Large Language Models (LLMs) and Retrieval Augmented Generation (RAG)","filename":"2026-07-29-9-generative-ai-large-language-models-llms-and-retrieval-augmented-generation-rag.md","date":"2026-07-29"},{"title":"8: Deep Learning for Natural Language – Transformers, Self-Supervised Learning","filename":"2026-07-29-8-deep-learning-for-natural-language-transformers-self-supervised-learning.md","date":"2026-07-29"},{"title":"7: Deep Learning for Natural Language – Transformers","filename":"2026-07-29-7-deep-learning-for-natural-language-transformers.md","date":"2026-07-29"},{"title":"6: Deep Learning for Natural Language – Embeddings","filename":"2026-07-29-6-deep-learning-for-natural-language-embeddings.md","date":"2026-07-29"},{"title":"5: Deep Learning for Natural Language – The Basics","filename":"2026-07-29-5-deep-learning-for-natural-language-the-basics.md","date":"2026-07-29"},{"title":"4: Deep Learning for Computer Vision – Transfer Learning and Fine-Tuning; Intro to HuggingFace","filename":"2026-07-29-4-deep-learning-for-computer-vision-transfer-learning-and-fine-tuning-intro-to-huggingface.md","date":"2026-07-29"},{"title":"3: Deep Learning for Computer Vision – Building Convolutional Neural Networks from Scratch","filename":"2026-07-29-3-deep-learning-for-computer-vision-building-convolutional-neural-networks-from-scratch.md","date":"2026-07-29"},{"title":"2: Training Deep NNs (cont.); Introduction to Keras/Tensorflow; Application to Tabular Data","filename":"2026-07-29-2-training-deep-nns-cont-introduction-to-keras-tensorflow-application-to-tabular-data.md","date":"2026-07-29"},{"title":"Most Common Kubernetes Deployment Strategies (Examples \u0026 Code)","filename":"2026-07-29-most-common-kubernetes-deployment-strategies-examples-code.md","date":"2026-07-29"},{"title":"LLM Compression Explained: Build Faster, Efficient AI Models","filename":"2026-07-28-llm-compression-explained-build-faster-efficient-ai-models.md","date":"2026-07-28"},{"title":"Llama.cpp vs vLLM: Which Local LLM Engine Actually Scales?","filename":"2026-07-28-llama-cpp-vs-vllm-which-local-llm-engine-actually-scales.md","date":"2026-07-28"},{"title":"1: Introduction to Neural Networks and Deep Learning; Training Deep NNs","filename":"2026-07-28-1-introduction-to-neural-networks-and-deep-learning-training-deep-nns.md","date":"2026-07-28"},{"title":"How I use LLMs","filename":"2026-07-28-how-i-use-llms.md","date":"2026-07-28"},{"title":"Why RAG Solutions Fail with Complex Documents \u0026 Vector Databases","filename":"2026-07-28-why-rag-solutions-fail-with-complex-documents-vector-databases.md","date":"2026-07-28"},{"title":"Is RAG Still Needed? Choosing the Best Approach for LLMs","filename":"2026-07-28-is-rag-still-needed-choosing-the-best-approach-for-llms.md","date":"2026-07-28"}];
+    window.EMBEDDED_CURRENT_DOC = {"title":"LLM Settings That Every AI Developer Must Know","filename":"2026-08-01-llm-settings-that-every-ai-developer-must-know.md","content":"## 1. Executive Summary\n\nLarge Language Models (LLMs) are fundamental probabilistic systems that predict subsequent tokens based on prior context. This document analyzes the six core parameters governing LLM inference: **Temperature**, **Top-P (Nucleus Sampling)**, **Top-K Sampling**, **Stop Sequences**, **Frequency Penalty**, and **Presence Penalty**. Masterful configuration of these parameters allows developers to transform a single foundational model into wildly different specialized applications—ranging from ultra-deterministic, transactional voice agents to open-ended creative storytellers and precise code documentation engines—without additional model fine-tuning. Understanding these controls is essential for mitigating hallucinations, enforcing structural output boundaries, and guaranteeing enterprise reliability.\n\n---\n\n## 2. Key Takeaways\n\n* **Probabilistic Foundation**: LLMs generate text by computing a probability distribution across a dictionary of vocabulary tokens; inference settings directly reshape this probability landscape.\n* **Temperature vs. Top-P**: Temperature reshapes the logit distribution directly, whereas Top-P (nucleus sampling) dynamically cuts off the low-probability tail of tokens based on cumulative probability mass. Altering both simultaneously is discouraged by providers like OpenAI.\n* **Top-K vs. Top-P**: Top-K imposes a rigid numerical limit on candidate tokens, making it less adaptable to dynamic probability distributions compared to Top-P.\n* **Boundary Control via Stop Sequences**: Stop sequences are non-negotiable for interactive conversational agents and structured parsers to prevent run-on generations and multi-turn role-bleed.\n* **Deduplication Mechanics**: Frequency Penalty scales penalization based on the exact repetition count of a token, whereas Presence Penalty applies a binary fixed penalty to any token that has appeared at least once.\n* **No Universal Defaults**: Optimal parameter selection depends entirely on the downstream execution task (e.g., transactional low-temperature vs. creative high-temperature setups).\n\n---\n\n## 3. Topics Covered\n\n1. **Parameter Importance in Probabilistic Systems**: Understanding how decoding hyper-parameters direct logit selection and overall agent behavior.\n2. **Temperature Dynamics**: Controlling output randomness and distribution flattening via logit scaling.\n3. **Top-P (Nucleus) Sampling**: Dynamically filtering candidate tokens using cumulative probability thresholds.\n4. **Top-K Sampling**: Applying static top-\u0024N\u0024 token count cutoffs prior to sampling.\n5. **Stop Sequences**: Halting model inference programmatically at defined string patterns or boundaries.\n6. **Frequency Penalty**: Suppressing word repetition proportionally to token occurrence counts.\n7. **Presence Penalty**: Encouraging topic and vocabulary shift via one-time token suppression.\n8. **Production Use Case Profiles**: Tuning parameter configurations for deterministic agents, creative applications, and technical documentation outputs.\n\n---\n\n## 4. Timeline with Timestamps\n\n* **[00:00] Introduction \u0026 Why LLM Settings Matter**: Overview of LLMs as probability engines and why inference tuning is critical.\n* **[00:41] Overview of All 6 Parameters**: High-level introduction to Temperature, Top-P, Top-K, Stop Sequences, Frequency Penalty, and Presence Penalty.\n* **[04:15] Lab Setup \u0026 Environment Verification**: Establishing the sandbox test environment and baseline configuration scripts.\n* **[05:23] Temperature: The Randomness Dial**: Detailed breakdown of mathematical temperature scaling on probability distributions.\n* **[06:54] Top-P: Cumulative Probability Filtering**: Deep dive into nucleus sampling mechanics and context-aware word selection.\n* **[08:01] Top-K: Hard Quantity Cutoff**: Mechanics of Top-K filtering and why it is often superseded by Top-P.\n* **[09:25] Stop Sequences: Controlling Generation Boundaries**: Enforcing structural stopping conditions for conversational tools.\n* **[10:31] Frequency \u0026 Presence Penalties**: Mathematical and behavioral distinctions between repetition penalties.\n* **[12:05] Production Presets: Three Real-World Configs**: Analyzing configurations for a Taco Bell agent, creative writer, and code documentation assistant.\n* **[13:46] Key Takeaways \u0026 Next Steps**: Summary of architectural workflows and best practices for prompt engineers and system developers.\n\n---\n\n## 5. Detailed Explanation\n\n### Parameter Importance in Probabilistic Systems\nLarge Language Models do not possess human comprehension; they calculate probability distributions across a fixed vocabulary tensor (\u0024V\u0024). When generating text, the model computes raw numerical values called **logits** for every possible next token. Inference parameters act as statistical transformers applied to these logits before the final token selection step.\n\n### Temperature: The Randomness Dial\nTemperature (\u0024T\u0024) operates directly on raw unnormalized logits before the softmax activation function is applied.\n* **Low Temperature (\u00240.0 - 0.2\u0024)**: Sharpen the probability distribution. The top token becomes overwhelmingly likely to be picked, leading to near-deterministic, repeatable, and highly focused outputs. Ideal for extraction, mathematics, JSON generation, and precise classification.\n* **High Temperature (\u00240.7 - 1.5+\u0024)**: Flatten the probability distribution. The relative gaps between high-probability tokens and low-probability tokens shrink, giving rarer words a realistic chance of selection. Ideal for creative storytelling, brainstorming, and poetic generation.\n\n### Top-P (Nucleus Sampling)\nTop-P sets a cumulative probability threshold (\u0024p\u0024). The model sorts all tokens by probability in descending order and calculates their running cumulative sum. As soon as the sum reaches or exceeds \u0024p\u0024, all remaining lower-probability tokens are discarded, and the remaining subset (\"the nucleus\") is re-normalized for sampling.\n* **Context Adaptability**: If the top token has an absolute probability of \u00240.92\u0024, a Top-P setting of \u00240.90\u0024 will select *only* that single token. If the top token has a probability of only \u00240.15\u0024 (high uncertainty), Top-P will collect dozens of tokens until \u002490\\%\u0024 cumulative probability is amassed. This makes Top-P dynamic and superior to static count cutoffs.\n\n### Top-K Sampling\nTop-K dictates a strict maximum limit (\u0024K\u0024) on the number of candidate tokens evaluated for the next step. If \u0024K=40\u0024, only the top 40 most probable tokens are retained; all others are zeroed out regardless of their actual probability values.\n* **Limitation**: In situations where 3 tokens account for \u002499\\%\u0024 of the probability, Top-K still retains 37 irrelevant tokens. Conversely, in open-ended contexts where 100 tokens are all plausible, Top-K cuts off candidate words prematurely.\n\n### Stop Sequences\nStop sequences are specific character strings (e.g., `\\n`, `User:`, `\u003c/s\u003e`, ```` ````) that instruct the inference engine to immediately cease text generation. When the engine predicts or constructs a matching stop sequence, it terminates the token loop without emitting the stop sequence string itself. This is critical in multi-turn dialogues to keep the assistant from simulating the user's response.\n\n### Frequency Penalty\nFrequency Penalty penalizes a token proportionally to how many times it has *already appeared* in the generated context. It mathematically reduces the logit score based on token frequency count, preventing models from getting stuck in repetitive loops or overusing specific buzzwords.\n\n### Presence Penalty\nPresence Penalty applies a flat, constant deduction to a token's logit if it has appeared *at least once* in the generated text, regardless of its total occurrence count. It forces the model to introduce new concepts, switch topics, or expand its vocabulary range.\n\n---\n\n## 6. Beginner Explanation (ELI5)\n\nImagine an AI is playing a word-guessing game where it has a big bag full of word cards.\n\n* **Temperature**: This is how adventurous the AI feels. \n  * At a **low temperature**, the AI only picks the absolute top card on the pile every single time. It never makes a mistake, but it always says the exact same boring thing.\n  * At a **high temperature**, the AI shakes up the bag, reaches deep down, and pulls out fun, weird, unexpected words.\n* **Top-P**: Imagine the AI lines up the word cards from most likely to least likely. It starts adding up their scores until it reaches 90% of all the points. Then it throws away the rest of the pile and picks only from that top group.\n* **Top-K**: The AI strictly grabs the top 40 cards off the pile and throws away the rest, no matter how good or bad those 40 cards actually are.\n* **Stop Sequences**: Imagine giving a referee a whistle. As soon as the AI says a trigger word like \"STOP\" or \"User:\", the referee blows the whistle, and the AI must stop talking immediately.\n* **Frequency Penalty**: Every time the AI uses a word like \"awesome\", it gets a small penalty fine. The more times it repeats \"awesome\", the higher the fine gets, forcing it to use a different word.\n* **Presence Penalty**: As soon as the AI uses a word once, it gets a flat tax for using it again. This encourages the AI to talk about new ideas instead of staying on the same subject.\n\n---\n\n## 7. Technical Deep Dive\n\n### Mathematical Formulation of Decoding Controls\n\n#### 1. Softmax with Temperature\nGiven a vector of unnormalized logits \u0024z = [z_1, z_2, \\dots, z_{|V|}]\u0024 for a vocabulary \u0024V\u0024, the probability distribution \u0024P\u0024 over token \u0024i\u0024 with temperature \u0024T \u003e 0\u0024 is defined as:\n\n\u0024\u0024P(w_i \\mid z, T) = \\frac{\\exp(z_i / T)}{\\sum_{j=1}^{|V|} \\exp(z_j / T)}\u0024\u0024\n\n* As \u0024T \\to 0\u0024, \u0024P(w_i) \\to 1\u0024 for \u0024i = \\arg\\max_j(z_j)\u0024 (Argmax / Greedy Decoding).\n* As \u0024T \\to \\infty\u0024, \u0024P(w_i) \\to \\frac{1}{|V|}\u0024 (Uniform Random Distribution).\n\n#### 2. Top-P (Nucleus) Filtering\nGiven probabilities \u0024P(w_i)\u0024 sorted in descending order such that \u0024P(w_1) \\ge P(w_2) \\ge \\dots \\ge P(w_{|V|})\u0024, define the nucleus set \u0024V^{(p)}\u0024 as the minimal set of top tokens whose cumulative probability satisfies:\n\n\u0024\u0024\\sum_{i \\in V^{(p)}} P(w_i) \\ge p\u0024\u0024\n\nAll logits \u0024z_i\u0024 where \u0024i \\notin V^{(p)}\u0024 are set to \u0024-\\infty\u0024 prior to final re-normalization.\n\n#### 3. Logit Penalties (Frequency and Presence)\nLet \u0024c_i\u0024 represent the count of token \u0024i\u0024 in the accumulated generated output sequence. The modified logit \u0024z_i'\u0024 for token \u0024i\u0024 is calculated as:\n\n\u0024\u0024z_i' = z_i - (c_i \\cdot \\mu_{\\text{freq}}) - (\\mathbb{I}(c_i \u003e 0) \\cdot \\mu_{\\text{pres}})\u0024\u0024\n\nWhere:\n* \u0024\\mu_{\\text{freq}}\u0024 is the Frequency Penalty parameter (\u0024\\ge 0\u0024).\n* \u0024\\mu_{\\text{pres}}\u0024 is the Presence Penalty parameter (\u0024\\ge 0\u0024).\n* \u0024\\mathbb{I}(\\cdot)\u0024 is the indicator function equal to \u00241\u0024 if \u0024c_i \u003e 0\u0024, and \u00240\u0024 otherwise.\n\n```\n+-------------------------------------------------------------------+\n|                        Raw Unnormalized Logits                    |\n+-------------------------------------------------------------------+\n                                  |\n                                  v\n+-------------------------------------------------------------------+\n| Logit Penalties: z'_i = z_i - (c_i * freq) - (I(c_i\u003e0) * pres)   |\n+-------------------------------------------------------------------+\n                                  |\n                                  v\n+-------------------------------------------------------------------+\n| Temperature Scaling: z'' = z' / T                                |\n+-------------------------------------------------------------------+\n                                  |\n                                  v\n+-------------------------------------------------------------------+\n| Softmax Activation: P(w_i) = exp(z''_i) / Sum(exp(z''_j))        |\n+-------------------------------------------------------------------+\n                                  |\n                                  v\n+-------------------------------------------------------------------+\n| Top-K / Top-P Filtering: Truncate distribution tail               |\n+-------------------------------------------------------------------+\n                                  |\n                                  v\n+-------------------------------------------------------------------+\n| Stochastic Token Sampling \u0026 Stop Sequence Match Check             |\n+-------------------------------------------------------------------+\n```\n\n---\n\n## 8. Important Definitions\n\n* **Logit**: The unnormalized log-odds output generated by the neural network's final linear layer before applying a probability activation function.\n* **Temperature**: A hyperparameter that scales logits to adjust the variance and entropy of the output probability distribution.\n* **Top-P (Nucleus Sampling)**: A sampling technique that restricts candidate token choices to a subset comprising a pre-specified cumulative probability mass.\n* **Top-K Sampling**: A truncation technique restricting token choices strictly to the \u0024K\u0024 highest-probability candidate words.\n* **Stop Sequence**: A developer-defined textual string that terminates the decoding process when generated by the model.\n* **Frequency Penalty**: A logit adjustment factor that penalizes candidate tokens proportionally to their cumulative usage frequency in the current output stream.\n* **Presence Penalty**: A binary logit adjustment factor applied to tokens that have appeared at least once in the existing text generation.\n\n---\n\n## 9. Code Snippets \u0026 Configuration Examples\n\n### Python: OpenAI API Parameter Setup for Three Profiles\n\n```python\nimport os\nfrom openai import OpenAI\n\nclient = OpenAI(api_key=os.environ.get(\"OPENAI_API_KEY\"))\n\n# Profile 1: Deterministic Taco Bell Drive-Thru Agent\ntaco_bell_response = client.chat.completions.create(\n    model=\"gpt-4o\",\n    temperature=0.0,\n    top_p=0.1,\n    frequency_penalty=0.0,\n    presence_penalty=0.0,\n    stop=[\"User:\", \"\\n\\n\"],\n    messages=[\n        {\"role\": \"system\", \"content\": \"You are a concise drive-thru ordering assistant for Taco Bell.\"},\n        {\"role\": \"user\", \"content\": \"I want two crunchy tacos and a soda.\"}\n    ]\n)\n\n# Profile 2: Creative Story Writer\nstory_response = client.chat.completions.create(\n    model=\"gpt-4o\",\n    temperature=0.9,\n    top_p=0.95,\n    frequency_penalty=0.5,\n    presence_penalty=0.6,\n    messages=[\n        {\"role\": \"system\", \"content\": \"You are an imaginative sci-fi author.\"},\n        {\"role\": \"user\", \"content\": \"Write a scene describing a city on a neon ocean.\"}\n    ]\n)\n\n# Profile 3: Precise Code Documentation Assistant\ndoc_response = client.chat.completions.create(\n    model=\"gpt-4o\",\n    temperature=0.1,\n    top_p=0.3,\n    frequency_penalty=0.2,\n    presence_penalty=0.1,\n    stop=[\"```\", \"EXAMPLE_END\"],\n    messages=[\n        {\"role\": \"system\", \"content\": \"Generate clear, accurate docstrings for Python code.\"},\n        {\"role\": \"user\", \"content\": \"def calculate_entropy(probabilities):\\n    return -sum(p * math.log2(p) for p in probabilities if p \u003e 0)\"}\n    ]\n)\n```\n\n### JSON Profile Configuration Manifest\n\n```json\n{\n  \"profiles\": {\n    \"transactional_agent\": {\n      \"model\": \"gpt-4o\",\n      \"temperature\": 0.0,\n      \"top_p\": 0.1,\n      \"top_k\": 1,\n      \"frequency_penalty\": 0.0,\n      \"presence_penalty\": 0.0,\n      \"stop_sequences\": [\"Customer:\", \"System:\", \"\\n\\n\"]\n    },\n    \"creative_writer\": {\n      \"model\": \"gpt-4o\",\n      \"temperature\": 0.95,\n      \"top_p\": 0.92,\n      \"top_k\": 50,\n      \"frequency_penalty\": 0.6,\n      \"presence_penalty\": 0.5,\n      \"stop_sequences\": [\"THE END\"]\n    },\n    \"code_documenter\": {\n      \"model\": \"gpt-4o\",\n      \"temperature\": 0.1,\n      \"top_p\": 0.2,\n      \"top_k\": 10,\n      \"frequency_penalty\": 0.3,\n      \"presence_penalty\": 0.0,\n      \"stop_sequences\": [\"```\", \"### Next Function\"]\n    }\n  }\n}\n```\n\n---\n\n## 10. Best Practices\n\n* **Modify Temperature OR Top-P, Not Both**: OpenAI and domain researchers explicitly advise altering either Temperature or Top-P at a time. Changing both concurrently alters the sampling space unpredictably.\n* **Zero Temperature for Structured Extraction**: Always set `temperature=0.0` when demanding structured schema outputs (e.g., JSON, YAML, SQL queries) to enforce strict adherence to formatting rules.\n* **Use Stop Sequences in Chat Systems**: Always pass explicit stop boundaries (e.g., `[\"\\nUser:\", \"\\nHuman:\"]`) to prevent the model from hallucinations involving conversational partner turns.\n* **Apply Moderated Penalties**: Avoid setting Frequency or Presence Penalties above `1.0` unless specifically debugging loops. Excessive penalties (\u0024\u003e1.5\u0024) force the model to invent ungrammatical synonyms and produce low-quality outputs.\n* **Establish Environmental Presets**: Store settings profiles externally in configuration code rather than hardcoding parameter values across codebases.\n\n---\n\n## 11. Common Mistakes\n\n* **Double Tuning Temperature and Top-P**: Lowering Temperature to `0.2` *and* Top-P to `0.1` simultaneously over-constrains sampling, degrading language fluency into repetitive, rigid statements.\n* **Missing Stop Sequences in Few-Shot Prompts**: Failing to supply a stop sequence matching few-shot separators (e.g., `---` or `Output:`) leads to run-on generations where the model crafts spurious additional examples.\n* **Using High Penalties on Technical Code Tasks**: Applying high presence or frequency penalties when generating code prevents the model from repeating necessary syntactic tokens like `return`, `self`, `def`, or common variable names, causing syntax errors.\n* **Assuming Top-K Is Supported Everywhere**: Relying on `top_k` across API wrappers; while supported natively in Anthropic Claude and open-source vLLM, standard OpenAI ChatCompletions APIs do not expose `top_k`.\n* **Ignoring Model-Specific Parameter Limits**: Presuming identical responses across model versions using the same parameters. Smaller parameter models (e.g., 8B parameters) require tighter temperature boundaries than massive engines (e.g., 400B+ parameters) to prevent degradation.\n\n---\n\n## 12. Interview Questions\n\n### Q1: What is the exact mathematical difference between Frequency Penalty and Presence Penalty?\n**Answer**: Frequency penalty scales linearly with how many times a token has already occurred in the generated text (\u0024c_i \\cdot \\mu_{\\text{freq}}\u0024). Each repeated occurrence increases the deduction on that token's logit. Presence penalty applies a flat, constant deduction (\u0024\\mu_{\\text{pres}}\u0024) as long as the token count \u0024c_i \u003e 0\u0024, regardless of whether the token appeared once or twenty times. Frequency penalty eliminates repetitive loops, whereas presence penalty forces the model to shift topics and expand its overall vocabulary usage.\n\n### Q2: Why is Top-P (Nucleus Sampling) generally preferred over Top-K sampling in real-world systems?\n**Answer**: Top-K imposes a static numerical cutoff, selecting the top \u0024K\u0024 candidates regardless of their actual probability distribution. If the top candidate has a \u002499\\%\u0024 probability, Top-K still retains \u0024K-1\u0024 irrelevant low-probability tokens. Conversely, in highly uncertain contexts, Top-K might cut off valid candidates prematurely. Top-P dynamically adjusts the size of the candidate token pool based on the cumulative probability mass (\u0024p\u0024), retaining fewer tokens when confidence is high and expanding the candidate set when uncertainty is high.\n\n### Q3: What happens to the logit distribution and generation when Temperature approaches zero (\u0024T \\to 0\u0024)?\n**Answer**: As \u0024T \\to 0\u0024, the logit scaling values (\u0024z_i / T\u0024) approach infinity for positive values, amplifying the relative difference between the highest logit and all other logits. When passed through the Softmax function, the highest-scoring token's probability approaches \u00241.0\u0024, while all other tokens approach \u00240.0\u0024. This converts stochastic sampling into deterministic \"Greedy Decoding\", where the single most likely token is selected at every step.\n\n---\n\n## 13. Certification Questions\n\n### Q1: An AI developer is building a medical diagnostic extraction pipeline that processes doctor notes into JSON formats. Which parameter combination is best suited for this task?\n* A) Temperature = 1.2, Top-P = 0.95, Frequency Penalty = 0.8\n* B) Temperature = 0.0, Top-P = 0.1, Frequency Penalty = 0.0\n* C) Temperature = 0.8, Top-P = 0.2, Presence Penalty = 1.0\n* D) Temperature = 1.0, Top-P = 1.0, Frequency Penalty = 0.5\n\n**Correct Answer**: B\n**Explanation**: Structured data extraction tasks require high determinism, strict JSON formatting adherence, and zero factual hallucination. Setting Temperature to `0.0` (or near zero) and Top-P low ensures greedy, consistent token selection, while zero penalty settings avoid corrupting JSON formatting schema key names.\n\n### Q2: You notice an interactive AI chatbot generates responses and then immediately simulates fake user messages within the same response. What setting should be implemented to prevent this?\n* A) Increase the Presence Penalty to 1.5\n* B) Decrease Top-P to 0.0\n* C) Add a Stop Sequence for the prompt's user prefix (e.g., `\\nUser:`)\n* D) Set Temperature to 0.5\n\n**Correct Answer**: C\n**Explanation**: Stop sequences force the model execution engine to halt output emission the exact moment a designated multi-turn identifier (such as `\\nUser:`) is generated, preventing multi-turn role-bleed and run-on text.\n\n---\n\n## 14. Real-World Examples\n\n### 1. Taco Bell Drive-Thru Voice Assistant\n* **Task**: Process customer voice audio transcribed to text, capture item orders accurately, and push them to a point-of-sale API.\n* **Configuration**: `temperature=0.0`, `top_p=0.1`, `stop=[\"Customer:\", \"System:\"]`, `frequency_penalty=0.0`.\n* **Impact**: Guarantees consistent order mapping and prevents the model from hallucinating non-existent menu items or inventing conversational exchanges.\n\n### 2. Marketing Slogan \u0026 Novel Ideation Engine\n* **Task**: Generate novel, diverse marketing copy and character story arcs.\n* **Configuration**: `temperature=0.9`, `top_p=0.95`, `frequency_penalty=0.4`, `presence_penalty=0.5`.\n* **Impact**: Flattens the token probability space to surface unique vocabulary and prevents the system from recycling cliché industry buzzwords.\n\n### 3. Automated Python Docstring Engine\n* **Task**: Analyze legacy codebase functions and produce standardized PEP-257 docstrings.\n* **Configuration**: `temperature=0.1`, `top_p=0.3`, `presence_penalty=0.0`, `stop=[\"def \", \"class \"]`.\n* **Impact**: Focuses output on factual code structures, preserves exact variable names without penalizing repetition, and stops generating text when it encounters the next code block definition.\n\n---\n\n## 15. Analogies\n\n### 1. The Volcanic Vent (Temperature)\nThink of temperature as heating up liquid under a volcanic vent. At low heat (\u0024T=0\u0024), the liquid freezes solid into a single, predictable crystal lattice structure—every molecule settles into one exact place. At high heat (\u0024T=1.5\u0024), the liquid boils violently; molecules bubble unpredictably in all directions, creating dynamic, novel, and volatile formations.\n\n### 2. The Nightclub Bouncer (Top-P vs. Top-K)\n* **Top-K is a VIP list with a strict head count limit**: The bouncer lets in exactly the first 40 people in line, regardless of whether they match the dress code.\n* **Top-P is a VIP list based on overall venue capacity**: The bouncer lets in guests in order of status until 90% of the club floor is full, then locks the door. If a mega-celebrity arrives, they take up the whole spot alone, and no one else gets in.\n\n### 3. The Repeating Jingle Tax (Penalties)\n* **Frequency Penalty is a repeated-singing fine**: Every single time you sing a corporate catchphrase in a room, the tax collector doubles your fine.\n* **Presence Penalty is a cover charge for topics**: As soon as you bring up a topic once, you pay a one-time entry fee. Once paid, talking about it more doesn't cost extra, but you are motivated to move on to other topics to get your money's worth.\n\n---\n\n## 16. Frequently Asked Questions\n\n### Q1: Should I tune Temperature or Top-P when controlling randomness?\nIt is recommended to tune either Temperature or Top-P, but not both simultaneously. Temperature directly changes the relative slope of the token probability curve, while Top-P cuts off the long tail of low-probability choices. Adjusting both at the same time makes output behavior unpredictable.\n\n### Q2: Why does `temperature=0.0` sometimes still produce non-deterministic results?\nWhile `temperature=0.0` enforces deterministic greedy decoding theoretically, minor variations in production infrastructure—such as floating-point operations across parallel GPU threads, batching dynamic shapes, or API load balancing across different CUDA kernel versions—can introduce slight non-determinism.\n\n### Q3: What is the default standard for parameters across major model providers?\nMost providers (OpenAI, Anthropic, Cohere) set defaults around `temperature=1.0` or `0.7`, `top_p=1.0`, `frequency_penalty=0.0`, and `presence_penalty=0.0`. These defaults balance creative vocabulary with logical coherence for general chat.\n\n### Q4: Can Frequency or Presence Penalty corrupt structured JSON outputs?\nYes. JSON syntax relies on repeating specific structural characters (e.g., `\"`, `{`, `}`, `:`, `,`) and key names. High frequency or presence penalties (\u0024\u003e0.8\u0024) penalize these necessary structural tokens, causing syntax corruptions or invalid JSON formatting.\n\n### Q5: What is the maximum allowed range for Frequency and Presence penalties?\nIn OpenAI APIs, penalty values range from `-2.0` to `2.0`. Positive values discourage repetition, while negative values actually encourage repetition.\n\n---\n\n## 17. Related Technologies\n\n* **Inference Serving Engines**: `vLLM`, `TGI (Text Generation Inference)`, `Ollama`, and `LMDeploy` implement custom PagedAttention algorithms with GPU kernel support for temperature, top-p, top-k, and penalty controls.\n* **Orchestration Frameworks**: `LangChain`, `LlamaIndex`, and `DSPy` simplify managing parameter profiles dynamically across RAG pipelines and multi-agent workflows.\n* **Structured Output Enforcers**: `Outlines`, `Instructor`, and `Guidance` enforce schema validation at the logit masking level alongside standard decoding parameters.\n\n---\n\n## 18. Important Quotes\n\n\u003e \"LLMs are essentially probability machines... understanding and adjusting these settings is crucial for optimizing their performance across various applications.\"\n\n\u003e \"According to OpenAI, it's generally recommended to alter either temperature or Top-P, but not both simultaneously.\"\n\n\u003e \"Top-K applies a hard cutoff regardless of probability distribution... Top-P is often seen as more adaptable to different contexts.\"\n\n\u003e \"No universal best settings exist; configuration depends entirely on your use case.\"\n\n---\n\n## 19. Glossary\n\n* **Argmax Decoding**: Selecting the token with the absolute highest probability at every step without sampling; equivalent to setting Temperature to 0.\n* **Cumulative Probability**: The running sum of individual token probabilities ordered from highest to lowest.\n* **Entropy**: A measure of randomness or uncertainty in a probability distribution; higher temperature increases distribution entropy.\n* **Logit**: Raw, unnormalized outputs from an LLM's final projection layer.\n* **Nucleus Sampling**: The formal academic term for Top-P sampling introduced by Holtzman et al.\n* **Softmax Function**: An activation function converting unnormalized real-valued logits into a normalized probability distribution summing to 1.\n* **Stop Sequence**: A text string pattern monitored during token generation that halts inference execution immediately upon detection.\n\n---\n\n## 20. One-Page Cheat Sheet\n\n| Parameter | Function | Value Range | Recommended for Extraction / Code | Recommended for Creative Writing |\n| :--- | :--- | :--- | :--- | :--- |\n| **Temperature** | Controls logit distribution entropy / randomness | `0.0 - 2.0` | `0.0 - 0.2` | `0.7 - 1.2` |\n| **Top-P** | Filters candidate pool based on cumulative probability mass | `0.0 - 1.0` | `0.1 - 0.3` | `0.85 - 0.95` |\n| **Top-K** | Caps candidate pool strictly to \u0024K\u0024 top tokens | `1 - |V|` | `1 - 10` | `40 - 100` |\n| **Stop Sequences**| String trigger to halt generation loop immediately | Array of Strings | Mandatory (`[\"\\n\", \"```\"]`) | Scenario Specific |\n| **Frequency Penalty** | Deducts from logit based on repeated count | `-2.0 - 2.0` | `0.0` | `0.3 - 0.6` |\n| **Presence Penalty** | Deducts flat value from logit if token appears \u0024\\ge 1\u0024 time | `-2.0 - 2.0` | `0.0` | `0.4 - 0.7` |\n\n### Parameter Decision Rules\n1. **JSON Parsing / RAG Extraction**: Set `temperature=0.0` + zero penalties.\n2. **Chatbot Boundary Control**: Set `stop=[\"\\nUser:\", \"\\nHuman:\"]`.\n3. **Avoiding Loop Bugs**: Apply `frequency_penalty=0.3 - 0.5`.\n4. **Sampling Rule**: Change **either** `temperature` **or** `top_p`, never both.\n\n---\n\n## 21. Flash Cards\n\n- **Card 1 | LLM Fundamentals**\n  - **Q:** Why are LLMs classified as \"probability machines\"?\n  - **A:** Because they compute a probabilistic distribution over a vocabulary dictionary to pick the next likely token.\n\n- **Card 2 | Decoding Parameters**\n  - **Q:** How does a low Temperature (\u00240.1\u0024) affect token choices?\n  - **A:** It sharpens the probability curve, making the top token dominant and output deterministic.\n\n- **Card 3 | Sampling Methods**\n  - **Q:** How does Top-P dynamically handle candidate token selection?\n  - **A:** It collects tokens ordered by probability until their combined sum hits \u0024P\u0024, adapting candidate pool size based on output confidence.\n\n- **Card 4 | Parameter Interaction**\n  - **Q:** What is OpenAI's official guidance regarding Temperature and Top-P?\n  - **A:** Tune either Temperature OR Top-P, but do not alter both concurrently.\n\n- **Card 5 | Generation Control**\n  - **Q:** What happens when an LLM encounters a defined Stop Sequence during inference?\n  - **A:** The generation loop terminates immediately without outputting the stop sequence string.\n\n- **Card 6 | Penalties**\n  - **Q:** What is the operational difference between Frequency and Presence Penalties?\n  - **A:** Frequency Penalty scales with total token count; Presence Penalty is a flat deduction applied if a token appears at least once.\n\n---\n\n## 22. Quiz (10-20 Questions)\n\n### Q1: What does raw logit scaling via Temperature do before Softmax normalization?\n- A) It removes stop sequences automatically.\n- B) It divides raw logits by \u0024T\u0024, altering the relative differences between candidate scores.\n- C) It truncates the vocabulary to \u0024K\u0024 elements.\n- D) It enforces schema restrictions on JSON keys.\n**Correct Answer:** B\n**Explanation:** Temperature scales logits (\u0024z / T\u0024) directly before Softmax, shifting distribution entropy.\n\n### Q2: Which parameter is best suited to cut off the \"long tail\" of low-probability words dynamically?\n- A) Presence Penalty\n- B) Top-P (Nucleus Sampling)\n- C) Frequency Penalty\n- D) Stop Sequences\n**Correct Answer:** B\n**Explanation:** Top-P sums top token probabilities until reaching threshold \u0024P\u0024, dropping low-probability tail tokens dynamically.\n\n### Q3: Why is Top-K sampling considered less flexible than Top-P?\n- A) Top-K requires higher GPU compute memory.\n- B) Top-K applies a rigid numerical cutoff regardless of how flat or sharp the probability distribution is.\n- C) Top-K only works on English language models.\n- D) Top-K forces the temperature to remain at 0.\n**Correct Answer:** B\n**Explanation:** Top-K always keeps \u0024K\u0024 items regardless of whether the candidates have \u002499\\%\u0024 or \u00240.001\\%\u0024 total probability.\n\n### Q4: If a developer sets `frequency_penalty=1.8` on a Python code generator, what is a likely negative consequence?\n- A) The model will generate code too quickly.\n- B) The model will refuse to generate output.\n- C) The model will avoid reusing mandatory keywords like `def` or `return`, causing syntax errors.\n- D) The API will throw a 400 validation error.\n**Correct Answer:** C\n**Explanation:** High frequency penalties severely penalize essential repeated syntax elements in programming languages.\n\n### Q5: What is the main purpose of configuring Stop Sequences in a multi-turn chat assistant?\n- A) To cut down latency by streaming fewer tokens.\n- B) To prevent the model from continuing the generation into the next user's conversational turn.\n- C) To enforce safety filters on toxic vocabulary.\n- D) To reduce API token costs on system prompts.\n**Correct Answer:** B\n**Explanation:** Stop sequences tell the inference loop to stop before generating turn prefixes like `User:`.\n\n### Q6: Which Temperature setting corresponds to absolute Greedy Decoding mathematically?\n- A) Temperature = 1.0\n- B) Temperature = 2.0\n- C) Temperature = 0.0\n- D) Temperature = 0.7\n**Correct Answer:** C\n**Explanation:** As Temperature approaches 0, Softmax shifts all probability mass onto the single highest logit.\n\n### Q7: If a model generates repetitive sentences like \"The car was fast. The car was very fast.\", which setting directly penalizes this occurrence count?\n- A) Presence Penalty\n- B) Frequency Penalty\n- C) Top-K\n- D) Temperature\n**Correct Answer:** B\n**Explanation:** Frequency penalty increases deductions proportional to the exact occurrence count of repeated tokens.\n\n### Q8: What is the valid numerical range for Frequency and Presence Penalties in the OpenAI API?\n- A) `0.0 to 1.0`\n- B) `-2.0 to 2.0`\n- C) `-1.0 to 1.0`\n- D) `0 to 100`\n**Correct Answer:** B\n**Explanation:** OpenAI penalties operate on a scale from `-2.0` to `2.0`.\n\n### Q9: When building a deterministic SQL query generator, what parameter profile should be selected?\n- A) High Temperature, High Top-P\n- B) Low Temperature (0.0), Low Top-P, Zero Penalties\n- C) Low Temperature, High Presence Penalty\n- D) High Top-K, High Temperature\n**Correct Answer:** B\n**Explanation:** Deterministic code and query tasks require low/zero temperature and zero penalties to prevent syntax corruption.\n\n### Q10: What does Nucleus Sampling refer to?\n- A) Hardware execution on GPU tensor cores.\n- B) Top-P sampling.\n- C) High-temperature sampling.\n- D) Multi-agent system orchestration.\n**Correct Answer:** B\n**Explanation:** Nucleus sampling is the formal computer science term for Top-P cumulative probability sampling.\n\n---\n\n## 23. Action Items\n\n* [ ] **Audit Current Parameters**: Check all production API calls to verify that settings are tuned for specific use cases rather than defaulting to \u0024T=1.0\u0024.\n* [ ] **Separate Temperature and Top-P**: Verify that your codebase tunes either Temperature or Top-P, but not both at once.\n* [ ] **Enforce Stop Sequences**: Verify that every conversational pipeline includes explicit stop sequences (e.g., `[\"\\nUser:\", \"\\nHuman:\"]`).\n* [ ] **Zero Penalties for Code and JSON Pipelines**: Remove presence and frequency penalties from all structured extraction workflows to preserve syntax keywords.\n* [ ] **Implement Environment Profiles**: Move parameters out of application source code into centralized JSON/YAML configuration manifests.\n\n---\n\n## 24. Recommended Further Reading\n\n* **Holtzman et al. (2019)**: *The Curious Case of Neural Text Degeneration* (Original paper introducing Nucleus / Top-P Sampling).\n* **OpenAI API Reference**: *Text Generation and Chat Completions Parameter Documentation*.\n* **Anthropic Claude Documentation**: *Model Settings and Output Decoding Controls*.\n* **vLLM Benchmarks \u0026 Documentation**: *Sampling Parameters in High-Throughput Inference Engines*."};
+
+    let documents = window.EMBEDDED_CATALOG || [];
+    let currentDoc = null;
+    let currentSections = [];
+    let flashcardsList = [];
+    let currentCardIdx = 0;
+    let isCardFlipped = false;
+    let quizList = [];
+    let userQuizAnswers = {};
+
+    function renderMarkdownContent(content) {
+      try {
+        if (typeof window.marked !== 'undefined') {
+          if (typeof window.marked.parse === 'function') {
+            return window.marked.parse(content || '');
+          } else if (typeof window.marked === 'function') {
+            return window.marked(content || '');
+          }
+        }
+      } catch (e) {
+        console.warn('Marked parse warning:', e);
+      }
+      return (content || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\n/g, '<br/>');
+    }
+
+    function loadCatalog() {
+      if (window.EMBEDDED_CATALOG && Array.isArray(window.EMBEDDED_CATALOG) && window.EMBEDDED_CATALOG.length > 0) {
+        documents = window.EMBEDDED_CATALOG;
+      }
+
+      renderDocList(documents);
+
+      // Check URL query parameters or hash routing (?doc=filename.md)
+      const urlParams = new URLSearchParams(window.location.search);
+      let targetDocFilename = urlParams.get('doc') || window.location.hash.replace('#', '');
+      if (targetDocFilename) {
+        if (targetDocFilename.startsWith('docs/')) targetDocFilename = targetDocFilename.replace('docs/', '');
+        if (targetDocFilename.endsWith('.html')) targetDocFilename = targetDocFilename.replace('.html', '.md');
+      }
+
+      if (targetDocFilename) {
+        loadDoc(targetDocFilename);
+        return;
+      }
+
+      if (window.EMBEDDED_CURRENT_DOC && window.EMBEDDED_CURRENT_DOC.content) {
+        currentDoc = {
+          filename: window.EMBEDDED_CURRENT_DOC.filename,
+          title: window.EMBEDDED_CURRENT_DOC.title,
+          date: (documents.find(d => d.filename === window.EMBEDDED_CURRENT_DOC.filename) || {}).date || ''
+        };
+        renderDocList(documents);
+        document.getElementById('doc-title-heading').innerText = currentDoc.title || 'Knowledge Document';
+        document.getElementById('doc-date-badge').innerText = currentDoc.date ? 'Published ' + currentDoc.date : '';
+        document.getElementById('doc-file-path').innerText = 'docs/' + (currentDoc.filename || 'document.md');
+        try {
+          parseAndRenderMarkdown(window.EMBEDDED_CURRENT_DOC.content);
+        } catch (rErr) {
+          console.error('Markdown parse error:', rErr);
+          document.getElementById('view-container-doc').innerHTML = '<div class="p-6 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-semibold">Could not render document: ' + (rErr.message || rErr) + '</div>';
+        }
+      } else if (documents.length > 0) {
+        loadDoc(documents[0].filename);
+      } else {
+        document.getElementById('doc-list').innerHTML = '<div class="text-xs text-amber-700 bg-amber-50 p-3 rounded border border-amber-200">No published documents found.</div>';
+        document.getElementById('view-container-doc').innerHTML = '<div class="p-8 text-center bg-white border border-gray-200 rounded-xl text-gray-500 font-serif"><i class="fas fa-book-open text-3xl mb-3 text-gray-300"></i><p class="font-bold text-gray-700">No document selected or published</p><p class="text-xs text-gray-400 mt-1">Publish a document from the app to populate this research library.</p></div>';
+      }
+
+      try {
+        const pathPrefix = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
+        fetch(pathPrefix + 'docs/data.json')
+          .then(res => res.ok ? res.json() : null)
+          .then(freshDocs => {
+            if (Array.isArray(freshDocs) && freshDocs.length > 0) {
+              documents = freshDocs;
+              renderDocList(documents);
+            }
+          })
+          .catch(e => console.warn('Background docs/data.json fetch skipped:', e));
+      } catch (err) {
+        console.warn('Network fetch skipped:', err);
+      }
+    }
+
+    function renderDocList(docs) {
+      document.getElementById('doc-count').innerText = docs.length;
+      const container = document.getElementById('doc-list');
+      if (docs.length === 0) {
+        container.innerHTML = '<div class="text-xs text-gray-400 italic p-2">No published documents found.</div>';
+        return;
+      }
+      container.innerHTML = docs.map(d =>
+        '<button onclick="loadDoc(&quot;' + d.filename + '&quot;)" class="w-full text-left p-2.5 rounded-lg hover:bg-[#F9F9F7] transition-all border border-transparent hover:border-gray-200 block cursor-pointer group ' + (currentDoc && currentDoc.filename === d.filename ? 'bg-red-50/70 border-red-200 font-bold' : '') + '">' +
+          '<p class="font-bold text-xs text-[#111111] group-hover:text-[#D43F33] line-clamp-2 leading-snug">' + d.title + '</p>' +
+          '<p class="text-[10px] text-gray-400 font-mono mt-1 flex items-center justify-between">' +
+            '<span>' + (d.date || '') + '</span>' +
+            '<i class="fas fa-chevron-right text-[9px] opacity-0 group-hover:opacity-100 transition-opacity"></i>' +
+          '</p>' +
+        '</button>'
+      ).join('');
+    }
+
+    function filterDocs() {
+      const q = document.getElementById('search-docs').value.toLowerCase();
+      const filtered = documents.filter(d => d.title.toLowerCase().includes(q) || d.filename.toLowerCase().includes(q));
+      renderDocList(filtered);
+    }
+
+    async function loadDoc(filename) {
+      try {
+        const doc = documents.find(d => d.filename === filename);
+        currentDoc = doc || { filename, title: filename };
+        renderDocList(documents);
+
+        document.getElementById('doc-title-heading').innerText = currentDoc.title || filename;
+        document.getElementById('doc-date-badge').innerText = currentDoc.date ? 'Published ' + currentDoc.date : '';
+        document.getElementById('doc-file-path').innerText = 'docs/' + filename;
+
+        let mdText = '';
+        if (window.EMBEDDED_CURRENT_DOC && window.EMBEDDED_CURRENT_DOC.filename === filename && window.EMBEDDED_CURRENT_DOC.content) {
+          mdText = window.EMBEDDED_CURRENT_DOC.content;
+        } else {
+          const pathPrefix = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
+          const pathsToTry = [pathPrefix + 'docs/' + filename, './docs/' + filename, 'docs/' + filename];
+          let loaded = false;
+          for (const path of pathsToTry) {
+            try {
+              const res = await fetch(path);
+              if (res.ok) {
+                mdText = await res.text();
+                loaded = true;
+                break;
+              }
+            } catch (e) {}
+          }
+          if (!loaded) throw new Error('Document markdown file (docs/' + filename + ') not found on server.');
+        }
+
+        parseAndRenderMarkdown(mdText);
+      } catch (err) {
+        document.getElementById('view-container-doc').innerHTML = '<div class="p-6 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-semibold">Could not load document: ' + (err.message || err) + '</div>';
+      }
+    }
+
+    function parseAndRenderMarkdown(mdText) {
+      const headingRegex = /^##\s*(\d+)[\.\s]+(.*)$/gm;
+      let matches = [];
+      let match;
+      while ((match = headingRegex.exec(mdText)) !== null) {
+        matches.push({
+          index: match.index,
+          num: parseInt(match[1], 10),
+          title: match[2].trim(),
+          fullMatch: match[0],
+        });
+      }
+
+      if (matches.length === 0) {
+        const altRegex = /^##\s+(.*)$/gm;
+        let count = 1;
+        while ((match = altRegex.exec(mdText)) !== null) {
+          matches.push({
+            index: match.index,
+            num: count++,
+            title: match[1].trim(),
+            fullMatch: match[0],
+          });
+        }
+      }
+
+      currentSections = [];
+      for (let i = 0; i < matches.length; i++) {
+        const cur = matches[i];
+        const next = matches[i + 1];
+        const startIndex = cur.index + cur.fullMatch.length;
+        const endIndex = next ? next.index : mdText.length;
+        const content = mdText.slice(startIndex, endIndex).trim();
+
+        currentSections.push({
+          num: cur.num,
+          title: cur.title,
+          content,
+        });
+      }
+
+      if (currentSections.length === 0) {
+        currentSections = [{
+          num: 1,
+          title: (currentDoc && currentDoc.title) ? currentDoc.title : 'Document Content',
+          content: mdText || ''
+        }];
+      }
+
+      renderSectionIndex(currentSections);
+      renderDocumentBody(currentSections);
+      extractFlashcardsAndQuiz(mdText);
+    }
+
+    function renderSectionIndex(sections) {
+      const container = document.getElementById('section-nav-list');
+      document.getElementById('sections-found-badge').innerText = sections.length + ' Sections';
+
+      if (sections.length === 0) {
+        container.innerHTML = '<div class="text-xs text-gray-400 italic p-2">No sections detected in document.</div>';
+        return;
+      }
+
+      container.innerHTML = sections.map(s => 
+        '<button onclick="scrollToSection(' + s.num + ')" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-[#F9F9F7] text-gray-700 hover:text-[#D43F33] transition-colors flex items-center space-x-2 cursor-pointer group">' +
+          '<span class="w-5 h-5 rounded bg-gray-100 group-hover:bg-red-50 text-gray-600 group-hover:text-[#D43F33] font-mono text-[10px] font-bold flex items-center justify-center shrink-0 border border-gray-200">' +
+            s.num +
+          '</span>' +
+          '<span class="truncate font-medium text-[11px] group-hover:font-bold">' + s.title + '</span>' +
+        '</button>'
+      ).join('');
+    }
+
+    function filterSections() {
+      const q = document.getElementById('search-sections').value.toLowerCase();
+      const filtered = currentSections.filter(s => s.title.toLowerCase().includes(q) || ('' + s.num).includes(q));
+      renderSectionIndex(filtered);
+    }
+
+    function scrollToSection(num) {
+      switchViewMode('doc');
+      const elem = document.getElementById('section-' + num);
+      if (elem) {
+        elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function renderDocumentBody(sections) {
+      const container = document.getElementById('view-container-doc');
+      if (sections.length === 0) {
+        container.innerHTML = '<div class="bg-white border p-8 rounded-xl text-center text-gray-500">Document empty or not structured in 24 sections.</div>';
+        return;
+      }
+
+      container.innerHTML = sections.map(s => 
+        '<div id="section-' + s.num + '" class="section-card bg-white border border-[#E5E7EB] rounded-xl p-6 sm:p-8 shadow-xs relative space-y-4">' +
+          '<div class="flex items-center justify-between pb-3 border-b border-gray-200">' +
+            '<div class="flex items-center space-x-2.5">' +
+              '<span class="px-2.5 py-0.5 rounded bg-[#111111] text-white font-mono font-bold text-[10px] uppercase tracking-wider">' +
+                'SECTION ' + (s.num < 10 ? '0' + s.num : s.num) +
+              '</span>' +
+              '<h2 class="text-xl sm:text-2xl font-serif font-bold text-[#111111]">' + s.title + '</h2>' +
+            '</div>' +
+            '<button onclick="window.scrollTo(0, 0)" class="text-gray-400 hover:text-[#111111] text-xs flex items-center space-x-1 cursor-pointer" title="Back to top">' +
+              '<i class="fas fa-arrow-up text-[10px]"></i>' +
+              '<span class="hidden sm:inline">Top</span>' +
+            '</button>' +
+          '</div>' +
+
+          '<div class="prose max-w-none text-[#222222]">' +
+            renderMarkdownContent(s.content) +
+          '</div>' +
+        '</div>'
+      ).join('');
+
+      document.querySelectorAll('.prose pre').forEach((pre) => {
+        if (!pre.querySelector('.copy-code-btn')) {
+          const btn = document.createElement('button');
+          btn.className = 'copy-code-btn absolute top-2 right-2 px-2 py-1 bg-gray-800 hover:bg-gray-700 text-gray-200 text-[10px] font-bold rounded cursor-pointer transition-colors';
+          btn.innerText = 'Copy';
+          btn.onclick = () => {
+            const code = pre.querySelector('code')?.innerText || pre.innerText;
+            navigator.clipboard.writeText(code);
+            btn.innerText = 'Copied!';
+            setTimeout(() => { btn.innerText = 'Copy'; }, 2000);
+          };
+          pre.style.position = 'relative';
+          pre.appendChild(btn);
+        }
+      });
+    }
+
+    function extractFlashcardsAndQuiz(mdText) {
+      flashcardsList = [];
+      const sec21Match = mdText.match(/##\s*21[\.\s]+Flash\s*Cards([\s\S]*?)(?=##\s*22|$)/i);
+      const fcContent = sec21Match ? sec21Match[1] : mdText;
+      const blocks = fcContent.split(/-\s*\*\*Card\s*\d+/i).filter(b => b.trim().length > 0);
+
+      blocks.forEach((block, idx) => {
+        const qMatch = block.match(/\*\*Q:\*\*\s*(.+)/i) || block.match(/Q:\s*(.+)/i);
+        const aMatch = block.match(/\*\*A:\*\*\s*(.+)/i) || block.match(/A:\s*(.+)/i);
+        if (qMatch && aMatch) {
+          flashcardsList.push({
+            question: qMatch[1].replace(/\*\*/g, '').trim(),
+            answer: aMatch[1].replace(/\*\*/g, '').trim(),
+            category: 'Core Knowledge'
+          });
+        }
+      });
+
+      if (flashcardsList.length === 0) {
+        flashcardsList = [
+          { question: "What is the primary objective of this knowledge research paper?", answer: "To deliver a 24-section comprehensive synthesis of the source video transcript.", category: "Overview" },
+          { question: "How can you utilize the flashcards and quiz tools?", answer: "Review sections sequentially, flip flashcards for key terms, and test recall with the interactive quiz.", category: "Study Method" }
+        ];
+      }
+      currentCardIdx = 0;
+      isCardFlipped = false;
+      renderCurrentFlashcard();
+
+      quizList = [];
+      userQuizAnswers = {};
+      const sec22Match = mdText.match(/##\s*22[\.\s]+Quiz([\s\S]*?)(?=##\s*23|$)/i);
+      const qContent = sec22Match ? sec22Match[1] : mdText;
+      const qBlocks = qContent.split(/(?=###?\s*Q\d+:?|^\d+\.\s+)/m).filter(b => b.trim().length > 0);
+
+      qBlocks.forEach((b, idx) => {
+        const bLines = b.split('\n').map(l => l.trim()).filter(Boolean);
+        if (bLines.length === 0) return;
+
+        let qText = '';
+        const opts = [];
+        let corrLetter = 'A';
+        let expText = '';
+
+        bLines.forEach(line => {
+          const optMatch = line.match(/^[-*]\s*([A-D]\))\s*(.+)/i);
+          const corrMatch = line.match(/(?:\*\*Correct Answer:\*\*|Correct:)\s*([A-D])/i);
+          const expMatch = line.match(/(?:\*\*Explanation:\*\*|Explanation:)\s*(.+)/i);
+
+          if (optMatch) {
+            opts.push(optMatch[1].toUpperCase() + ' ' + optMatch[2].trim());
+          } else if (corrMatch) {
+            corrLetter = corrMatch[1].toUpperCase();
+          } else if (expMatch) {
+            expText = expMatch[1].trim();
+          } else if (!line.startsWith('###') && !line.startsWith('**') && opts.length === 0) {
+            const clean = line.replace(/^###?\s*Q\d+:?\s*/i, '').replace(/^\d+\.\s*/, '').trim();
+            if (clean) qText += (qText ? ' ' : '') + clean;
+          }
+        });
+
+        if (qText && opts.length >= 2) {
+          let cIdx = ['A', 'B', 'C', 'D'].indexOf(corrLetter);
+          if (cIdx === -1) cIdx = 0;
+          quizList.push({
+            id: idx,
+            question: qText,
+            options: opts,
+            correctIndex: cIdx,
+            explanation: expText || 'Refer to the detailed explanation sections above.'
+          });
+        }
+      });
+
+      renderQuizList();
+    }
+
+    function renderCurrentFlashcard() {
+      if (flashcardsList.length === 0) return;
+      const card = flashcardsList[currentCardIdx];
+      document.getElementById('fc-category').innerText = card.category;
+      document.getElementById('fc-question-text').innerText = isCardFlipped ? card.answer : card.question;
+      document.getElementById('fc-hint').innerText = isCardFlipped ? '(Click to reveal question)' : '(Click to flip answer)';
+      document.getElementById('fc-counter').innerText = 'Card ' + (currentCardIdx + 1) + ' / ' + flashcardsList.length;
+    }
+
+    function flipCard() {
+      isCardFlipped = !isCardFlipped;
+      renderCurrentFlashcard();
+    }
+
+    function prevCard() {
+      isCardFlipped = false;
+      currentCardIdx = (currentCardIdx - 1 + flashcardsList.length) % flashcardsList.length;
+      renderCurrentFlashcard();
+    }
+
+    function nextCard() {
+      isCardFlipped = false;
+      currentCardIdx = (currentCardIdx + 1) % flashcardsList.length;
+      renderCurrentFlashcard();
+    }
+
+    function renderQuizList() {
+      const container = document.getElementById('quiz-questions-list');
+      if (quizList.length === 0) {
+        container.innerHTML = '<div class="text-xs text-gray-500 italic">No structured multiple-choice quiz questions parsed from Section 22.</div>';
+        return;
+      }
+
+      container.innerHTML = quizList.map((q, qIdx) => 
+        '<div class="p-6 rounded-xl bg-[#F9F9F7] border border-[#E5E7EB] space-y-3">' +
+          '<p class="font-bold text-sm text-[#111111] font-serif">' +
+            '<span class="text-[#D43F33] font-mono mr-1.5">Q' + (qIdx + 1) + '.</span> ' + q.question +
+          '</p>' +
+
+          '<div class="space-y-2 pt-1">' +
+            q.options.map((opt, oIdx) => {
+              const isSelected = userQuizAnswers[qIdx] === oIdx;
+              const isSubmitted = userQuizAnswers[qIdx] !== undefined;
+              const isCorrect = oIdx === q.correctIndex;
+
+              let btnStyle = 'bg-white border-gray-200 text-gray-800 hover:border-[#111111]';
+              if (isSubmitted) {
+                if (isCorrect) btnStyle = 'bg-emerald-50 border-emerald-500 text-emerald-900 font-bold';
+                else if (isSelected) btnStyle = 'bg-rose-50 border-rose-400 text-rose-900 font-bold';
+                else btnStyle = 'bg-white border-gray-200 text-gray-400 opacity-60';
+              }
+
+              return '<button onclick="selectQuizOption(' + qIdx + ', ' + oIdx + ')" class="w-full text-left p-3 rounded-lg border text-xs transition-all flex items-center justify-between cursor-pointer ' + btnStyle + '">' +
+                '<span>' + opt + '</span>' +
+                (isSubmitted && isCorrect ? '<i class="fas fa-check-circle text-emerald-600"></i>' : '') +
+                (isSubmitted && isSelected && !isCorrect ? '<i class="fas fa-times-circle text-rose-500"></i>' : '') +
+              '</button>';
+            }).join('') +
+          '</div>' +
+
+          (userQuizAnswers[qIdx] !== undefined ? 
+            '<div class="p-3 rounded bg-white border border-gray-200 text-xs text-gray-700 font-mono mt-2">' +
+              '<strong class="text-[#111111]">Explanation:</strong> ' + q.explanation +
+            '</div>'
+          : '') +
+        '</div>'
+      ).join('');
+
+      let correctCount = 0;
+      let answeredCount = 0;
+      Object.keys(userQuizAnswers).forEach((qIdxStr) => {
+        answeredCount++;
+        const qIdx = parseInt(qIdxStr, 10);
+        if (userQuizAnswers[qIdx] === quizList[qIdx].correctIndex) {
+          correctCount++;
+        }
+      });
+
+      document.getElementById('quiz-score-badge').innerText = 'Score: ' + correctCount + ' / ' + quizList.length + ' (' + answeredCount + ' answered)';
+    }
+
+    function selectQuizOption(qIdx, oIdx) {
+      userQuizAnswers[qIdx] = oIdx;
+      renderQuizList();
+    }
+
+    // Audio Speech Reader State & Logic
+    let currentUtterance = null;
+    let isAudioPlaying = false;
+    let isAudioPaused = false;
+
+    function toggleAudioReader() {
+      if (!('speechSynthesis' in window)) {
+        alert('Text-to-speech audio reader is not supported in this browser.');
+        return;
+      }
+      if (isAudioPlaying) {
+        stopAudioReader();
+      } else {
+        startAudioReader();
+      }
+    }
+
+    function startAudioReader() {
+      if (!currentSections || currentSections.length === 0) {
+        alert('No document sections loaded to read.');
+        return;
+      }
+      window.speechSynthesis.cancel();
+      
+      const fullText = currentSections.map(s => 'Section ' + s.num + ': ' + s.title + '. ' + s.content.replace(/[*#_]/g, '')).join(' ');
+      currentUtterance = new SpeechSynthesisUtterance(fullText.slice(0, 4500));
+      currentUtterance.rate = 1.0;
+      currentUtterance.pitch = 1.0;
+
+      currentUtterance.onstart = () => {
+        isAudioPlaying = true;
+        isAudioPaused = false;
+        document.getElementById('audio-bar').classList.remove('hidden');
+        document.getElementById('header-audio-icon').className = 'fas fa-volume-up text-amber-400 animate-pulse';
+        updateAudioBarState('Reading document aloud...');
+      };
+
+      currentUtterance.onend = () => {
+        stopAudioReader();
+      };
+
+      currentUtterance.onerror = () => {
+        stopAudioReader();
+      };
+
+      window.speechSynthesis.speak(currentUtterance);
+    }
+
+    function toggleAudioPause() {
+      if (!('speechSynthesis' in window) || !isAudioPlaying) return;
+      if (isAudioPaused) {
+        window.speechSynthesis.resume();
+        isAudioPaused = false;
+        updateAudioBarState('Reading document aloud...');
+      } else {
+        window.speechSynthesis.pause();
+        isAudioPaused = true;
+        updateAudioBarState('Paused');
+      }
+    }
+
+    function stopAudioReader() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      isAudioPlaying = false;
+      isAudioPaused = false;
+      document.getElementById('audio-bar').classList.add('hidden');
+      document.getElementById('header-audio-icon').className = 'fas fa-volume-up';
+    }
+
+    function updateAudioBarState(statusText) {
+      document.getElementById('audio-status-text').innerText = statusText;
+      document.getElementById('audio-play-icon').className = isAudioPaused ? 'fas fa-play' : 'fas fa-pause';
+      document.getElementById('audio-pause-label').innerText = isAudioPaused ? 'Resume' : 'Pause';
+    }
+
+    function setQaQuestion(q) {
+      document.getElementById('qa-input-field').value = q;
+      submitQaQuestion();
+    }
+
+    function submitQaQuestion() {
+      const field = document.getElementById('qa-input-field');
+      const query = field ? field.value.trim() : '';
+      if (!query) return;
+
+      const terms = query.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(t => t.length > 2);
+      
+      const scored = currentSections.map(sec => {
+        const titleText = sec.title.toLowerCase();
+        const contentText = sec.content.toLowerCase();
+        let score = 0;
+        terms.forEach(term => {
+          if (titleText.includes(term)) score += 5;
+          const matches = contentText.split(term).length - 1;
+          score += matches;
+        });
+        return { section: sec, score };
+      }).filter(s => s.score > 0).sort((a, b) => b.score - a.score);
+
+      const container = document.getElementById('qa-results-container');
+      if (scored.length === 0) {
+        container.innerHTML = '<div class="p-6 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs space-y-1"><strong class="text-amber-950 font-bold">No direct section matches found for "' + query + '"</strong><p class="text-amber-800">Try rephrasing your search or browse the 24-section index on the left sidebar.</p></div>';
+        return;
+      }
+
+      const topMatches = scored.slice(0, 3);
+      container.innerHTML = '<div class="space-y-4">' +
+        '<div class="p-5 bg-red-50/80 border border-red-200 rounded-xl space-y-2">' +
+          '<div class="flex items-center space-x-2 text-[#D43F33] font-bold text-xs uppercase tracking-wider"><i class="fas fa-sparkles"></i><span>Synthesized Response Across Document</span></div>' +
+          '<p class="text-xs text-gray-800 leading-relaxed font-sans">Based on section analysis for query <strong>"' + query + '"</strong>:</p>' +
+          '<blockquote class="text-xs text-gray-800 italic border-l-2 border-[#D43F33] pl-3 py-1 font-serif bg-white/70 rounded-r">"' + topMatches[0].section.content.slice(0, 320).replace(/[*#_]/g, '') + '..."</blockquote>' +
+        '</div>' +
+        '<div class="space-y-3">' +
+          '<h4 class="font-bold text-xs text-[#111111] uppercase tracking-wider">Matching Citations & Sections (' + topMatches.length + ')</h4>' +
+          topMatches.map(m => '<div class="p-4 bg-[#F9F9F7] border border-gray-200 rounded-lg space-y-2">' +
+            '<div class="flex items-center justify-between">' +
+              '<span class="text-xs font-bold font-serif text-[#111111] flex items-center space-x-2">' +
+                '<span class="px-2 py-0.5 rounded bg-[#111111] text-white font-mono text-[10px]">Sec ' + m.section.num + '</span>' +
+                '<span>' + m.section.title + '</span>' +
+              '</span>' +
+              '<button onclick="scrollToSection(' + m.section.num + ')" class="text-[11px] font-bold text-[#D43F33] hover:underline flex items-center space-x-1 cursor-pointer"><span>Jump to Section</span><i class="fas fa-arrow-right text-[9px]"></i></button>' +
+            '</div>' +
+            '<p class="text-xs text-gray-600 line-clamp-3 leading-relaxed">' + m.section.content.slice(0, 280).replace(/[*#_]/g, '') + '...</p>' +
+          '</div>').join('') +
+        '</div>' +
+      '</div>';
+    }
+
+    function switchViewMode(mode) {
+      document.getElementById('view-container-doc').classList.add('hidden');
+      document.getElementById('view-container-flashcards').classList.add('hidden');
+      document.getElementById('view-container-quiz').classList.add('hidden');
+      const qaContainer = document.getElementById('view-container-qa');
+      if (qaContainer) qaContainer.classList.add('hidden');
+
+      document.getElementById('tab-doc').className = 'px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]';
+      document.getElementById('tab-flashcards').className = 'px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]';
+      document.getElementById('tab-quiz').className = 'px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]';
+      const qaTab = document.getElementById('tab-qa');
+      if (qaTab) qaTab.className = 'px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]';
+
+      const activeBtnClass = 'px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer bg-[#111111] text-white shadow-xs';
+
+      if (mode === 'doc') {
+        document.getElementById('view-container-doc').classList.remove('hidden');
+        document.getElementById('tab-doc').className = activeBtnClass;
+      } else if (mode === 'flashcards') {
+        document.getElementById('view-container-flashcards').classList.remove('hidden');
+        document.getElementById('tab-flashcards').className = activeBtnClass;
+      } else if (mode === 'quiz') {
+        document.getElementById('view-container-quiz').classList.remove('hidden');
+        document.getElementById('tab-quiz').className = activeBtnClass;
+      } else if (mode === 'qa') {
+        if (qaContainer) qaContainer.classList.remove('hidden');
+        if (qaTab) qaTab.className = activeBtnClass;
+      }
+    }
+
+    function changeFontSize(size) {
+      const container = document.getElementById('view-container-doc');
+      if (size === 'sm') container.style.fontSize = '0.875rem';
+      else if (size === 'base') container.style.fontSize = '1rem';
+      else if (size === 'lg') container.style.fontSize = '1.125rem';
+    }
+
+    function copyFullMarkdown() {
+      if (!currentSections || currentSections.length === 0) return;
+      const text = currentSections.map(s => '## ' + s.num + '. ' + s.title + '\\n\\n' + s.content).join('\\n\\n');
+      navigator.clipboard.writeText(text);
+      alert('Full document markdown copied to clipboard!');
+    }
+
+    function initApp() {
+      try {
+        loadCatalog();
+      } catch (err) {
+        console.error('App load error:', err);
+        const container = document.getElementById('view-container-doc');
+        if (container) {
+          container.innerHTML = '<div class="p-6 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-semibold">Error loading document: ' + (err.message || err) + '</div>';
+        }
+      }
+    }
+
+    try {
+      initApp();
+    } catch (e) {
+      console.error('Direct init error:', e);
+    }
+    if (document.readyState !== 'complete' && document.readyState !== 'interactive') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    }
+  </script>
+</body>
+</html>
