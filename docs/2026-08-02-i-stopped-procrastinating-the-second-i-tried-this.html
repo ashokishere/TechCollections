@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transcript Scholar — Research & Knowledge Library</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FDFBF7; color: #111111; }
+    h1, h2, h3, h4, .font-serif, .editorial-title { font-family: 'Playfair Display', serif; }
+    
+    /* Markdown Prose Styling matching Transcript Scholar */
+    .prose h1 { font-size: 1.75rem; font-weight: 800; border-bottom: 2px solid #111; padding-bottom: 0.5rem; margin-top: 1.5rem; margin-bottom: 1rem; font-family: 'Playfair Display', serif; }
+    .prose h2 { font-size: 1.35rem; font-weight: 700; color: #D43F33; border-bottom: 1px solid #E5E7EB; padding-bottom: 0.3rem; margin-top: 1.5rem; margin-bottom: 0.75rem; font-family: 'Playfair Display', serif; }
+    .prose h3 { font-size: 1.15rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; font-family: 'Playfair Display', serif; }
+    .prose p { margin-bottom: 1rem; line-height: 1.75; color: #222222; font-size: 0.95rem; }
+    .prose ul, .prose ol { margin-left: 1.5rem; margin-bottom: 1.25rem; }
+    .prose ul { list-style-type: disc; }
+    .prose ol { list-style-type: decimal; }
+    .prose li { margin-bottom: 0.35rem; line-height: 1.6; }
+    .prose code { background: #F3F4F6; color: #111; padding: 0.15rem 0.4rem; border-radius: 4px; font-family: monospace; font-size: 0.85em; border: 1px solid #E5E7EB; }
+    .prose pre { background: #111; color: #F3F4F6; padding: 1.25rem; border-radius: 8px; overflow-x: auto; font-family: monospace; font-size: 0.85rem; margin: 1.25rem 0; border: 1px solid #333; }
+    .prose pre code { background: transparent; color: inherit; border: none; padding: 0; }
+    .prose blockquote { border-left: 4px solid #D43F33; padding-left: 1rem; font-style: italic; color: #4B5563; margin: 1.25rem 0; background: #F9F9F7; padding-top: 0.5rem; padding-bottom: 0.5rem; border-radius: 0 6px 6px 0; }
+    .prose table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.875rem; }
+    .prose th, .prose td { border: 1px solid #E5E7EB; padding: 0.6rem 0.8rem; text-align: left; }
+    .prose th { background-color: #F9F9F7; font-weight: 700; color: #111; }
+    .prose strong { color: #111; font-weight: 700; }
+
+    /* Print Stylesheet */
+    @media print {
+      header, aside, .no-print, #view-tabs, #doc-meta-bar { display: none !important; }
+      body { background-color: white !important; color: black !important; font-size: 11pt; }
+      main { width: 100% !important; margin: 0 !important; padding: 0 !important; border: none !important; box-shadow: none !important; }
+      .section-card { page-break-inside: avoid; border: 1px solid #ddd !important; margin-bottom: 1.5rem !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#FDFBF7]">
+
+  <!-- Top Navigation Bar -->
+  <header class="bg-[#111111] text-white border-b border-gray-800 px-4 sm:px-8 py-3.5 flex items-center justify-between sticky top-0 z-40 shadow-md">
+    <div class="flex items-center space-x-3.5">
+      <div class="w-9 h-9 rounded bg-[#D43F33] text-white font-serif font-extrabold flex items-center justify-center text-xl tracking-tighter shadow-xs">TS</div>
+      <div>
+        <div class="flex items-center space-x-2">
+          <h1 class="text-base sm:text-lg font-bold font-serif tracking-wide text-white">TRANSCRIPT SCHOLAR</h1>
+          <span class="hidden sm:inline-block px-2 py-0.5 rounded bg-red-950 text-[#D43F33] border border-red-800 text-[10px] font-mono font-bold uppercase">Research Library</span>
+        </div>
+        <p class="text-[11px] text-gray-400 font-mono">24-Section Knowledge Base • Hosted on GitHub Pages</p>
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-2 sm:space-x-3 text-xs">
+      <button onclick="toggleAudioReader()" class="px-3 py-1.5 rounded bg-[#D43F33] hover:bg-[#be352a] text-white font-bold flex items-center space-x-1.5 transition-colors cursor-pointer" title="Listen to document">
+        <i id="header-audio-icon" class="fas fa-volume-up"></i>
+        <span class="hidden md:inline">Listen Aloud</span>
+      </button>
+
+      <button onclick="window.print()" class="px-3 py-1.5 rounded bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold flex items-center space-x-1.5 transition-colors cursor-pointer" title="Print Academic Document">
+        <i class="fas fa-print"></i>
+        <span class="hidden md:inline">Print Paper</span>
+      </button>
+
+      <button onclick="copyFullMarkdown()" class="px-3 py-1.5 rounded bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold flex items-center space-x-1.5 transition-colors cursor-pointer" title="Copy raw markdown">
+        <i class="fas fa-copy"></i>
+        <span class="hidden md:inline">Copy Markdown</span>
+      </button>
+
+      <a href="https://github.com/ashokishere/TechCollections" target="_blank" class="px-3 py-1.5 rounded bg-gray-800 hover:bg-gray-700 text-white font-bold flex items-center space-x-1.5 transition-colors cursor-pointer">
+        <i class="fab fa-github text-sm"></i>
+        <span class="hidden sm:inline">GitHub Repo</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Audio Reader Floating Status Bar -->
+  <div id="audio-bar" class="hidden bg-[#111111] border-b border-red-900/80 px-4 py-2.5 text-white flex items-center justify-between z-30 sticky top-[57px] shadow-sm">
+    <div class="flex items-center space-x-3">
+      <div class="w-3 h-3 rounded-full bg-[#D43F33] animate-pulse"></div>
+      <span id="audio-status-text" class="text-xs font-mono font-medium text-gray-200">Reading document aloud...</span>
+    </div>
+    <div class="flex items-center space-x-2 text-xs">
+      <button onclick="toggleAudioPause()" class="px-2.5 py-1 rounded bg-gray-800 hover:bg-gray-700 text-white font-bold flex items-center space-x-1">
+        <i id="audio-play-icon" class="fas fa-pause"></i>
+        <span id="audio-pause-label">Pause</span>
+      </button>
+      <button onclick="stopAudioReader()" class="px-2.5 py-1 rounded bg-red-950 hover:bg-red-900 border border-red-800 text-red-200 font-bold flex items-center space-x-1">
+        <i class="fas fa-stop"></i>
+        <span>Stop</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Layout Grid -->
+  <div class="flex-1 max-w-[1400px] w-full mx-auto p-3 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- Left Sidebar: Document Library & 24-Section Index -->
+    <aside class="lg:col-span-3 space-y-5">
+      
+      <!-- Document Catalog Box -->
+      <div class="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-xs">
+        <h2 class="font-bold uppercase tracking-wider text-xs text-[#111111] mb-2.5 pb-2 border-b border-gray-200 flex items-center justify-between">
+          <span class="flex items-center space-x-1.5">
+            <i class="fas fa-books text-[#D43F33]"></i>
+            <span>Published Library</span>
+          </span>
+          <span id="doc-count" class="text-[10px] bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-mono font-bold">0</span>
+        </h2>
+
+        <div class="relative mb-3">
+          <input id="search-docs" type="text" placeholder="Search catalog..." class="w-full text-xs p-2 pl-7 bg-[#F9F9F7] border border-gray-200 rounded focus:outline-none focus:border-[#111111]" oninput="filterDocs()" />
+          <i class="fas fa-search absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
+        </div>
+
+        <div id="doc-list" class="space-y-1.5 overflow-y-auto max-h-[32vh] pr-1">
+          <div class="text-xs text-gray-400 italic p-2">Loading library catalog...</div>
+        </div>
+      </div>
+
+      <!-- 24-Section Quick Index Box -->
+      <div class="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-xs sticky top-20">
+        <div class="flex items-center justify-between mb-2.5 pb-2 border-b border-gray-200">
+          <h2 class="font-bold uppercase tracking-wider text-xs text-[#111111] flex items-center space-x-1.5">
+            <i class="fas fa-list-ol text-[#D43F33]"></i>
+            <span>24-Section Index</span>
+          </h2>
+          <span id="sections-found-badge" class="text-[10px] bg-red-50 text-[#D43F33] font-bold px-2 py-0.5 rounded border border-red-200 font-mono">24 Sections</span>
+        </div>
+
+        <div class="relative mb-2.5">
+          <input id="search-sections" type="text" placeholder="Jump to section..." class="w-full text-xs p-2 pl-7 bg-[#F9F9F7] border border-gray-200 rounded focus:outline-none focus:border-[#111111]" oninput="filterSections()" />
+          <i class="fas fa-filter absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
+        </div>
+
+        <div id="section-nav-list" class="space-y-1 overflow-y-auto max-h-[48vh] pr-1 text-xs">
+          <div class="text-xs text-gray-400 italic p-2">Select a document to view sections...</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area: Transcript Scholar View -->
+    <main class="lg:col-span-9 space-y-6">
+
+      <!-- Document Header Banner -->
+      <div id="doc-header-banner" class="bg-white border border-[#E5E7EB] rounded-xl p-6 sm:p-8 shadow-xs relative overflow-hidden">
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-[#D43F33]"></div>
+
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+          <span class="px-3 py-1 rounded bg-red-50 border border-red-200 text-[#D43F33] font-bold text-[11px] uppercase tracking-widest flex items-center space-x-1.5">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Transcript Scholar • 24-Section Comprehensive Research Document</span>
+          </span>
+          <span id="doc-date-badge" class="text-xs text-gray-500 font-mono"></span>
+        </div>
+
+        <h1 id="doc-title-heading" class="text-2xl sm:text-4xl font-extrabold text-[#111111] tracking-tight mb-3 font-serif leading-snug">
+          Select a Knowledge Document
+        </h1>
+
+        <p id="doc-file-path" class="text-xs text-gray-500 font-mono bg-[#F9F9F7] px-3 py-1.5 rounded border border-[#E5E7EB] inline-block">
+          Select a document from the Published Library on the left sidebar.
+        </p>
+
+        <!-- View Mode Switcher Toolbar -->
+        <div id="view-tabs" class="mt-6 pt-4 border-t border-gray-200 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center space-x-1 bg-[#F9F9F7] p-1 rounded-lg border border-[#E5E7EB]">
+            <button id="tab-doc" onclick="switchViewMode('doc')" class="px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer bg-[#111111] text-white">
+              <i class="fas fa-file-alt"></i>
+              <span>Full Research Document</span>
+            </button>
+            <button id="tab-flashcards" onclick="switchViewMode('flashcards')" class="px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]">
+              <i class="fas fa-clone"></i>
+              <span>Flash Cards</span>
+            </button>
+            <button id="tab-quiz" onclick="switchViewMode('quiz')" class="px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]">
+              <i class="fas fa-tasks"></i>
+              <span>Interactive Quiz</span>
+            </button>
+            <button id="tab-qa" onclick="switchViewMode('qa')" class="px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]">
+              <i class="fas fa-comments text-[#D43F33]"></i>
+              <span>Document Q&A</span>
+            </button>
+          </div>
+
+          <div class="flex items-center space-x-2 text-xs">
+            <span class="text-gray-500 font-bold uppercase tracking-wider text-[10px]">Text Size:</span>
+            <button onclick="changeFontSize('sm')" class="px-2 py-1 rounded bg-[#F9F9F7] hover:bg-gray-200 border border-[#E5E7EB] font-bold">A-</button>
+            <button onclick="changeFontSize('base')" class="px-2 py-1 rounded bg-[#F9F9F7] hover:bg-gray-200 border border-[#E5E7EB] font-bold">A</button>
+            <button onclick="changeFontSize('lg')" class="px-2 py-1 rounded bg-[#F9F9F7] hover:bg-gray-200 border border-[#E5E7EB] font-bold">A+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- View 1: Rendered Document Sections Container -->
+      <div id="view-container-doc" class="space-y-6">
+        <div class="bg-white border border-[#E5E7EB] rounded-xl p-12 text-center text-gray-400 font-serif">
+          <i class="fas fa-spinner fa-spin text-3xl mb-3 text-[#D43F33]"></i>
+          <p>Loading document analysis...</p>
+        </div>
+      </div>
+
+      <!-- View 2: Interactive Flashcards Container -->
+      <div id="view-container-flashcards" class="hidden space-y-6">
+        <div class="bg-white border border-[#E5E7EB] rounded-xl p-8 shadow-xs text-center">
+          <h3 class="font-serif font-bold text-xl text-[#111111] mb-2">Interactive Study Flashcards</h3>
+          <p class="text-xs text-gray-500 mb-6">Click card to reveal answer. Use controls below to navigate.</p>
+
+          <div id="flashcard-box" class="max-w-xl mx-auto min-h-[220px] bg-[#F9F9F7] border-2 border-[#111111] rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer shadow-md transition-all hover:border-[#D43F33]" onclick="flipCard()">
+            <span id="fc-category" class="text-[10px] font-bold uppercase tracking-widest text-[#D43F33] bg-red-50 border border-red-200 px-2.5 py-0.5 rounded-full mb-3">Core Concept</span>
+            <p id="fc-question-text" class="text-lg font-serif font-bold text-[#111111] leading-relaxed">Loading card question...</p>
+            <p id="fc-hint" class="text-[11px] text-gray-400 font-mono mt-4">(Click to flip card)</p>
+          </div>
+
+          <div class="flex items-center justify-center space-x-4 mt-6">
+            <button onclick="prevCard()" class="px-4 py-2 rounded bg-[#111111] hover:bg-[#D43F33] text-white font-bold text-xs uppercase tracking-wider flex items-center space-x-1 transition-colors cursor-pointer">
+              <i class="fas fa-arrow-left"></i>
+              <span>Previous</span>
+            </button>
+            <span id="fc-counter" class="text-xs font-mono font-bold text-gray-600 px-3 py-1 bg-gray-100 rounded">Card 1 / 1</span>
+            <button onclick="nextCard()" class="px-4 py-2 rounded bg-[#111111] hover:bg-[#D43F33] text-white font-bold text-xs uppercase tracking-wider flex items-center space-x-1 transition-colors cursor-pointer">
+              <span>Next</span>
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- View 3: Interactive Quiz Container -->
+      <div id="view-container-quiz" class="hidden space-y-6">
+        <div class="bg-white border border-[#E5E7EB] rounded-xl p-8 shadow-xs">
+          <div class="flex items-center justify-between border-b border-gray-200 pb-4 mb-6">
+            <div>
+              <h3 class="font-serif font-bold text-xl text-[#111111]">Interactive Knowledge Quiz</h3>
+              <p class="text-xs text-gray-500 mt-0.5">Test your comprehension on this research paper.</p>
+            </div>
+            <span id="quiz-score-badge" class="px-3 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 font-mono text-xs font-bold">
+              Score: 0 / 0
+            </span>
+          </div>
+
+          <div id="quiz-questions-list" class="space-y-6">
+            <div class="text-center py-8 text-gray-400 italic">Extracting quiz questions from Section 22...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- View 4: Document Q&A Assistant Container -->
+      <div id="view-container-qa" class="hidden space-y-6">
+        <div class="bg-white border border-[#E5E7EB] rounded-xl p-6 sm:p-8 shadow-xs space-y-6">
+          <div class="border-b border-gray-200 pb-4">
+            <div class="flex items-center space-x-2 text-[#D43F33] text-xs font-bold uppercase tracking-wider mb-1">
+              <i class="fas fa-brain"></i>
+              <span>Instant Semantic Document Search & Synthesis</span>
+            </div>
+            <h3 class="font-serif font-bold text-2xl text-[#111111]">Document Q&A Assistant</h3>
+            <p class="text-xs text-gray-500 mt-1">Ask questions about this research document to get instant answers with section citations.</p>
+          </div>
+
+          <!-- Question Input Form -->
+          <div class="space-y-3">
+            <div class="flex items-center gap-2">
+              <input id="qa-input-field" type="text" placeholder="Ask any question about this document (e.g. 'What are the core conclusions?')..." class="flex-1 text-sm p-3 bg-[#F9F9F7] border border-gray-300 rounded-lg focus:outline-none focus:border-[#111111]" onkeydown="if(event.key==='Enter') submitQaQuestion()" />
+              <button onclick="submitQaQuestion()" class="px-5 py-3 rounded-lg bg-[#111111] hover:bg-[#D43F33] text-white font-bold text-xs uppercase tracking-wider flex items-center space-x-2 transition-colors cursor-pointer">
+                <i class="fas fa-search"></i>
+                <span>Ask</span>
+              </button>
+            </div>
+
+            <!-- Preset Quick Question Chips -->
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+              <span class="text-gray-400 text-[11px] font-mono font-bold">Try asking:</span>
+              <button onclick="setQaQuestion('Summarize the main conclusions of this paper')" class="px-2.5 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium text-[11px] transition-colors">"Summarize main conclusions"</button>
+              <button onclick="setQaQuestion('What key takeaways are highlighted in Section 5?')" class="px-2.5 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium text-[11px] transition-colors">"Key takeaways in Section 5"</button>
+              <button onclick="setQaQuestion('Explain core definitions and methodology')" class="px-2.5 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium text-[11px] transition-colors">"Core methodology"</button>
+            </div>
+          </div>
+
+          <!-- Q&A Results Display -->
+          <div id="qa-results-container" class="mt-6 pt-4 border-t border-gray-200">
+            <div class="text-center py-12 text-gray-400 font-serif">
+              <i class="fas fa-comments text-3xl mb-3 text-gray-300"></i>
+              <p class="font-bold text-gray-600">Enter a question above to analyze document sections.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // GitHub Pages URL normalization (prevents 404 on relative fetches when missing trailing slash)
+    if (!window.location.pathname.endsWith('/') && !window.location.pathname.split('/').pop().includes('.')) {
+      window.location.replace(window.location.pathname + '/' + window.location.search + window.location.hash);
+    }
+
+    window.EMBEDDED_CATALOG = [{"title":"I Stopped Procrastinating the Second I Tried This","filename":"2026-08-02-i-stopped-procrastinating-the-second-i-tried-this.md","path":"docs/Deeplearning AI/General/2026-08-02-i-stopped-procrastinating-the-second-i-tried-this.md","category":"Deeplearning AI","subcategory":"General","date":"2026-08-02"},{"title":"Master Structured Knowledge Document","filename":"2026-08-02_i-stopped-procrastinating-the-second-i-tried-this.md","path":"docs/Deeplearning AI/General/2026-08-02_i-stopped-procrastinating-the-second-i-tried-this.md","category":"Deeplearning AI","subcategory":"General","date":"2026-08-02"}];
+    window.EMBEDDED_CURRENT_DOC = {"title":"I Stopped Procrastinating the Second I Tried This","filename":"2026-08-02-i-stopped-procrastinating-the-second-i-tried-this.md","content":"# Master Structured Knowledge Document\n\n**Title:** I Stopped Procrastinating the Second I Tried This  \n**Video URL:** https://www.youtube.com/watch?v=p4htJlyGEic  \n**Domain:** Behavioral Psychology, Productivity Engineering, Habit Formation  \n**Political / Policy Content Flag:** False (No political or policy content detected)\n\n---\n\n## 1. Executive Summary\n\nProcrastination is rarely a time-management problem; it is an emotional and psychological barrier driven by perfectionism, fear of failure, and high activation energy. The video *“I Stopped Procrastinating the Second I Tried This”* presents the **2-Minute Rule** as a practical friction-reduction strategy to overcome psychological inertia and initiate action. \n\nThe speaker illustrates this using a personal narrative: despite long-standing desires to launch a YouTube channel, self-doubt regarding language fluency and pronunciation created operational paralysis. By committing to just two minutes of work without the pressure of producing a finished product, the speaker eliminated the cognitive load of starting. \n\nThe core thesis posits that **action precedes motivation**, not vice versa. Initiating an activity for 120 seconds lowers static friction, establishes physical momentum, and activates dopamine-driven feedback loops that sustain effort long past the initial time limit. To master a habit, one must first establish the ritual of showing up before attempting to optimize performance.\n\n---\n\n## 2. Key Takeaways\n\n1. **Activation Energy is the Primary Hurdle:** The hardest phase of any task is static friction—the transition from state \u00240\u0024 (rest) to state \u00241\u0024 (motion).\n2. **De-escalate Commitment to 120 Seconds:** Lowering the barrier to a two-minute window eliminates psychological resistance and reduces anxiety around performance.\n3. **Action Triggers Motivation:** Motivation is an outcome of movement rather than a prerequisite for it.\n4. **Standardize Before Optimizing:** A habit must be established (showing up) before it can be refined (quality execution).\n5. **Perfectionism is Inertia:** Overthinking outcomes generates cognitive paralysis; micro-commitments bypass the brain's threat-detection mechanisms.\n6. **Micro-Wins Build Compound Momentum:** Completing two minutes creates a sense of self-efficacy that propels the individual into extended flow states.\n\n---\n\n## 3. Topics Covered\n\n* **The Psychology of Procrastination \u0026 Imposter Syndrome:** Explores how perfectionism and fear of judgment prevent high-potential tasks from starting.\n* **The Mechanics of the 2-Minute Rule:** Details how reducing initial time commitments lowers cognitive load and bypasses task resistance.\n* **Momentum \u0026 State Transitions:** Analyzes how initial physical action transitions an individual into a flow state through neurochemical reinforcement.\n* **Establishing vs. Optimizing Habits:** Emphasizes that mastering the habit of showing up must precede any attempts at performance optimization.\n* **Scaling Micro-Actions Across Domains:** Demonstrates how micro-commitments apply universally to writing, fitness, public speaking, and project management.\n\n---\n\n## 4. Timeline with Timestamps\n\n* **[00:00] Introduction to the Problem of Procrastination:** Acknowledging the universal struggle with task avoidance and the friction of starting significant goals.\n* **[00:05] Personal Struggle \u0026 Fear of Imperfection:** The speaker details personal insecurities surrounding English proficiency and pronunciation that delayed starting a YouTube channel.\n* **[00:15] The Breakthrough: Applying the 2-Minute Rule:** Shifting perspective from creating a complete project to executing just two minutes of frictionless effort.\n* **[00:25] The Outcome: The Power of Starting:** Real-time demonstration that the video itself was created solely as a product of initiating that 2-minute commitment.\n* **[00:35] Generalizing the Rule Across Domains:** Applying micro-commitments to workouts, writing, study sessions, and operational work.\n* **[00:45] Psychological Mechanisms \u0026 Rewiring the Brain:** How micro-wins establish behavioral consistency, alter neural pathways, and build sustainable momentum.\n* **[00:55] Conclusion \u0026 Call to Action:** Summary of the \"Everyday Better\" framework—focusing on showing up consistently rather than demanding instant perfection.\n\n---\n\n## 5. Detailed Explanation\n\n### The Psychology of Procrastination \u0026 Imposter Syndrome\nProcrastination is often misdiagnosed as laziness. In reality, it is an emotional regulation strategy designed to avoid negative feelings such as anxiety, incompetence, or fear of failure. When faced with a complex task—such as starting a YouTube channel, writing code, or recording a video in a foreign language—the brain evaluates the gap between current skill and ideal execution. This gap triggers an avoidance response. The speaker’s self-doubt regarding English fluency served as a cognitive barrier, reinforcing paralysis through overthinking.\n\n### Mechanics of the 2-Minute Rule\nThe 2-Minute Rule (popularized by David Allen in *Getting Things Done* and adapted by James Clear in *Atomic Habits*) operates by shrinking the scale of a task until psychological resistance drops to zero. Instead of committing to \"record an entire YouTube video,\" the user commits to \"sit down and speak into the camera for 2 minutes.\" By defining the objective as a time-bounded micro-action, the brain no longer perceives the task as a high-stakes threat, neutralizing the fight-or-flight avoidance response.\n\n```\n[ High Cognitive Load ] --\u003e Task Avoidance --\u003e Procrastination\n[ 2-Minute Shrinkage ]  --\u003e Zero Friction  --\u003e Action --\u003e Flow State\n```\n\n### Momentum \u0026 State Transitions\nPhysics provides a useful mental model: static friction (\u0024\\mu_s\u0024) is significantly greater than kinetic friction (\u0024\\mu_k\u0024). The energy required to move an object from a complete standstill is far higher than the energy required to keep it moving once in motion. In human behavior, starting a task represents static friction. Once the 2-minute threshold is crossed, kinetic friction takes over; momentum reduces executive fatigue, and the natural desire for task completion (Zeigarnik Effect) carries the individual past the initial 120-second mark.\n\n### Establishing vs. Optimizing Habits\nA common failure mode in habit formation is optimizing for quality before establishing consistency. Attempting to run a marathon on day one yields burnout or injury. The primary skill in habit formation is not high output, but the meta-habit of **showing up**. Once the habit of sitting at the desk, opening the IDE, or putting on running shoes is automatic, the duration and quality of the activity can be incrementally scaled.\n\n---\n\n## 6. Beginner Explanation (ELI5)\n\nImagine you have to push a big heavy car that stopped moving. \n\nWhen the car is sitting completely still, pushing it feels almost impossible. Your arms hurt, and it feels like nothing is happening. But if you get one or two friends to help push really hard for just **two seconds**, the tires start rolling. Once the car is rolling, even just a little bit, it becomes much easier to keep pushing it with one hand!\n\nProcrastination is like that heavy, frozen car. Thinking about doing your homework or cleaning your room feels like trying to push that car up a hill. \n\nThe **2-Minute Rule** says: *\"Don't try to push the car up the whole hill. Just push it for two minutes. After two minutes, you can stop if you want.\"* \n\nWhat usually happens? Once you start pushing and the wheels start turning, you realize it isn't so bad, and you just keep going!\n\n---\n\n## 7. Technical Deep Dive\n\n### Behavioral Mechanics \u0026 Activation Energy\n\nThe dynamics of human productivity can be modeled using chemical kinetics principles, specifically **Activation Energy (\u0024E_a\u0024)** in the Arrhenius equation:\n\n\u0024\u0024k = A e^{-\\frac{E_a}{R T}}\u0024\u0024\n\nWhere:\n* \u0024k\u0024 represents the rate of execution/action.\n* \u0024E_a\u0024 represents the cognitive activation energy required to initiate the task.\n* \u0024A\u0024 is the foundational frequency of habit triggers.\n\nWhen \u0024E_a\u0024 is artificially lowered by shrinking the target task duration (\u0024t \\to 120\\text{s}\u0024), the execution constant \u0024k\u0024 increases exponentially.\n\n```\nCognitive Friction (E_a)\n|\n|   /---\\  \u003c-- Normal Task Threshold (High E_a)\n|  /     \\\n| /       \\___ Initial State\n|/___________  \u003c-- 2-Minute Rule Threshold (Low E_a)\n+-----------------------------------\u003e Time / Effort\n```\n\n### Neurobiology of Micro-Wins\nWhen an individual completes a micro-task (e.g., writing for 2 minutes), the brain registers task completion. This triggers a release of **dopamine** in the mesolimbic pathway, specifically from the ventral tegmental area (VTA) to the nucleus accumbens. Dopamine does not merely signal pleasure; it functions primarily as a prediction error signal that reinforces motor and cognitive habits, driving continued engagement.\n\n```\n[ Intention: 2 Mins ] --\u003e [ Action Initiated ] --\u003e [ Micro-Task Complete ]\n                                                          |\n                                                          v\n[ Extended Action State ] \u003c-- [ Dopamine Release ] \u003c------+\n```\n\n---\n\n## 8. Important Definitions\n\n* **2-Minute Rule:** A productivity heuristic stating that any habit or task can be scaled down into a 2-minute version to eliminate friction during initiation.\n* **Activation Energy (\u0024E_a\u0024):** The initial threshold of cognitive and physical effort required to move from inaction to execution.\n* **Static Friction (\u0024\\mu_s\u0024):** The resistive force that opposes the initiation of motion between two surfaces at rest (used analogously for cognitive inertia).\n* **Kinetic Friction (\u0024\\mu_k\u0024):** The resistive force opposing relative motion once an object is already moving; notably lower than static friction.\n* **Zeigarnik Effect:** A psychological phenomenon where people remember uncompleted or interrupted tasks better than completed ones, creating an internal drive to finish what was started.\n* **Dopaminergic Feedback Loop:** A neurobiological cycle where task completion releases dopamine, reinforcing the behavioral loop and encouraging continuous execution.\n\n---\n\n## 9. Code Snippets \u0026 Configuration Examples\n\nTo operationalize the 2-Minute Rule into daily technical workflows, engineers can implement automated CLI tools or shell hooks that enforce a 2-minute focus sprint before committing to longer tasks.\n\n### Python 2-Minute Sprint CLI Focus Engine (`focus2min.py`)\n\n```python\n#!/usr/bin/env python3\n\"\"\"\nFocus2Min CLI Tool\nEnforces the 2-Minute Rule by executing a timed, uninterrupted focus block.\nUses terminal-notifier / system display alerts to signal completion.\n\"\"\"\n\nimport sys\nimport time\nimport os\nimport platform\n\ndef trigger_notification(title: str, message: str) -\u003e None:\n    \"\"\"Delivers cross-platform desktop notifications.\"\"\"\n    system = platform.system()\n    if system == \"Darwin\":  # macOS\n        os.system(f'osascript -e \\'display notification \"{message}\" with title \"{title}\"\\'')\n    elif system == \"Linux\":\n        os.system(f'notify-send \"{title}\" \"{message}\"')\n    elif system == \"Windows\":\n        from win10toast import ToastNotifier\n        toaster = ToastNotifier()\n        toaster.show_toast(title, message, duration=5)\n\ndef run_two_minute_sprint(task_name: str) -\u003e None:\n    \"\"\"Executes a 120-second countdown for task initiation.\"\"\"\n    duration_seconds = 120\n    print(f\"\\n[+] Starting 2-Minute Sprint for: '{task_name}'\")\n    print(\"[+] Rule: Commitment is ONLY 120 seconds. You may quit guilt-free after time expires.\\n\")\n\n    try:\n        for remaining in range(duration_seconds, 0, -1):\n            mins, secs = divmod(remaining, 60)\n            timer_format = f\"{mins:02d}:{secs:02d}\"\n            print(f\"\\r[TIMER] Focus Window: {timer_format} | Task: {task_name}\", end=\"\", flush=True)\n            time.sleep(1)\n        \n        print(\"\\n\\n [!] 2 MINUTES COMPLETE!\")\n        trigger_notification(\"2-Minute Rule Triggered\", f\"Great job starting '{task_name}'! Keep going or stop.\")\n        \n        user_choice = input(\"\\n[?] Do you want to continue working? (y/n): \").strip().lower()\n        if user_choice in ['y', 'yes']:\n            print(\"[🚀] Momentum unlocked! System entering extended workflow mode...\\n\")\n        else:\n            print(\"[✅] Sprint completed. Habit of showing up reinforced!\\n\")\n\n    except KeyboardInterrupt:\n        print(\"\\n\\n[-] Sprint aborted manually.\")\n        sys.exit(1)\n\nif __name__ == \"__main__\":\n    task = \" \".join(sys.argv[1:]) if len(sys.argv) \u003e 1 else \"Task Initiation\"\n    run_two_minute_sprint(task)\n```\n\n### Shell Alias Configuration (`.bashrc` / `.zshrc`)\n\n```bash\n# Add this alias to instantly launch a 2-minute commitment sprint\nalias start2=\"python3 ~/scripts/focus2min.py\"\n\n# Example Usage:\n# \u0024 start2 \"Refactoring Legacy Authentication Module\"\n```\n\n---\n\n## 10. Best Practices\n\n1. **Scale Down to Absolute Minimum:** If a 2-minute commitment still induces resistance, scale down to 30 seconds or 1 simple action (e.g., \"Open the code editor\").\n2. **Remove Environmental Friction:** Keep required tools readily available. If writing code, keep your IDE open to the correct workspace.\n3. **Decouple Action from Performance Metrics:** During the first 120 seconds, explicit output volume and code quality do not matter; execution efficiency is secondary to physical initiation.\n4. **Enforce Guilt-Free Stopping:** Grant yourself full permission to stop after two minutes. If the rule is used as a trick to force prolonged work, the brain will resist it.\n5. **Use Implementation Intentions:** Combine the 2-Minute Rule with time/location triggers: *\"When [Trigger occurs], I will perform [2-Minute Action].\"*\n\n---\n\n## 11. Common Mistakes\n\n* **The Trojan Horse Trap:** Pretending you only have to work for 2 minutes while secretly expecting to work for 4 hours. The brain senses the deception and maintains high \u0024E_a\u0024 resistance.\n* **Optimizing Quality First:** Delaying action to plan the perfect architecture, perfect wording, or ideal setup before taking the first micro-action.\n* **Failing to Prepare the Environment:** Expending all energy trying to locate tools, logins, or files during the 2-minute window.\n* **Ignoring Micro-Wins:** Dismissing a 2-minute effort as \"too small to matter,\" thereby destroying positive neurobiological reinforcement loops.\n\n---\n\n## 12. Interview Questions\n\n### Question 1 (Behavioral / Productivity Engineering)\n**How do you approach starting a large-scale, poorly defined technical initiative when faced with high ambiguity and cognitive inertia?**\n\u003e **Answer:** I approach large, ambiguous projects by reducing activation energy using micro-segmentation and time-boxed initiation protocols like the 2-Minute Rule. First, I identify the smallest non-threatening step—such as creating a blank architectural document or initializing a local git branch. Next, I commit to working on that single action for 120 seconds. This lowers static friction, bypasses overthinking, and initiates a state shift. Once momentum is established, I apply structured breakdown techniques (like breaking requirements into user stories) to sustain progress.\n\n### Question 2 (Engineering Leadership)\n**How would you help a junior engineer who consistently misses deadlines due to perfectionism and fear of producing flawed code?**\n\u003e **Answer:** I would coach them to separate the *creation phase* from the *optimization phase*. I'd introduce micro-commitments, encouraging them to commit non-ideal draft code or pseudocode within their first 10 minutes of working on a ticket. By framing early code as throwaway discovery work and emphasizing that \"habits/artifacts must be established before they can be improved,\" I help remove the cognitive fear of judgment. Automated testing and peer review serve as safety nets later in the process.\n\n### Question 3 (Agile Management)\n**How does the concept of \"Standardize before you Optimize\" apply to Agile software development workflows?**\n\u003e **Answer:** \"Standardize before optimizing\" means establishing a consistent operational rhythm before attempting to optimize cycle times or throughput. For instance, a team must consistently execute daily standups, sprint planning, and basic CI/CD delivery—even if sprint velocity is initially low—before tuning advance metrics, test coverage rules, or continuous deployment gates.\n\n---\n\n## 13. Certification Questions\n\n### Question 1 (Agile / Project Management)\nA software developer on a Scrum team consistently spends several days in \"Analysis Paralysis\" before writing the first line of code for a user story. Which technique directly addresses this behavioral bottleneck?\n- A) Increasing the team velocity targets in Sprint Planning\n- B) Decomposing task initiation into minimal time-boxed actions to reduce activation energy\n- C) Reassigning complex tickets to Senior Developers\n- D) Extending the Sprint length from 2 weeks to 4 weeks  \n\n**Correct Answer:** **B**  \n**Explanation:** Decomposing task initiation into minimal time-boxed micro-actions (such as the 2-Minute Rule) directly lowers cognitive friction and mitigates task-avoidance paralysis.\n\n---\n\n### Question 2 (DevOps / Process Optimization)\nAccording to Lean principles and habit mechanics, what is the primary operational objective when introducing a new automated integration pipeline across an organization?\n- A) Achieving 100% test coverage on day one\n- B) Ensuring zero pipeline build failures during the first iteration\n- C) Establishing pipeline adoption and execution daily before optimizing step runtime and coverage depth\n- D) Replacing all existing release pipelines simultaneously  \n\n**Correct Answer:** **C**  \n**Explanation:** The fundamental principle dictates that a system or habit must be established and standardized before it can be optimized (\"Standardize before you Optimize\").\n\n---\n\n## 14. Real-World Examples\n\n* **Launching a Content Creation Workflow:** A creator hesitating over video recording due to accent or hardware insecurities sets a rule: *\"Press record and talk for 2 minutes.\"* This initial footage breaks the paralysis barrier and leads to complete video uploads.\n* **Refactoring Legacy Codebases:** An engineer faced with a 10,000-line monolithic legacy module avoids refactoring due to complexity. Applying the rule, they open the repository and write a single unit test shell in 2 minutes, establishing momentum for full refactoring.\n* **Physical Fitness:** An individual struggling to stick to a workout routine commits to driving to the gym and walking on a treadmill for 2 minutes. Usually, once at the facility, they complete a full 45-minute training session.\n\n---\n\n## 15. Analogies\n\n### 1. Rocket Launch Dynamics\nEscape velocity requires the majority of a rocket's fuel during launch to overcome static gravitational pull. Once the spacecraft exits the atmosphere, minimal fuel is required to maintain high speeds. The 2-Minute Rule acts as the initial booster burn that breaks atmospheric inertia.\n\n```\n[ Atmospheric Friction / Inaction ] ---\u003e Rocket Burn (2 Mins) ---\u003e [ Orbit / Flow State ]\n```\n\n### 2. Siphon Effect in Hydraulics\nTo draw liquid through a siphon, you must first apply suction pressure to pull liquid up against gravity over the arch. Once liquid flows over the crest, gravity takes over and draws the rest automatically. The 2-minute effort is the initial suction pressure.\n\n---\n\n## 16. Frequently Asked Questions\n\n### What if I stop working after exactly 2 minutes?\nThat is acceptable and expected. The agreement requires only 2 minutes of effort. Celebrating that micro-win builds trust with yourself and reinforces the habit of showing up.\n\n### Isn't the 2-Minute Rule just tricking yourself into working?\nIt is a structured heuristic to bypass cognitive overthinking, but it must be executed in good faith. If you treat it as a trap to force long working hours, your brain will recognize the strategy and restore the activation barrier.\n\n### How does this apply to complex, deep cognitive tasks like system architecture?\nFor complex tasks, define the 2-minute version as an initial discovery step: draw a single architectural diagram component, write pseudocode for one function, or list three core requirements.\n\n### Can the 2-Minute Rule be combined with the Pomodoro Technique?\nYes. The 2-Minute Rule acts as the initiation trigger (breaking static friction), while the Pomodoro Technique (e.g., 25-minute focus blocks) maintains kinetic momentum.\n\n---\n\n## 17. Related Technologies\n\n* **Pomodoro Focus Timers:** Tools like *Tomighty*, *Forest*, or *Marinara Timer* to sustain momentum post-initiation.\n* **Habit Tracking Systems:** Frameworks and software like *Loop Habit Tracker*, *Habitica*, or custom Notion dashboards to track operational consistency.\n* **Task Automation Engines:** Shell scripts, Cron jobs, and GitHub Actions to minimize technical friction when initiating workflows.\n* **Behavioral Frameworks:** James Clear’s *Atomic Habits*, David Allen’s *Getting Things Done (GTD)*, and BJ Fogg’s *Tiny Habits*.\n\n---\n\n## 18. Important Quotes\n\n\u003e *\"I stopped procrastinating the second I tried this.\"*  \n\u003e *\"Sit for 2 minutes. That's it. No pressure to be perfect.\"*  \n\u003e *\"And that's literally how this video exists today.\"*  \n\u003e *\"Rewire your brain to act instantly on small tasks... small wins turn into unstoppable momentum.\"*  \n\u003e *\"A habit must be established before it can be improved.\"*\n\n---\n\n## 19. Glossary\n\n| Term | Definition |\n| :--- | :--- |\n| **Activation Energy (\u0024E_a\u0024)** | The baseline neural and mental threshold needed to start an activity. |\n| **Zeigarnik Effect** | The psychological drive to complete a task once it has been started. |\n| **Cognitive Inertia** | The tendency for a mental state or thought pattern to remain unchanged unless acted upon by an external force or trigger. |\n| **Habit Stacking** | Linking a new 2-minute micro-habit to an established daily routine. |\n| **Static Friction (\u0024\\mu_s\u0024)** | The initial resistance to motion when transitioning from rest to action. |\n| **Kinetic Friction (\u0024\\mu_k\u0024)** | The reduced ongoing friction experienced while actively maintaining motion. |\n\n---\n\n## 20. One-Page Cheat Sheet\n\n```\n========================================================================================\n                          THE 2-MINUTE RULE CHEAT SHEET\n========================================================================================\n\nCORE PRINCIPLE:\n  Lower activation energy (E_a) to zero by scaling any task down to a 120-second execution block.\n  \"Standardize before you optimize.\"\n\nOPERATIONAL STEPS:\n  1. IDENTIFY TARGET:  Pinpoint the task generating avoidance (e.g., Write Report).\n  2. DOWNSCALE TASK:   Reduce to 2-minute entry point (e.g., Write 1 sentence).\n  3. REMOVE FRICTION:  Prepare environment (Open doc, bring tools to desk).\n  4. EXECUTE SPRINT:   Run 120-second timer. Work without quality judgment.\n  5. EVALUATE STATE:   Stop guilt-free OR leverage kinetic momentum to continue.\n\nBEHAVIORAL RULES:\n  +-------------------------------------+----------------------------------------------+\n  | DO THIS                             | AVOID THIS                                   |\n  +-------------------------------------+----------------------------------------------+\n  | Focus on showing up consistently    | Demanding high output/perfection on start    |\n  | Allow guilt-free stopping at 2 min  | Using 2 min as a deceptive trap for 4h work  |\n  | Celebrate completing the 120s block | Dismissing micro-wins as insignificant       |\n  +-------------------------------------+----------------------------------------------+\n\nMETRIC TRANSITION MODEL:\n  Static Friction (Inaction)  ---\u003e  2-Min Micro-Burst  ---\u003e  Kinetic Friction (Flow)\n  [High Resistance]                 [Low Barrier]             [Low Resistance]\n========================================================================================\n```\n\n---\n\n## 21. Flash Cards\n\n- **Card 1 | Principles**\n  - **Q:** What is the primary underlying cause of procrastination targeted by the 2-Minute Rule?\n  - **A:** High activation energy caused by emotional resistance, overthinking, and perfectionism.\n\n- **Card 2 | Execution**\n  - **Q:** What is the core objective during the first 2 minutes of executing a scaled-down task?\n  - **A:** Establishing the physical habit of showing up, regardless of output quality.\n\n- **Card 3 | Physics Analogy**\n  - **Q:** Why is continuing a task easier than starting a task?\n  - **A:** Static friction (\u0024\\mu_s\u0024) is higher than kinetic friction (\u0024\\mu_k\u0024); starting requires overcoming static resistance.\n\n- **Card 4 | Methodology**\n  - **Q:** Complete the core rule of habit optimization: \"A habit must be _________ before it can be _________.\"\n  - **A:** Established; improved.\n\n- **Card 5 | Psychology**\n  - **Q:** What neurobiological response helps sustain momentum after completing a 2-minute task?\n  - **A:** Dopamine release from task completion, which reinforces continuous engagement.\n\n---\n\n## 22. Quiz\n\n### Q1: According to the content, what is the main driver behind procrastination?\n- A) Poor time management skills\n- B) Lack of technical domain knowledge\n- C) Overthinking, perfectionism, and fear of failure\n- D) Low physical energy reserves  \n**Correct Answer:** **C**  \n**Explanation:** Procrastination is primarily driven by emotional factors such as overthinking, self-doubt, and perfectionism rather than poor time management.\n\n---\n\n### Q2: What is the main objective of the 2-Minute Rule?\n- A) To complete an entire project in 120 seconds\n- B) To lower the activation energy required to initiate a task\n- C) To measure exact output metrics over short intervals\n- D) To eliminate the need for long focus blocks  \n**Correct Answer:** **B**  \n**Explanation:** The primary goal of the 2-Minute Rule is to shrink the initiation barrier, thereby lowering activation energy to near zero.\n\n---\n\n### Q3: Why did the video speaker procrastinate on starting a YouTube channel?\n- A) Lack of video editing software\n- B) Self-doubt about English proficiency and pronunciation\n- C) Shortage of recording equipment\n- D) Absence of video topic ideas  \n**Correct Answer:** **B**  \n**Explanation:** The transcript states the speaker was held back by fears that their English was not good enough and their pronunciation was imperfect.\n\n---\n\n### Q4: Which principle describes why continuing a task is easier once initiated?\n- A) Static friction is lower than kinetic friction\n- B) Kinetic friction is lower than static friction\n- C) Thermal dynamics of mental focus\n- D) Parkinson's Law of time expansion  \n**Correct Answer:** **B**  \n**Explanation:** Kinetic friction (ongoing effort) requires less energy than static friction (moving from complete rest to motion).\n\n---\n\n### Q5: What rule governs habit optimization according to behavioral psychology?\n- A) Optimize quality before expanding volume\n- B) A habit must be established before it can be improved\n- C) Speed of execution takes priority over consistency\n- D) Always aim for perfection on the first attempt  \n**Correct Answer:** **B**  \n**Explanation:** You cannot optimize a habit that does not exist; establishing the routine of showing up must happen first.\n\n---\n\n### Q6: What should you do if you reach 2 minutes of work and still feel significant resistance?\n- A) Force yourself to work for another 2 hours\n- B) Punish yourself for failing to focus\n- C) Stop working guilt-free, having successfully reinforced the practice of showing up\n- D) Change your primary goal entirely  \n**Correct Answer:** **C**  \n**Explanation:** The 2-Minute Rule requires allowing yourself to stop guilt-free, preserving trust in the system.\n\n---\n\n### Q7: What psychological phenomenon explains the drive to complete an interrupted task?\n- A) Cognitive Dissonance\n- B) The Zeigarnik Effect\n- C) Hawthorn Effect\n- D) Pareto Principle  \n**Correct Answer:** **B**  \n**Explanation:** The Zeigarnik Effect states that the human brain retains a desire to complete tasks once they have been initiated.\n\n---\n\n### Q8: Which neurochemical is released during micro-wins to reinforce execution?\n- A) Cortisol\n- B) Melatonin\n- C) Dopamine\n- D) Insulin  \n**Correct Answer:** **C**  \n**Explanation:** Completing a micro-task releases dopamine, which reinforces the behavior and helps sustain momentum.\n\n---\n\n### Q9: What is the \"Trojan Horse Trap\" in micro-habit formation?\n- A) Using automated scripts to monitor tasks\n- B) Pretending a task takes 2 minutes while secretly expecting long hours of work\n- C) Working on multiple micro-tasks at once\n- D) Using physical timers on your desk  \n**Correct Answer:** **B**  \n**Explanation:** Deceiving yourself about task duration causes the brain to maintain high activation resistance.\n\n---\n\n### Q10: How does lowering task duration to 2 minutes affect activation energy?\n- A) Increases activation energy\n- B) Exponentially reduces activation energy\n- C) Keeps activation energy constant\n- D) Replaces activation energy with cortisol  \n**Correct Answer:** **B**  \n**Explanation:** Shrinking task scale reduces cognitive threat, significantly lowering activation energy.\n\n---\n\n## 23. Action Items\n\n1. [ ] **Identify 3 Paralysis Targets:** Write down three tasks or projects you have procrastinated on over the past two weeks.\n2. [ ] **Define 2-Minute Entry Points:** Break each of the three tasks into a micro-action that takes \u0024\\le 120\u0024 seconds to start.\n3. [ ] **Prepare Environment:** Remove physical or digital roadblocks for your top priority task (e.g., open necessary software, clean workspace).\n4. [ ] **Execute a 2-Minute Sprint:** Run a timer for 120 seconds and focus on the micro-action without analyzing quality.\n5. [ ] **Assess and Record:** Document whether you continued past 2 minutes or stopped, confirming that showing up occurred in either case.\n\n---\n\n## 24. Recommended Further Reading\n\n* **Atomic Habits** by James Clear – *Comprehensive guide on habit formation mechanics and scaling micro-actions.*\n* **Getting Things Done: The Art of Stress-Free Productivity** by David Allen – *The original framework introducing the 2-Minute Rule for operational processing.*\n* **The War of Art** by Steven Pressfield – *Deep analysis of internal resistance, procrastination, and overcoming creative paralysis.*\n* **Tiny Habits: The Small Changes That Change Everything** by BJ Fogg – *Behavioral design strategies focused on micro-step habit anchoring.*"};
+
+    let documents = window.EMBEDDED_CATALOG || [];
+    let currentDoc = null;
+    let currentSections = [];
+    let flashcardsList = [];
+    let currentCardIdx = 0;
+    let isCardFlipped = false;
+    let quizList = [];
+    let userQuizAnswers = {};
+
+    function renderMarkdownContent(content) {
+      try {
+        if (typeof window.marked !== 'undefined') {
+          if (typeof window.marked.parse === 'function') {
+            return window.marked.parse(content || '');
+          } else if (typeof window.marked === 'function') {
+            return window.marked(content || '');
+          }
+        }
+      } catch (e) {
+        console.warn('Marked parse warning:', e);
+      }
+      return (content || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\n/g, '<br/>');
+    }
+
+    function loadCatalog() {
+      if (window.EMBEDDED_CATALOG && Array.isArray(window.EMBEDDED_CATALOG) && window.EMBEDDED_CATALOG.length > 0) {
+        documents = window.EMBEDDED_CATALOG;
+      }
+
+      renderDocList(documents);
+
+      // Check URL query parameters or hash routing (?doc=filename.md)
+      const urlParams = new URLSearchParams(window.location.search);
+      let targetDocFilename = urlParams.get('doc') || window.location.hash.replace('#', '');
+      if (targetDocFilename) {
+        if (targetDocFilename.startsWith('docs/')) targetDocFilename = targetDocFilename.replace('docs/', '');
+        if (targetDocFilename.endsWith('.html')) targetDocFilename = targetDocFilename.replace('.html', '.md');
+      }
+
+      if (targetDocFilename) {
+        loadDoc(targetDocFilename);
+        return;
+      }
+
+      if (window.EMBEDDED_CURRENT_DOC && window.EMBEDDED_CURRENT_DOC.content) {
+        currentDoc = {
+          filename: window.EMBEDDED_CURRENT_DOC.filename,
+          title: window.EMBEDDED_CURRENT_DOC.title,
+          date: (documents.find(d => d.filename === window.EMBEDDED_CURRENT_DOC.filename) || {}).date || ''
+        };
+        renderDocList(documents);
+        document.getElementById('doc-title-heading').innerText = currentDoc.title || 'Knowledge Document';
+        document.getElementById('doc-date-badge').innerText = currentDoc.date ? 'Published ' + currentDoc.date : '';
+        document.getElementById('doc-file-path').innerText = 'docs/' + (currentDoc.filename || 'document.md');
+        try {
+          parseAndRenderMarkdown(window.EMBEDDED_CURRENT_DOC.content);
+        } catch (rErr) {
+          console.error('Markdown parse error:', rErr);
+          document.getElementById('view-container-doc').innerHTML = '<div class="p-6 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-semibold">Could not render document: ' + (rErr.message || rErr) + '</div>';
+        }
+      } else if (documents.length > 0) {
+        loadDoc(documents[0].filename);
+      } else {
+        document.getElementById('doc-list').innerHTML = '<div class="text-xs text-amber-700 bg-amber-50 p-3 rounded border border-amber-200">No published documents found.</div>';
+        document.getElementById('view-container-doc').innerHTML = '<div class="p-8 text-center bg-white border border-gray-200 rounded-xl text-gray-500 font-serif"><i class="fas fa-book-open text-3xl mb-3 text-gray-300"></i><p class="font-bold text-gray-700">No document selected or published</p><p class="text-xs text-gray-400 mt-1">Publish a document from the app to populate this research library.</p></div>';
+      }
+
+      try {
+        const pathPrefix = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
+        fetch(pathPrefix + 'docs/data.json')
+          .then(res => res.ok ? res.json() : null)
+          .then(freshDocs => {
+            if (Array.isArray(freshDocs) && freshDocs.length > 0) {
+              documents = freshDocs;
+              renderDocList(documents);
+            }
+          })
+          .catch(e => console.warn('Background docs/data.json fetch skipped:', e));
+      } catch (err) {
+        console.warn('Network fetch skipped:', err);
+      }
+    }
+
+    function renderDocList(docs) {
+      document.getElementById('doc-count').innerText = docs.length;
+      const container = document.getElementById('doc-list');
+      if (docs.length === 0) {
+        container.innerHTML = '<div class="text-xs text-gray-400 italic p-2">No published documents found.</div>';
+        return;
+      }
+      container.innerHTML = docs.map(d => {
+        const cat = d.category || 'General';
+        const sub = d.subcategory || 'General';
+        const isSel = currentDoc && (currentDoc.filename === d.filename || currentDoc.title === d.title);
+        return '<button onclick="loadDoc(&quot;' + (d.filename || d.title) + '&quot;)" class="w-full text-left p-2.5 rounded-lg hover:bg-[#F9F9F7] transition-all border border-transparent hover:border-gray-200 block cursor-pointer group ' + (isSel ? 'bg-red-50/70 border-red-200 font-bold' : '') + '">' +
+          '<p class="font-bold text-xs text-[#111111] group-hover:text-[#D43F33] line-clamp-2 leading-snug">' + d.title + '</p>' +
+          '<div class="flex items-center gap-1 mt-1.5 flex-wrap">' +
+            '<span class="px-1.5 py-0.2 bg-gray-100 text-gray-600 rounded text-[9px] font-mono border border-gray-200">' + cat + '</span>' +
+            (sub && sub !== 'General' ? '<span class="px-1.5 py-0.2 bg-red-50 text-red-700 rounded text-[9px] font-mono border border-red-100">' + sub + '</span>' : '') +
+          '</div>' +
+          '<p class="text-[10px] text-gray-400 font-mono mt-1 flex items-center justify-between">' +
+            '<span>' + (d.date || '') + '</span>' +
+            '<i class="fas fa-chevron-right text-[9px] opacity-0 group-hover:opacity-100 transition-opacity"></i>' +
+          '</p>' +
+        '</button>';
+      }).join('');
+    }
+
+    function filterDocs() {
+      const q = (document.getElementById('search-docs').value || '').toLowerCase();
+      const filtered = documents.filter(d =>
+        (d.title || '').toLowerCase().includes(q) ||
+        (d.filename || '').toLowerCase().includes(q) ||
+        (d.category || '').toLowerCase().includes(q) ||
+        (d.subcategory || '').toLowerCase().includes(q)
+      );
+      renderDocList(filtered);
+    }
+
+    async function loadDoc(targetKey) {
+      try {
+        const doc = documents.find(d => d.filename === targetKey || d.title === targetKey || (d.path && d.path.includes(targetKey)));
+        currentDoc = doc || { filename: targetKey, title: targetKey };
+        renderDocList(documents);
+
+        document.getElementById('doc-title-heading').innerText = currentDoc.title || targetKey;
+        document.getElementById('doc-date-badge').innerText = currentDoc.date ? 'Published ' + currentDoc.date : '';
+        document.getElementById('doc-file-path').innerText = currentDoc.path || ('docs/' + (currentDoc.filename || targetKey));
+
+        let mdText = '';
+        if (window.EMBEDDED_CURRENT_DOC && (window.EMBEDDED_CURRENT_DOC.filename === targetKey || window.EMBEDDED_CURRENT_DOC.title === targetKey) && window.EMBEDDED_CURRENT_DOC.content) {
+          mdText = window.EMBEDDED_CURRENT_DOC.content;
+        } else {
+          const pathPrefix = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
+          const relPath = currentDoc.path || ('docs/' + (currentDoc.filename || targetKey));
+          const pathsToTry = [
+            pathPrefix + relPath,
+            pathPrefix + encodeURI(relPath),
+            './' + relPath,
+            './' + encodeURI(relPath),
+            pathPrefix + 'docs/' + (currentDoc.filename || targetKey),
+            './docs/' + (currentDoc.filename || targetKey),
+            'docs/' + (currentDoc.filename || targetKey)
+          ];
+          let loaded = false;
+          for (const path of pathsToTry) {
+            try {
+              const res = await fetch(path);
+              if (res.ok) {
+                mdText = await res.text();
+                loaded = true;
+                break;
+              }
+            } catch (e) {}
+          }
+          if (!loaded) throw new Error('Document markdown file (' + relPath + ') not found on server.');
+        }
+
+        parseAndRenderMarkdown(mdText);
+      } catch (err) {
+        document.getElementById('view-container-doc').innerHTML = '<div class="p-6 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-semibold">Could not load document: ' + (err.message || err) + '</div>';
+      }
+    }
+
+    function parseAndRenderMarkdown(mdText) {
+      const headingRegex = /^##\s*(\d+)[\.\s]+(.*)$/gm;
+      let matches = [];
+      let match;
+      while ((match = headingRegex.exec(mdText)) !== null) {
+        matches.push({
+          index: match.index,
+          num: parseInt(match[1], 10),
+          title: match[2].trim(),
+          fullMatch: match[0],
+        });
+      }
+
+      if (matches.length === 0) {
+        const altRegex = /^##\s+(.*)$/gm;
+        let count = 1;
+        while ((match = altRegex.exec(mdText)) !== null) {
+          matches.push({
+            index: match.index,
+            num: count++,
+            title: match[1].trim(),
+            fullMatch: match[0],
+          });
+        }
+      }
+
+      currentSections = [];
+      for (let i = 0; i < matches.length; i++) {
+        const cur = matches[i];
+        const next = matches[i + 1];
+        const startIndex = cur.index + cur.fullMatch.length;
+        const endIndex = next ? next.index : mdText.length;
+        const content = mdText.slice(startIndex, endIndex).trim();
+
+        currentSections.push({
+          num: cur.num,
+          title: cur.title,
+          content,
+        });
+      }
+
+      if (currentSections.length === 0) {
+        currentSections = [{
+          num: 1,
+          title: (currentDoc && currentDoc.title) ? currentDoc.title : 'Document Content',
+          content: mdText || ''
+        }];
+      }
+
+      renderSectionIndex(currentSections);
+      renderDocumentBody(currentSections);
+      extractFlashcardsAndQuiz(mdText);
+    }
+
+    function renderSectionIndex(sections) {
+      const container = document.getElementById('section-nav-list');
+      document.getElementById('sections-found-badge').innerText = sections.length + ' Sections';
+
+      if (sections.length === 0) {
+        container.innerHTML = '<div class="text-xs text-gray-400 italic p-2">No sections detected in document.</div>';
+        return;
+      }
+
+      container.innerHTML = sections.map(s => 
+        '<button onclick="scrollToSection(' + s.num + ')" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-[#F9F9F7] text-gray-700 hover:text-[#D43F33] transition-colors flex items-center space-x-2 cursor-pointer group">' +
+          '<span class="w-5 h-5 rounded bg-gray-100 group-hover:bg-red-50 text-gray-600 group-hover:text-[#D43F33] font-mono text-[10px] font-bold flex items-center justify-center shrink-0 border border-gray-200">' +
+            s.num +
+          '</span>' +
+          '<span class="truncate font-medium text-[11px] group-hover:font-bold">' + s.title + '</span>' +
+        '</button>'
+      ).join('');
+    }
+
+    function filterSections() {
+      const q = document.getElementById('search-sections').value.toLowerCase();
+      const filtered = currentSections.filter(s => s.title.toLowerCase().includes(q) || ('' + s.num).includes(q));
+      renderSectionIndex(filtered);
+    }
+
+    function scrollToSection(num) {
+      switchViewMode('doc');
+      const elem = document.getElementById('section-' + num);
+      if (elem) {
+        elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function renderDocumentBody(sections) {
+      const container = document.getElementById('view-container-doc');
+      if (sections.length === 0) {
+        container.innerHTML = '<div class="bg-white border p-8 rounded-xl text-center text-gray-500">Document empty or not structured in 24 sections.</div>';
+        return;
+      }
+
+      container.innerHTML = sections.map(s => 
+        '<div id="section-' + s.num + '" class="section-card bg-white border border-[#E5E7EB] rounded-xl p-6 sm:p-8 shadow-xs relative space-y-4">' +
+          '<div class="flex items-center justify-between pb-3 border-b border-gray-200">' +
+            '<div class="flex items-center space-x-2.5">' +
+              '<span class="px-2.5 py-0.5 rounded bg-[#111111] text-white font-mono font-bold text-[10px] uppercase tracking-wider">' +
+                'SECTION ' + (s.num < 10 ? '0' + s.num : s.num) +
+              '</span>' +
+              '<h2 class="text-xl sm:text-2xl font-serif font-bold text-[#111111]">' + s.title + '</h2>' +
+            '</div>' +
+            '<button onclick="window.scrollTo(0, 0)" class="text-gray-400 hover:text-[#111111] text-xs flex items-center space-x-1 cursor-pointer" title="Back to top">' +
+              '<i class="fas fa-arrow-up text-[10px]"></i>' +
+              '<span class="hidden sm:inline">Top</span>' +
+            '</button>' +
+          '</div>' +
+
+          '<div class="prose max-w-none text-[#222222]">' +
+            renderMarkdownContent(s.content) +
+          '</div>' +
+        '</div>'
+      ).join('');
+
+      document.querySelectorAll('.prose pre').forEach((pre) => {
+        if (!pre.querySelector('.copy-code-btn')) {
+          const btn = document.createElement('button');
+          btn.className = 'copy-code-btn absolute top-2 right-2 px-2 py-1 bg-gray-800 hover:bg-gray-700 text-gray-200 text-[10px] font-bold rounded cursor-pointer transition-colors';
+          btn.innerText = 'Copy';
+          btn.onclick = () => {
+            const code = pre.querySelector('code')?.innerText || pre.innerText;
+            navigator.clipboard.writeText(code);
+            btn.innerText = 'Copied!';
+            setTimeout(() => { btn.innerText = 'Copy'; }, 2000);
+          };
+          pre.style.position = 'relative';
+          pre.appendChild(btn);
+        }
+      });
+    }
+
+    function extractFlashcardsAndQuiz(mdText) {
+      flashcardsList = [];
+      const sec21Match = mdText.match(/##\s*21[\.\s]+Flash\s*Cards([\s\S]*?)(?=##\s*22|$)/i);
+      const fcContent = sec21Match ? sec21Match[1] : mdText;
+      const blocks = fcContent.split(/-\s*\*\*Card\s*\d+/i).filter(b => b.trim().length > 0);
+
+      blocks.forEach((block, idx) => {
+        const qMatch = block.match(/\*\*Q:\*\*\s*(.+)/i) || block.match(/Q:\s*(.+)/i);
+        const aMatch = block.match(/\*\*A:\*\*\s*(.+)/i) || block.match(/A:\s*(.+)/i);
+        if (qMatch && aMatch) {
+          flashcardsList.push({
+            question: qMatch[1].replace(/\*\*/g, '').trim(),
+            answer: aMatch[1].replace(/\*\*/g, '').trim(),
+            category: 'Core Knowledge'
+          });
+        }
+      });
+
+      if (flashcardsList.length === 0) {
+        flashcardsList = [
+          { question: "What is the primary objective of this knowledge research paper?", answer: "To deliver a 24-section comprehensive synthesis of the source video transcript.", category: "Overview" },
+          { question: "How can you utilize the flashcards and quiz tools?", answer: "Review sections sequentially, flip flashcards for key terms, and test recall with the interactive quiz.", category: "Study Method" }
+        ];
+      }
+      currentCardIdx = 0;
+      isCardFlipped = false;
+      renderCurrentFlashcard();
+
+      quizList = [];
+      userQuizAnswers = {};
+      const sec22Match = mdText.match(/##\s*22[\.\s]+Quiz([\s\S]*?)(?=##\s*23|$)/i);
+      const qContent = sec22Match ? sec22Match[1] : mdText;
+      const qBlocks = qContent.split(/(?=###?\s*Q\d+:?|^\d+\.\s+)/m).filter(b => b.trim().length > 0);
+
+      qBlocks.forEach((b, idx) => {
+        const bLines = b.split('\n').map(l => l.trim()).filter(Boolean);
+        if (bLines.length === 0) return;
+
+        let qText = '';
+        const opts = [];
+        let corrLetter = 'A';
+        let expText = '';
+
+        bLines.forEach(line => {
+          const optMatch = line.match(/^[-*]\s*([A-D]\))\s*(.+)/i);
+          const corrMatch = line.match(/(?:\*\*Correct Answer:\*\*|Correct:)\s*([A-D])/i);
+          const expMatch = line.match(/(?:\*\*Explanation:\*\*|Explanation:)\s*(.+)/i);
+
+          if (optMatch) {
+            opts.push(optMatch[1].toUpperCase() + ' ' + optMatch[2].trim());
+          } else if (corrMatch) {
+            corrLetter = corrMatch[1].toUpperCase();
+          } else if (expMatch) {
+            expText = expMatch[1].trim();
+          } else if (!line.startsWith('###') && !line.startsWith('**') && opts.length === 0) {
+            const clean = line.replace(/^###?\s*Q\d+:?\s*/i, '').replace(/^\d+\.\s*/, '').trim();
+            if (clean) qText += (qText ? ' ' : '') + clean;
+          }
+        });
+
+        if (qText && opts.length >= 2) {
+          let cIdx = ['A', 'B', 'C', 'D'].indexOf(corrLetter);
+          if (cIdx === -1) cIdx = 0;
+          quizList.push({
+            id: idx,
+            question: qText,
+            options: opts,
+            correctIndex: cIdx,
+            explanation: expText || 'Refer to the detailed explanation sections above.'
+          });
+        }
+      });
+
+      renderQuizList();
+    }
+
+    function renderCurrentFlashcard() {
+      if (flashcardsList.length === 0) return;
+      const card = flashcardsList[currentCardIdx];
+      document.getElementById('fc-category').innerText = card.category;
+      document.getElementById('fc-question-text').innerText = isCardFlipped ? card.answer : card.question;
+      document.getElementById('fc-hint').innerText = isCardFlipped ? '(Click to reveal question)' : '(Click to flip answer)';
+      document.getElementById('fc-counter').innerText = 'Card ' + (currentCardIdx + 1) + ' / ' + flashcardsList.length;
+    }
+
+    function flipCard() {
+      isCardFlipped = !isCardFlipped;
+      renderCurrentFlashcard();
+    }
+
+    function prevCard() {
+      isCardFlipped = false;
+      currentCardIdx = (currentCardIdx - 1 + flashcardsList.length) % flashcardsList.length;
+      renderCurrentFlashcard();
+    }
+
+    function nextCard() {
+      isCardFlipped = false;
+      currentCardIdx = (currentCardIdx + 1) % flashcardsList.length;
+      renderCurrentFlashcard();
+    }
+
+    function renderQuizList() {
+      const container = document.getElementById('quiz-questions-list');
+      if (quizList.length === 0) {
+        container.innerHTML = '<div class="text-xs text-gray-500 italic">No structured multiple-choice quiz questions parsed from Section 22.</div>';
+        return;
+      }
+
+      container.innerHTML = quizList.map((q, qIdx) => 
+        '<div class="p-6 rounded-xl bg-[#F9F9F7] border border-[#E5E7EB] space-y-3">' +
+          '<p class="font-bold text-sm text-[#111111] font-serif">' +
+            '<span class="text-[#D43F33] font-mono mr-1.5">Q' + (qIdx + 1) + '.</span> ' + q.question +
+          '</p>' +
+
+          '<div class="space-y-2 pt-1">' +
+            q.options.map((opt, oIdx) => {
+              const isSelected = userQuizAnswers[qIdx] === oIdx;
+              const isSubmitted = userQuizAnswers[qIdx] !== undefined;
+              const isCorrect = oIdx === q.correctIndex;
+
+              let btnStyle = 'bg-white border-gray-200 text-gray-800 hover:border-[#111111]';
+              if (isSubmitted) {
+                if (isCorrect) btnStyle = 'bg-emerald-50 border-emerald-500 text-emerald-900 font-bold';
+                else if (isSelected) btnStyle = 'bg-rose-50 border-rose-400 text-rose-900 font-bold';
+                else btnStyle = 'bg-white border-gray-200 text-gray-400 opacity-60';
+              }
+
+              return '<button onclick="selectQuizOption(' + qIdx + ', ' + oIdx + ')" class="w-full text-left p-3 rounded-lg border text-xs transition-all flex items-center justify-between cursor-pointer ' + btnStyle + '">' +
+                '<span>' + opt + '</span>' +
+                (isSubmitted && isCorrect ? '<i class="fas fa-check-circle text-emerald-600"></i>' : '') +
+                (isSubmitted && isSelected && !isCorrect ? '<i class="fas fa-times-circle text-rose-500"></i>' : '') +
+              '</button>';
+            }).join('') +
+          '</div>' +
+
+          (userQuizAnswers[qIdx] !== undefined ? 
+            '<div class="p-3 rounded bg-white border border-gray-200 text-xs text-gray-700 font-mono mt-2">' +
+              '<strong class="text-[#111111]">Explanation:</strong> ' + q.explanation +
+            '</div>'
+          : '') +
+        '</div>'
+      ).join('');
+
+      let correctCount = 0;
+      let answeredCount = 0;
+      Object.keys(userQuizAnswers).forEach((qIdxStr) => {
+        answeredCount++;
+        const qIdx = parseInt(qIdxStr, 10);
+        if (userQuizAnswers[qIdx] === quizList[qIdx].correctIndex) {
+          correctCount++;
+        }
+      });
+
+      document.getElementById('quiz-score-badge').innerText = 'Score: ' + correctCount + ' / ' + quizList.length + ' (' + answeredCount + ' answered)';
+    }
+
+    function selectQuizOption(qIdx, oIdx) {
+      userQuizAnswers[qIdx] = oIdx;
+      renderQuizList();
+    }
+
+    // Audio Speech Reader State & Logic
+    let currentUtterance = null;
+    let isAudioPlaying = false;
+    let isAudioPaused = false;
+
+    function toggleAudioReader() {
+      if (!('speechSynthesis' in window)) {
+        alert('Text-to-speech audio reader is not supported in this browser.');
+        return;
+      }
+      if (isAudioPlaying) {
+        stopAudioReader();
+      } else {
+        startAudioReader();
+      }
+    }
+
+    function startAudioReader() {
+      if (!currentSections || currentSections.length === 0) {
+        alert('No document sections loaded to read.');
+        return;
+      }
+      window.speechSynthesis.cancel();
+      
+      const fullText = currentSections.map(s => 'Section ' + s.num + ': ' + s.title + '. ' + s.content.replace(/[*#_]/g, '')).join(' ');
+      currentUtterance = new SpeechSynthesisUtterance(fullText.slice(0, 4500));
+      currentUtterance.rate = 1.0;
+      currentUtterance.pitch = 1.0;
+
+      currentUtterance.onstart = () => {
+        isAudioPlaying = true;
+        isAudioPaused = false;
+        document.getElementById('audio-bar').classList.remove('hidden');
+        document.getElementById('header-audio-icon').className = 'fas fa-volume-up text-amber-400 animate-pulse';
+        updateAudioBarState('Reading document aloud...');
+      };
+
+      currentUtterance.onend = () => {
+        stopAudioReader();
+      };
+
+      currentUtterance.onerror = () => {
+        stopAudioReader();
+      };
+
+      window.speechSynthesis.speak(currentUtterance);
+    }
+
+    function toggleAudioPause() {
+      if (!('speechSynthesis' in window) || !isAudioPlaying) return;
+      if (isAudioPaused) {
+        window.speechSynthesis.resume();
+        isAudioPaused = false;
+        updateAudioBarState('Reading document aloud...');
+      } else {
+        window.speechSynthesis.pause();
+        isAudioPaused = true;
+        updateAudioBarState('Paused');
+      }
+    }
+
+    function stopAudioReader() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      isAudioPlaying = false;
+      isAudioPaused = false;
+      document.getElementById('audio-bar').classList.add('hidden');
+      document.getElementById('header-audio-icon').className = 'fas fa-volume-up';
+    }
+
+    function updateAudioBarState(statusText) {
+      document.getElementById('audio-status-text').innerText = statusText;
+      document.getElementById('audio-play-icon').className = isAudioPaused ? 'fas fa-play' : 'fas fa-pause';
+      document.getElementById('audio-pause-label').innerText = isAudioPaused ? 'Resume' : 'Pause';
+    }
+
+    function setQaQuestion(q) {
+      document.getElementById('qa-input-field').value = q;
+      submitQaQuestion();
+    }
+
+    function submitQaQuestion() {
+      const field = document.getElementById('qa-input-field');
+      const query = field ? field.value.trim() : '';
+      if (!query) return;
+
+      const terms = query.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(t => t.length > 2);
+      
+      const scored = currentSections.map(sec => {
+        const titleText = sec.title.toLowerCase();
+        const contentText = sec.content.toLowerCase();
+        let score = 0;
+        terms.forEach(term => {
+          if (titleText.includes(term)) score += 5;
+          const matches = contentText.split(term).length - 1;
+          score += matches;
+        });
+        return { section: sec, score };
+      }).filter(s => s.score > 0).sort((a, b) => b.score - a.score);
+
+      const container = document.getElementById('qa-results-container');
+      if (scored.length === 0) {
+        container.innerHTML = '<div class="p-6 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs space-y-1"><strong class="text-amber-950 font-bold">No direct section matches found for "' + query + '"</strong><p class="text-amber-800">Try rephrasing your search or browse the 24-section index on the left sidebar.</p></div>';
+        return;
+      }
+
+      const topMatches = scored.slice(0, 3);
+      container.innerHTML = '<div class="space-y-4">' +
+        '<div class="p-5 bg-red-50/80 border border-red-200 rounded-xl space-y-2">' +
+          '<div class="flex items-center space-x-2 text-[#D43F33] font-bold text-xs uppercase tracking-wider"><i class="fas fa-sparkles"></i><span>Synthesized Response Across Document</span></div>' +
+          '<p class="text-xs text-gray-800 leading-relaxed font-sans">Based on section analysis for query <strong>"' + query + '"</strong>:</p>' +
+          '<blockquote class="text-xs text-gray-800 italic border-l-2 border-[#D43F33] pl-3 py-1 font-serif bg-white/70 rounded-r">"' + topMatches[0].section.content.slice(0, 320).replace(/[*#_]/g, '') + '..."</blockquote>' +
+        '</div>' +
+        '<div class="space-y-3">' +
+          '<h4 class="font-bold text-xs text-[#111111] uppercase tracking-wider">Matching Citations & Sections (' + topMatches.length + ')</h4>' +
+          topMatches.map(m => '<div class="p-4 bg-[#F9F9F7] border border-gray-200 rounded-lg space-y-2">' +
+            '<div class="flex items-center justify-between">' +
+              '<span class="text-xs font-bold font-serif text-[#111111] flex items-center space-x-2">' +
+                '<span class="px-2 py-0.5 rounded bg-[#111111] text-white font-mono text-[10px]">Sec ' + m.section.num + '</span>' +
+                '<span>' + m.section.title + '</span>' +
+              '</span>' +
+              '<button onclick="scrollToSection(' + m.section.num + ')" class="text-[11px] font-bold text-[#D43F33] hover:underline flex items-center space-x-1 cursor-pointer"><span>Jump to Section</span><i class="fas fa-arrow-right text-[9px]"></i></button>' +
+            '</div>' +
+            '<p class="text-xs text-gray-600 line-clamp-3 leading-relaxed">' + m.section.content.slice(0, 280).replace(/[*#_]/g, '') + '...</p>' +
+          '</div>').join('') +
+        '</div>' +
+      '</div>';
+    }
+
+    function switchViewMode(mode) {
+      document.getElementById('view-container-doc').classList.add('hidden');
+      document.getElementById('view-container-flashcards').classList.add('hidden');
+      document.getElementById('view-container-quiz').classList.add('hidden');
+      const qaContainer = document.getElementById('view-container-qa');
+      if (qaContainer) qaContainer.classList.add('hidden');
+
+      document.getElementById('tab-doc').className = 'px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]';
+      document.getElementById('tab-flashcards').className = 'px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]';
+      document.getElementById('tab-quiz').className = 'px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]';
+      const qaTab = document.getElementById('tab-qa');
+      if (qaTab) qaTab.className = 'px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer text-gray-600 hover:text-[#111111]';
+
+      const activeBtnClass = 'px-3.5 py-1.5 rounded font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 transition-colors cursor-pointer bg-[#111111] text-white shadow-xs';
+
+      if (mode === 'doc') {
+        document.getElementById('view-container-doc').classList.remove('hidden');
+        document.getElementById('tab-doc').className = activeBtnClass;
+      } else if (mode === 'flashcards') {
+        document.getElementById('view-container-flashcards').classList.remove('hidden');
+        document.getElementById('tab-flashcards').className = activeBtnClass;
+      } else if (mode === 'quiz') {
+        document.getElementById('view-container-quiz').classList.remove('hidden');
+        document.getElementById('tab-quiz').className = activeBtnClass;
+      } else if (mode === 'qa') {
+        if (qaContainer) qaContainer.classList.remove('hidden');
+        if (qaTab) qaTab.className = activeBtnClass;
+      }
+    }
+
+    function changeFontSize(size) {
+      const container = document.getElementById('view-container-doc');
+      if (size === 'sm') container.style.fontSize = '0.875rem';
+      else if (size === 'base') container.style.fontSize = '1rem';
+      else if (size === 'lg') container.style.fontSize = '1.125rem';
+    }
+
+    function copyFullMarkdown() {
+      if (!currentSections || currentSections.length === 0) return;
+      const text = currentSections.map(s => '## ' + s.num + '. ' + s.title + '\\n\\n' + s.content).join('\\n\\n');
+      navigator.clipboard.writeText(text);
+      alert('Full document markdown copied to clipboard!');
+    }
+
+    function initApp() {
+      try {
+        loadCatalog();
+      } catch (err) {
+        console.error('App load error:', err);
+        const container = document.getElementById('view-container-doc');
+        if (container) {
+          container.innerHTML = '<div class="p-6 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-semibold">Error loading document: ' + (err.message || err) + '</div>';
+        }
+      }
+    }
+
+    try {
+      initApp();
+    } catch (e) {
+      console.error('Direct init error:', e);
+    }
+    if (document.readyState !== 'complete' && document.readyState !== 'interactive') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    }
+  </script>
+</body>
+</html>
