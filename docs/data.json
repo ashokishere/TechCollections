@@ -1,122 +1,18 @@
 [
   {
-    "title": "LLM Settings That Every AI Developer Must Know",
-    "filename": "2026-08-01-llm-settings-that-every-ai-developer-must-know.md",
-    "date": "2026-08-01"
+    "title": "I Stopped Procrastinating the Second I Tried This",
+    "filename": "2026-08-02-i-stopped-procrastinating-the-second-i-tried-this.md",
+    "path": "docs/Deeplearning AI/General/2026-08-02-i-stopped-procrastinating-the-second-i-tried-this.md",
+    "category": "Deeplearning AI",
+    "subcategory": "General",
+    "date": "2026-08-02"
   },
   {
-    "title": "Docker AI, what’s new with MCP, Agents, Sandboxes, and more",
-    "filename": "2026-07-31-docker-ai-what-s-new-with-mcp-agents-sandboxes-and-more.md",
-    "date": "2026-07-31"
-  },
-  {
-    "title": "Networking Concepts Every DevOps Engineer Must Know",
-    "filename": "2026-07-31-networking-concepts-every-devops-engineer-must-know.md",
-    "date": "2026-07-31"
-  },
-  {
-    "title": "Helm vs Kustomize - The Fight Between Templating and Patching in Kubernetes",
-    "filename": "2026-07-30-helm-vs-kustomize-the-fight-between-templating-and-patching-in-kubernetes.md",
-    "date": "2026-07-30"
-  },
-  {
-    "title": "Kustomize explained in 60 minutes with detailed GitHub notes | Demo Included",
-    "filename": "2026-07-30-kustomize-explained-in-60-minutes-with-detailed-github-notes-demo-included.md",
-    "date": "2026-07-30"
-  },
-  {
-    "title": "OpenTelemetry in Kubernetes explained!",
-    "filename": "2026-07-30-opentelemetry-in-kubernetes-explained.md",
-    "date": "2026-07-30"
-  },
-  {
-    "title": "Docker AI, what’s new with MCP, Agents, Sandboxes, and more",
-    "filename": "2026-07-30-docker-ai-what-s-new-with-mcp-agents-sandboxes-and-more.md",
-    "date": "2026-07-30"
-  },
-  {
-    "title": "11: Generative AI – Text-to-Image Models",
-    "filename": "2026-07-30-11-generative-ai-text-to-image-models.md",
-    "date": "2026-07-30"
-  },
-  {
-    "title": "10: Generative AI – Adapting LLMs with Parameter-Efficient Fine-Tuning",
-    "filename": "2026-07-30-10-generative-ai-adapting-llms-with-parameter-efficient-fine-tuning.md",
-    "date": "2026-07-30"
-  },
-  {
-    "title": "9: Generative AI – Large Language Models (LLMs) and Retrieval Augmented Generation (RAG)",
-    "filename": "2026-07-29-9-generative-ai-large-language-models-llms-and-retrieval-augmented-generation-rag.md",
-    "date": "2026-07-29"
-  },
-  {
-    "title": "8: Deep Learning for Natural Language – Transformers, Self-Supervised Learning",
-    "filename": "2026-07-29-8-deep-learning-for-natural-language-transformers-self-supervised-learning.md",
-    "date": "2026-07-29"
-  },
-  {
-    "title": "7: Deep Learning for Natural Language – Transformers",
-    "filename": "2026-07-29-7-deep-learning-for-natural-language-transformers.md",
-    "date": "2026-07-29"
-  },
-  {
-    "title": "6: Deep Learning for Natural Language – Embeddings",
-    "filename": "2026-07-29-6-deep-learning-for-natural-language-embeddings.md",
-    "date": "2026-07-29"
-  },
-  {
-    "title": "5: Deep Learning for Natural Language – The Basics",
-    "filename": "2026-07-29-5-deep-learning-for-natural-language-the-basics.md",
-    "date": "2026-07-29"
-  },
-  {
-    "title": "4: Deep Learning for Computer Vision – Transfer Learning and Fine-Tuning; Intro to HuggingFace",
-    "filename": "2026-07-29-4-deep-learning-for-computer-vision-transfer-learning-and-fine-tuning-intro-to-huggingface.md",
-    "date": "2026-07-29"
-  },
-  {
-    "title": "3: Deep Learning for Computer Vision – Building Convolutional Neural Networks from Scratch",
-    "filename": "2026-07-29-3-deep-learning-for-computer-vision-building-convolutional-neural-networks-from-scratch.md",
-    "date": "2026-07-29"
-  },
-  {
-    "title": "2: Training Deep NNs (cont.); Introduction to Keras/Tensorflow; Application to Tabular Data",
-    "filename": "2026-07-29-2-training-deep-nns-cont-introduction-to-keras-tensorflow-application-to-tabular-data.md",
-    "date": "2026-07-29"
-  },
-  {
-    "title": "Most Common Kubernetes Deployment Strategies (Examples & Code)",
-    "filename": "2026-07-29-most-common-kubernetes-deployment-strategies-examples-code.md",
-    "date": "2026-07-29"
-  },
-  {
-    "title": "LLM Compression Explained: Build Faster, Efficient AI Models",
-    "filename": "2026-07-28-llm-compression-explained-build-faster-efficient-ai-models.md",
-    "date": "2026-07-28"
-  },
-  {
-    "title": "Llama.cpp vs vLLM: Which Local LLM Engine Actually Scales?",
-    "filename": "2026-07-28-llama-cpp-vs-vllm-which-local-llm-engine-actually-scales.md",
-    "date": "2026-07-28"
-  },
-  {
-    "title": "1: Introduction to Neural Networks and Deep Learning; Training Deep NNs",
-    "filename": "2026-07-28-1-introduction-to-neural-networks-and-deep-learning-training-deep-nns.md",
-    "date": "2026-07-28"
-  },
-  {
-    "title": "How I use LLMs",
-    "filename": "2026-07-28-how-i-use-llms.md",
-    "date": "2026-07-28"
-  },
-  {
-    "title": "Why RAG Solutions Fail with Complex Documents & Vector Databases",
-    "filename": "2026-07-28-why-rag-solutions-fail-with-complex-documents-vector-databases.md",
-    "date": "2026-07-28"
-  },
-  {
-    "title": "Is RAG Still Needed? Choosing the Best Approach for LLMs",
-    "filename": "2026-07-28-is-rag-still-needed-choosing-the-best-approach-for-llms.md",
-    "date": "2026-07-28"
+    "title": "Master Structured Knowledge Document",
+    "filename": "2026-08-02_i-stopped-procrastinating-the-second-i-tried-this.md",
+    "path": "docs/Deeplearning AI/General/2026-08-02_i-stopped-procrastinating-the-second-i-tried-this.md",
+    "category": "Deeplearning AI",
+    "subcategory": "General",
+    "date": "2026-08-02"
   }
 ]
