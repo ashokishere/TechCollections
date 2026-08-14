@@ -6,6 +6,8 @@ This repository contains published 24-section Knowledge Documents generated from
 
 ## 📚 Published Documents
 
+- [1. Executive Summary](./docs/2026-08-14-1-executive-summary.md) *(2026-08-14)*
+- [1. Executive Summary](./docs/2026-08-14_youtube-knowledge-document.md) *(2026-08-14)*
 - [Master Knowledge Document: The Entire AI Data Center Explained — From Electricity to ChatGPT](./docs/2026-08-03-master-knowledge-document-the-entire-ai-data-center-explained-from-electricity-to-chatgpt.md) *(2026-08-03)*
 - [Master Knowledge Document: The Entire AI Data Center Explained — From Electricity to ChatGPT](./docs/2026-08-03_the-entire-ai-data-center-explained-from-electricity-to-chatgpt.md) *(2026-08-03)*
 - [Deep Dive into LLMs like ChatGPT: Master Technical Reference Document](./docs/2026-08-03_deep-dive-into-llms-like-chatgpt.md) *(2026-08-03)*
