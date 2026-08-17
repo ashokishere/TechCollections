@@ -6,6 +6,8 @@ This repository contains published 24-section Knowledge Documents generated from
 
 ## 📚 Published Documents
 
+- [1. Executive Summary](./docs/Deeplearning AI/General/2026-08-17_youtube-knowledge-document.md) *(2026-08-17)*
+- [Master Knowledge Document: System Building, Operational Execution, and Entrepreneurial Architecture](./docs/Deeplearning AI/System Design/2026-08-17_forget-experience-this-is-how-you-actually-build-systems.md) *(2026-08-17)*
 - [Master Knowledge Document: How Transformer Large Language Models (LLMs) Work](./docs/Deeplearning AI/System Design/2026-08-15_youtube-knowledge-document.md) *(2026-08-15)*
 - [Master Knowledge Document: Comparing Major CI/CD Strategies](./docs/Nana YouTube Tutorials/General/2026-08-14_i-compared-every-major-ci-cd-strategy-so-you-don-t-have-to.md) *(2026-08-14)*
 - [1. Executive Summary](./docs/Deeplearning AI/Deep Learning/2026-08-14_andrej-karpathy-tesla-ai-self-driving-optimus-aliens-and-agi-lex-fridman-podcast-333.md) *(2026-08-14)*
