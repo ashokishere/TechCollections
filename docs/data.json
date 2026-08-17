@@ -1,5 +1,21 @@
 [
   {
+    "title": "1. Executive Summary",
+    "filename": "2026-08-17_youtube-knowledge-document.md",
+    "path": "docs/Deeplearning AI/General/2026-08-17_youtube-knowledge-document.md",
+    "category": "Deeplearning AI",
+    "subcategory": "General",
+    "date": "2026-08-17"
+  },
+  {
+    "title": "Master Knowledge Document: System Building, Operational Execution, and Entrepreneurial Architecture",
+    "filename": "2026-08-17_forget-experience-this-is-how-you-actually-build-systems.md",
+    "path": "docs/Deeplearning AI/System Design/2026-08-17_forget-experience-this-is-how-you-actually-build-systems.md",
+    "category": "Deeplearning AI",
+    "subcategory": "System Design",
+    "date": "2026-08-17"
+  },
+  {
     "title": "Master Knowledge Document: How Transformer Large Language Models (LLMs) Work",
     "filename": "2026-08-15_youtube-knowledge-document.md",
     "path": "docs/Deeplearning AI/System Design/2026-08-15_youtube-knowledge-document.md",
