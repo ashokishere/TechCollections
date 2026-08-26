@@ -6,6 +6,7 @@ This repository contains published 24-section Knowledge Documents generated from
 
 ## 📚 Published Documents
 
+- [DeepLearning.AI: ChatGPT Prompt Engineering for Developers — Master Knowledge Document](./docs/Deeplearning AI/General/2026-08-26_deeplearning-ai-chatgpt-prompt-engineering-for-developers.md) *(2026-08-26)*
 - [Master Knowledge Document: Fast & Efficient LLM Inference with vLLM](./docs/Deeplearning AI/General/2026-08-26_deeplearning-ai-fast-efficient-llm-inference-with-vllm.md) *(2026-08-26)*
 - [Deeplearning/How Transformer LLMs Work: Master Knowledge Document](./docs/Deeplearning AI/System Design/2026-08-26_deeplearning-how-transformer-llms-work.md) *(2026-08-26)*
 - [1. Executive Summary](./docs/Deeplearning AI/General/2026-08-17_youtube-knowledge-document.md) *(2026-08-17)*
